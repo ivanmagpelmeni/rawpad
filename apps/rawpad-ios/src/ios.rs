@@ -7,7 +7,7 @@
 
 use std::num::NonZeroU32;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use std::time::{Duration, Instant};
 
 use egui::ViewportId;
@@ -23,6 +23,11 @@ use winit::window::{Window, WindowId};
 #[allow(dead_code)]
 mod control_server;
 
+// The desktop app's logger, used as is: standard error plus a rotated log file (see `logs_dir`).
+#[path = "../../lightcraft/src/logging.rs"]
+#[allow(dead_code)]
+mod logging;
+
 /// Wakes the event loop from other threads (finished renders, control requests).
 #[derive(Debug, Clone, Copy)]
 enum UserEvent {
@@ -30,7 +35,7 @@ enum UserEvent {
 }
 
 pub fn run() {
-    log::set_logger(&LOGGER).map(|()| log::set_max_level(log::LevelFilter::Info)).ok();
+    install_logger();
     log::info!("RawPad {} starting", env!("CARGO_PKG_VERSION"));
     let event_loop = match EventLoop::<UserEvent>::with_user_event().build() {
         Ok(l) => l,
@@ -336,18 +341,30 @@ impl ApplicationHandler<UserEvent> for Host {
     }
 }
 
-/// Log lines go to stderr (the simulator's console in CI, Console.app on a Mac).
-struct StderrLogger;
-static LOGGER: StderrLogger = StderrLogger;
+/// `<app container>/Documents/Logs`: shown in Files › On My iPad › RawPad › Logs, so a log can be
+/// shared after a crash. Each launch moves the previous log to `lightcraft.1.log` (then `.2`).
+fn logs_dir() -> Option<PathBuf> {
+    let home = std::env::var_os("HOME").filter(|h| !h.is_empty())?;
+    Some(PathBuf::from(home).join("Documents").join("Logs"))
+}
 
-impl log::Log for StderrLogger {
-    fn enabled(&self, m: &log::Metadata<'_>) -> bool {
-        m.level() <= log::Level::Info
+/// Log lines go to stderr (the simulator's console in CI, Console.app on a Mac) and to the log
+/// file in [`logs_dir`]; panics that escape are added to the file too.
+fn install_logger() {
+    static LOGGER: OnceLock<logging::AppLogger> = OnceLock::new();
+    let filter = logging::Filter::parse("warn,lightcraft*=info,rawpad*=info");
+    let max = filter.max();
+    let logger = LOGGER.get_or_init(|| logging::AppLogger::new(filter, true));
+    if log::set_logger(logger).is_err() {
+        return;
     }
-    fn log(&self, r: &log::Record<'_>) {
-        if self.enabled(r.metadata()) {
-            eprintln!("[rawpad {} {}] {}", r.level(), r.target(), r.args());
-        }
+    log::set_max_level(max);
+    logging::record_panics(logger);
+    match logs_dir() {
+        Some(dir) => match logger.attach_dir(&dir) {
+            Ok(path) => log::info!("log file {}", path.display()),
+            Err(e) => log::warn!("no log file, standard error only: {e}"),
+        },
+        None => logger.no_file(),
     }
-    fn flush(&self) {}
 }

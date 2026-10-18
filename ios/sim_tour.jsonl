@@ -19,4 +19,6 @@
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}
 {"checkFiles":"Documents/Exports","min":1}
+# the log file (Files ▸ On My iPad ▸ RawPad ▸ Logs)
+{"checkFiles":"Documents/Logs","min":1}
 {"method":"ui.inspect"}
