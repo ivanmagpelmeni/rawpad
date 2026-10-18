@@ -9,6 +9,9 @@
 
 #[cfg(target_os = "ios")]
 mod ios;
+// ⌘ shortcuts from a hardware keyboard: plain egui, tested on the CI's macOS host too
+#[cfg(any(target_os = "ios", test))]
+mod keys;
 #[cfg(target_os = "ios")]
 mod native;
 #[cfg(target_os = "ios")]

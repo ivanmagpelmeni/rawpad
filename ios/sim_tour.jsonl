@@ -58,6 +58,10 @@
 {"method":"ui.clickWidget","params":{"id":"button:rawpadShareExport"},"expectOk":true}
 {"sleep":4}
 {"shot":"06-share-sheet"}
+# hardware-keyboard probe: do keys reach the app through winit? (app-stderr.log "keyboard:" lines)
+{"hostKeys":"p"}
+{"hostKeys":"z","cmd":true}
+{"sleep":2}
 # the log file (Files ▸ On My iPad ▸ RawPad ▸ Logs)
 {"checkFiles":"Documents/Logs","min":1}
 # Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome).

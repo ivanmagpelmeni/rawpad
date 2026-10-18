@@ -15,17 +15,18 @@ end. The next session reads it **first**.
     marked from winit's altitude angle in `ios.rs::window_event`; `touch.rs` doesn't hold their
     press (DECISIONS.md 39). The tour paints a brush mask; `runs/28/03-brush.jpg` shows Mask 2,
     the brush panel and exposure −1. Run 28's Photos step saved in 6 s (`permission status 3`).
-  - **Keyboard** (`p4-keys`, NOT merged): `src/keys.rs` makes ⌘ egui's command; first six key
+  - **Keyboard** (`p4-keys`, run 30 tour green, **merged into main at 01:38** with a hand-resolved
+    conflict in `ios.rs::window_event`: one `match` with the Pencil, modifiers and key arms; this
+    push cancels main run 31, so the next main run is the first CI of Pencil + keys together): `src/keys.rs` makes ⌘ egui's command; first six key
     presses and modifier changes logged as `keyboard:`; tour step `hostKeys` types `p` and ⌘Z
     into Simulator.app with osascript (never fails). Run 29 didn't compile (egui 0.36 has no
     `RawInput.modifiers`), fixed in `66e5081`; run 30
     (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39176043435) was running at handoff.
 - **Very next step:**
-  1. Check the main run started by the merge push (`159b616`, about run 31): green and released?
-     If red, fix or revert the merge.
-  2. Check run 30 (`p4-keys`): green? In `runs/30/tour.log` the `hostKeys` lines (ok or WARN:
-     the CI Mac may refuse System Events), and in `runs/30/app-stderr.log` any `keyboard:` lines.
-     Green → merge `p4-keys` into main (DECISIONS.md 40 already describes it).
+  1. Check the main run started by the `p4-keys` merge push (about run 32): green and released
+     (Pencil + keys)? If red, fix it, or revert the `p4-keys` merge commit first.
+  2. In `runs/30/tour.log` (or the main run's) the `hostKeys` lines (ok or WARN: the CI Mac may
+     refuse System Events), and in `app-stderr.log` any `keyboard:` lines.
   3. No `keyboard:` lines although `hostKeys` said ok → winit 0.30 on iOS probably doesn't pass
      hardware keys on: plan UIKit `pressesBegan:` handling in `native.rs`.
 - **Open problems:**

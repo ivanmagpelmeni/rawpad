@@ -6,7 +6,7 @@
 1. Main was **red** (run 26: the simulator's Photos never answered). Fixed the CI tour (Photos step only warns, Share check no longer needs Photos); main run 27 green, released **1.27** (pinch/pan, top gap, translated Share label).
 2. **Apple Pencil:** a resting Pencil tip now starts a brush stroke at once instead of opening the long-press menu. Branch run 28 green; merged into main (the next main run should release it, about 1.31).
 3. CI tour now paints a **brush mask** (screenshot `03-brush` shows "Mask 2", the brush panel, exposure −1).
-4. **Hardware keyboard:** ⌘ becomes the shortcut key as on the Mac, plus a CI keyboard probe; on branch `p4-keys` (first try didn't compile, fixed; run 30 was running at handoff).
+4. **Hardware keyboard:** ⌘ becomes the shortcut key as on the Mac, plus a CI keyboard probe; branch run 30's tour green, merged into main at the end (its main run is the first CI of both together).
 5. Upstream not checked (not the first run of the night).
 
 **2026-10-19 (nightly 6, 23:55–00:40 Berlin, unattended)**
@@ -96,15 +96,16 @@
 
 Main is green: run 27 released **1.27**. Main now also has the merged `p4-pencil` (Pencil
 bypasses the long-press; brush stroke in the tour); the main run started by that push should
-release it (about 1.31). Branch `p4-keys` (⌘ = command, keyboard probe) is not merged yet. CI
+release it (about 1.31). `p4-keys` (⌘ = command, keyboard probe; run 30 tour green) was merged last, so the main run after
+that push releases both. CI
 checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush masks,
 pinch/pan, background export, Share button and sheet, Add to Apple Photos as a soft check), the
 export file and the log file.
 
 ## Next 3 tasks
 
-1. Check `p4-keys`' branch run (30 or later): green? `app-stderr.log` has `keyboard:` lines from
-   the osascript probe? If green, merge into main.
+1. Check the main run after the `p4-keys` merge: green and released? `app-stderr.log` has
+   `keyboard:` lines from the osascript probe?
 2. If keys don't reach the app (no `keyboard:` lines), add UIKit key handling (`pressesBegan` /
    `UIKeyCommand`) in `native.rs`; check how winit 0.30's iOS view handles presses first.
 3. Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try
