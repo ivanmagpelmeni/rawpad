@@ -52,6 +52,8 @@ pub fn run() {
         app: None,
         next_repaint: None,
         long_press: Default::default(),
+        logo_key: false,
+        keys_logged: 0,
         logged_insets: None,
         prefs: None,
         share_offer: Default::default(),
@@ -74,6 +76,10 @@ struct Host {
     app: Option<LightcraftApp>,
     next_repaint: Option<Instant>,
     long_press: crate::touch::LongPress,
+    /// ⌘ held on a hardware keyboard (winit's logo key), for `keys::apply`.
+    logo_key: bool,
+    /// Key presses logged so far (only the first few, so typed text doesn't fill the log).
+    keys_logged: u8,
     logged_insets: Option<crate::native::EdgeInsets>,
     prefs: Option<crate::prefs::Writer>,
     /// The Share button for the files of the last export.
@@ -230,6 +236,8 @@ impl Host {
         // long-press → secondary click (context menus); before the hook, so control-channel
         // pointer events (CI) are never held back
         let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
+        // ⌘ is `command` on the iPad as on the Mac (egui-winit maps it to Ctrl off macOS)
+        crate::keys::apply(&mut raw.events, &mut raw.modifiers, self.logo_key);
         app.raw_input_hook(&mut raw);
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
@@ -327,6 +335,18 @@ impl ApplicationHandler<UserEvent> for Host {
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
+        match &event {
+            WindowEvent::ModifiersChanged(m) => {
+                self.logo_key = m.state().super_key();
+                log::info!("keyboard: modifiers {:?}", m.state());
+            }
+            // logged so a device log shows whether a hardware keyboard reaches the app at all
+            WindowEvent::KeyboardInput { event: k, .. } if self.keys_logged < 6 => {
+                self.keys_logged = self.keys_logged.saturating_add(1);
+                log::info!("keyboard: {:?} {:?}", k.logical_key, k.state);
+            }
+            _ => {}
+        }
         let Some(gfx) = self.gfx.as_mut() else { return };
         let response = gfx.input.on_window_event(&gfx.window, &event);
         match event {
