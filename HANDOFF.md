@@ -15,8 +15,6 @@ end. The next session reads it **first**.
      `run.json`, and the `*.jpg` screenshots. `LATEST` names the newest run.
   3. Fix, push, repeat.
 - **Open problems:**
-  - If no run shows up, Actions may still be disabled on the fork (see `PROGRESS.md` →
-    *Needs Ivan*).
   - Expect first-compile API mismatches in `apps/rawpad-ios/src/ios.rs`. The egui-wgpu 0.36 /
     egui-winit 0.36 / winit 0.30 signatures were checked against egui's 0.36.2 sources, but never
     compiled.

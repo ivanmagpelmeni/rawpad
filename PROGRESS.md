@@ -56,10 +56,6 @@ Phase 1 and 2 code is written but **not compiled yet**: the first CI run is the 
 
 ## Needs Ivan
 
-1. **Turn on GitHub Actions for the fork** (forks start with Actions off):
-   1. On github.com, open **Ivanmagpelmeni/rawpad**.
-   2. Tap the **Actions** tab. On a phone it's in the row under the repo name; swipe it if hidden.
-   3. Tap the green button **I understand my workflows, go ahead and enable them**.
-2. **Install SideStore** once from a Windows PC: `SETUP.md` parts A–D. Do this any time before
+1. **Install SideStore** once from a Windows PC: `SETUP.md` parts A–D. Do this any time before
    phase 3.
-3. *(Later, phase 3)* Add the RawPad source in SideStore: `SETUP.md` part E.
+2. *(Later, phase 3)* Add the RawPad source in SideStore: `SETUP.md` part E.
