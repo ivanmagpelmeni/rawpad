@@ -21,7 +21,13 @@
 {"checkFiles":"Documents/Exports","min":1}
 # Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[2],"format":"jpeg","addToPhotos":true}}}
-{"sleep":10}
+{"sleep":8}
+# after an export: the Share button for the files just written (rawpad-ios src/share_offer.rs)
+{"method":"ui.widgets","params":{"filter":"rawpadShare"}}
+{"shot":"05-share-offer"}
+{"method":"ui.clickWidget","params":{"id":"button:rawpadShareExport"},"expectOk":true}
+{"sleep":4}
+{"shot":"06-share-sheet"}
 {"method":"engine.execute","params":{"command":"export.photosImports","params":{}}}
 # the log file (Files ▸ On My iPad ▸ RawPad ▸ Logs)
 {"checkFiles":"Documents/Logs","min":1}
@@ -29,7 +35,4 @@
 # Photos import again, once it has had time to finish ("imported": 1 in replies.jsonl)
 {"sleep":5}
 {"method":"engine.execute","params":{"command":"export.photosImports","params":{}}}
-# the share sheet: Help › Open Log Folder shares the log on iPad (a crash here fails the tour)
-{"method":"ui.menu.invoke","params":{"id":"app.openLogFolder"},"expectOk":true}
-{"sleep":4}
-{"shot":"05-share-sheet"}
+# (Help › Open Log Folder → share sheet was checked in runs 15/16; a second sheet can't open over this one)

@@ -54,6 +54,7 @@ pub fn run() {
         long_press: Default::default(),
         logged_insets: None,
         prefs: None,
+        share_offer: Default::default(),
     };
     if let Err(e) = event_loop.run_app(&mut host) {
         log::error!("event loop ended with an error: {e}");
@@ -75,6 +76,8 @@ struct Host {
     long_press: crate::touch::LongPress,
     logged_insets: Option<crate::native::EdgeInsets>,
     prefs: Option<crate::prefs::Writer>,
+    /// The Share button for the files of the last export.
+    share_offer: crate::share_offer::ShareOffer,
 }
 
 /// `<app container>/Library/Application Support/RawPad Library` (backed up with the app, not shown in Files).
@@ -224,9 +227,22 @@ impl Host {
         // pointer events (CI) are never held back
         let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
         app.raw_input_hook(&mut raw);
+        let share_offer = &mut self.share_offer;
+        let mut share: Option<(Vec<String>, egui::Pos2)> = None;
         let mut out = self.ctx.run_ui(raw, |ui| {
             app.logic(ui.ctx());
             app.ui(ui);
+            // after an export: a Share button for the files just written, above the export toast
+            let ctx = ui.ctx();
+            let now = ctx.input(|i| i.time);
+            share_offer.update(app.last_export_result.as_ref(), now);
+            let area = app.canvas_rect.unwrap_or_else(|| ctx.content_rect());
+            if let Some(shown) = share_offer.show(ctx, egui::pos2(area.center().x, area.bottom() - 90.0), now) {
+                app.widgets.push((crate::share_offer::WIDGET_ID.to_owned(), shown.rect));
+                if let Some(files) = shown.share {
+                    share = Some((files, shown.rect.center()));
+                }
+            }
         });
         gfx.input.handle_platform_output(&gfx.window, std::mem::take(&mut out.platform_output));
         let clipped = self.ctx.tessellate(std::mem::take(&mut out.shapes), out.pixels_per_point);
@@ -239,6 +255,14 @@ impl Host {
             Vec::new(),
             &gfx.window,
         );
+        if let Some((files, at)) = share {
+            let zoom = f64::from(self.ctx.zoom_factor());
+            let paths: Vec<&str> = files.iter().map(String::as_str).collect();
+            if let Err(e) = crate::native::share_files(&gfx.window, &paths, Some((f64::from(at.x) * zoom, f64::from(at.y) * zoom))) {
+                log::warn!("share after export: {e}");
+                app.toast_error(&self.ctx, e);
+            }
+        }
         // the library keeps every command in its journal; also catch state changed outside commands
         app.session.persist_if_dirty();
         if let Some(p) = self.prefs.as_mut() {

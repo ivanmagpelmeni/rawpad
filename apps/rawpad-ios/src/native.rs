@@ -215,17 +215,27 @@ unsafe impl objc2::Encode for Rect {
 /// popover and must have an anchor, or UIKit raises an exception: it points at `at` (window
 /// points, normally where the finger was), or at the middle of the window.
 pub fn share(window: &winit::window::Window, path: &str, at: Option<(f64, f64)>) -> Result<(), String> {
+    share_files(window, &[path], at)
+}
+
+/// The share sheet for several files at once (the photos of one export).
+pub fn share_files(window: &winit::window::Window, paths: &[&str], at: Option<(f64, f64)>) -> Result<(), String> {
     use objc2::runtime::{AnyClass, AnyObject};
     use objc2_foundation::NSString;
     MainThreadMarker::new().ok_or("the share sheet must be opened on the main thread")?;
-    if !std::path::Path::new(path).exists() {
-        return Err(format!("{path} isn't there any more"));
-    }
+    let paths: Vec<&str> = paths.iter().copied().filter(|p| std::path::Path::new(p).exists()).collect();
+    let Some(first) = paths.first() else {
+        return Err("the exported files aren't there any more".into());
+    };
     let vc = root_view_controller(window)?;
     let class = AnyClass::get(c"UIActivityViewController").ok_or("no share sheet on this system")?;
-    // SAFETY: makes a file URL from a string (no file access).
-    let url = unsafe { NSURL::fileURLWithPath(&NSString::from_str(path)) };
-    let items = NSArray::from_slice(&[&*url]);
+    let mut urls: Vec<Retained<NSURL>> = Vec::with_capacity(paths.len());
+    for p in &paths {
+        // SAFETY: makes a file URL from a string (no file access).
+        urls.push(unsafe { NSURL::fileURLWithPath(&NSString::from_str(p)) });
+    }
+    let refs: Vec<&NSURL> = urls.iter().map(|u| &**u).collect();
+    let items = NSArray::from_slice(&refs);
     // SAFETY: `alloc` on UIActivityViewController's class, then its designated initializer with an
     // array of items and no custom activities, on the main thread.
     let sheet: Option<Retained<AnyObject>> = unsafe {
@@ -245,7 +255,7 @@ pub fn share(window: &winit::window::Window, path: &str, at: Option<(f64, f64)>)
         .filter(|(x, y)| x.is_finite() && y.is_finite() && (0.0..=bounds.width).contains(x) && (0.0..=bounds.height).contains(y))
         .unwrap_or((bounds.width / 2.0, bounds.height / 2.0));
     let anchor = Rect { x, y, width: 1.0, height: 1.0 };
-    log::info!("share sheet for {path}");
+    log::info!("share sheet for {first}{}", if paths.len() > 1 { format!(" and {} more", paths.len() - 1) } else { String::new() });
     // SAFETY: setters on the sheet's popover controller (the view is retained by it), then
     // presenting the sheet from the window's view controller; all on the main thread. The cast is
     // sound: UIActivityViewController is a UIViewController subclass.
