@@ -6,6 +6,7 @@ Exits non-zero when the app can't be reached, a request with "expectPhotosAtLeas
 at the end. Every reply is written to <out_dir>/replies.jsonl.
 """
 import json
+import os
 import socket
 import subprocess
 import sys
@@ -56,6 +57,15 @@ def main():
             if "sleep" in step:
                 time.sleep(step["sleep"])
                 continue
+            if "checkFiles" in step:
+                # files the app wrote inside its container, e.g. Documents/Exports
+                data = subprocess.run(["xcrun", "simctl", "get_app_container", "booted", BUNDLE, "data"], capture_output=True, text=True).stdout.strip()
+                folder = os.path.join(data, step["checkFiles"])
+                found = sorted(os.listdir(folder)) if os.path.isdir(folder) else []
+                print(f"files in {step['checkFiles']}: {found}")
+                if len(found) < step.get("min", 1):
+                    failures.append(f"expected at least {step.get('min', 1)} file(s) in {step['checkFiles']}, found {found}")
+                continue
             if "shot" in step:
                 path = f"{out_dir}/{step['shot']}.png"
                 subprocess.run(["xcrun", "simctl", "io", "booted", "screenshot", path], check=True)
@@ -67,6 +77,8 @@ def main():
             print(f"{'ok ' if ok else 'ERR'} {step['method']} {json.dumps(step.get('params', {}))[:120]}")
             if not ok:
                 print(f"    {json.dumps(reply)[:400]}")
+            if step.get("expectOk") and not ok:
+                failures.append(f"{step['method']} {json.dumps(step.get('params', {}))[:120]} failed: {json.dumps(reply)[:300]}")
             want = step.get("expectPhotosAtLeast")
             if want is not None:
                 got = (reply.get("result") or {}).get("photos", 0) if ok else 0

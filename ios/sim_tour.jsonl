@@ -15,4 +15,8 @@
 {"method":"engine.execute","params":{"command":"mask.adjust","params":{"values":{"exposure":0.5,"temp":40}}}}
 {"sleep":8}
 {"shot":"03-masking"}
+# export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
+{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
+{"sleep":10}
+{"checkFiles":"Documents/Exports","min":1}
 {"method":"ui.inspect"}

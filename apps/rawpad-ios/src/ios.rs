@@ -123,6 +123,14 @@ impl Host {
             if app.session.catalog.is_empty() {
                 lightcraft_ui_egui::panels::empty_library::open_on_empty_library(&mut app);
             }
+            // First export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad), not to the
+            // desktop default ~/Pictures, which the Files app can't see inside the sandbox.
+            if app.session.last_export.is_none()
+                && let Some(dir) = crate::native::exports_dir()
+            {
+                let _ = std::fs::create_dir_all(&dir);
+                app.session.last_export = Some(serde_json::json!({ "dir": dir.to_string_lossy() }));
+            }
             self.app = Some(app);
         }
         window.request_redraw();
