@@ -15,8 +15,9 @@ end. The next session reads it **first**.
     saved to `Library/Application Support/RawPad UI.json` (`src/prefs.rs`).
   - `e83191e` P7: AI mask tiles hidden on iOS (first upstream patch, logged in `UPSTREAM.md`);
     `DECISIONS.md` 20–23.
-- **In progress:** CI run 10 for `e83191e` (the two commits above) was started at about 19:21
-  Berlin and had not finished when this was written. **Check it first:**
+- **In progress:** CI run 10 for `e83191e` (the two commits above): at 19:33 Berlin fmt, unit
+  tests, sim build, clippy and the **simulator tour had all passed**; the device build, report
+  and release (1.10) were still running. Screenshots not yet looked at. **Check it first:**
   - green → look at `runs/10/03-masking.jpg` (5 tiles: Brush, Linear, Radial, Luminance, Color)
     and `02-develop.jpg` (bottom toolbar clear of the home indicator), and grep
     `runs/10/app-stderr.log` for `safe area (points)`. If the toolbar still touches the bottom,
