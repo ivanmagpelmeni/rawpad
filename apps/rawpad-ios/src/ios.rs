@@ -94,6 +94,9 @@ fn open_session() -> Session {
         log::error!("can't create the library folder {}: {e}", dir.display());
     }
     let mut s = fresh();
+    // Export ▸ Add to Apple Photos saves to the Photos app, on a worker thread
+    s.apple_photos = Some(crate::native::photos_runner());
+    s.apple_photos_background = true;
     match s.open_library(&dir, seed_demo).map(|r| r.replayed) {
         Ok(replayed) => log::info!("library {}: {} photos ({replayed} log records replayed)", dir.display(), s.catalog.len()),
         Err(e) => log::error!("can't open library {}: {e}", dir.display()),

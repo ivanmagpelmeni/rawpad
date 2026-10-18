@@ -750,7 +750,8 @@ pub const OPTION_PARAMS: &[&str] = &[
 /// Why an export can't add its files to Apple Photos on this platform (`None`: it can, when the
 /// session has the runner; see [`crate::Session::after_export`]).
 pub fn apple_photos_unsupported() -> Option<&'static str> {
-    (!cfg!(target_os = "macos")).then_some("Apple Photos is only available on macOS")
+    // RawPad: the iPad host installs a Photos runner too (apps/rawpad-ios, native::photos_runner)
+    (!cfg!(any(target_os = "macos", target_os = "ios"))).then_some("Apple Photos is only available on macOS")
 }
 
 /// The keys of a `watermark` object ([`Watermark`], camelCase). `inset` sets `insetX` and `insetY`
