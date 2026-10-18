@@ -112,7 +112,26 @@ impl Host {
             });
             let services = {
                 let (window, ctx) = (Arc::clone(&window), self.ctx.clone());
-                Services { picker: Some(Box::new(move |req| crate::native::pick(&window, &ctx, &req))), ..Services::default() }
+                let links = ctx.clone();
+                Services {
+                    picker: Some(Box::new(move |req| crate::native::pick(&window, &ctx, &req))),
+                    // exports write files themselves (the background exporter needs the shared one)
+                    write_shared: Some(Arc::new(lightcraft_engine::export::write_file)),
+                    write: Some(Box::new(lightcraft_engine::export::write_file)),
+                    png: Some(Box::new(|img: &lightcraft_raster::Rgba8| {
+                        lightcraft_codecs::encode_png(&lightcraft_codecs::EncodeImage::rgba8(img), &lightcraft_codecs::EncodeMeta::default())
+                            .unwrap_or_default()
+                    })),
+                    // Help links open in Safari (egui-winit hands them to UIApplication)
+                    open_url: Some(Box::new(move |url: &str| {
+                        if !url.starts_with("https://") {
+                            return Err("only https links are opened".into());
+                        }
+                        links.open_url(egui::OpenUrl::new_tab(url));
+                        Ok(())
+                    })),
+                    ..Services::default()
+                }
             };
             let mut app = LightcraftApp::new(open_session(), services);
             lightcraft_ui_egui::i18n::set_language(app.ui.language);
