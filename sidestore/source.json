@@ -1,0 +1,43 @@
+{
+  "name": "RawPad",
+  "identifier": "io.github.ivanmagpelmeni.rawpad.source",
+  "subtitle": "LightCraft photo editor for iPad",
+  "description": "Personal builds of RawPad, a native iPadOS port of LightCraft (open-source raw developer and photo library).",
+  "iconURL": "https://raw.githubusercontent.com/Ivanmagpelmeni/rawpad/main/ios/icon/AppIcon-1024.png",
+  "website": "https://github.com/Ivanmagpelmeni/rawpad",
+  "tintColor": "#FFB85C",
+  "apps": [
+    {
+      "name": "RawPad",
+      "bundleIdentifier": "io.github.ivanmagpelmeni.rawpad",
+      "developerName": "Ivanmagpelmeni",
+      "subtitle": "Raw developer and photo library",
+      "localizedDescription": "LightCraft on iPad: library, culling, develop sliders, masks, presets and export. Based on LightCraft by the ArtCraft team; not an ArtCraft product.",
+      "iconURL": "https://raw.githubusercontent.com/Ivanmagpelmeni/rawpad/main/ios/icon/AppIcon-1024.png",
+      "tintColor": "#FFB85C",
+      "category": "photo-video",
+      "screenshots": [],
+      "versions": [
+        {
+          "version": "1.5",
+          "buildVersion": "5",
+          "date": "2026-10-18T12:23:49Z",
+          "localizedDescription": "RawPad 1.5 (build 5, fac8d71): P2: request the adapter's own limits for the egui device",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.5/RawPad.ipa",
+          "size": 19638192,
+          "minOSVersion": "17.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {}
+      },
+      "version": "1.5",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.5/RawPad.ipa",
+      "size": 19638192,
+      "versionDate": "2026-10-18T12:23:49Z",
+      "versionDescription": "RawPad 1.5 (build 5, fac8d71): P2: request the adapter's own limits for the egui device"
+    }
+  ],
+  "news": []
+}
