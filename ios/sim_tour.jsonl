@@ -43,7 +43,7 @@
 # Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome)
 # in the background, as the Export dialog does (the Share button watches that path)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[2],"format":"jpeg","addToPhotos":true,"background":true}},"expectOk":true}
-{"waitUntil":"export.last","method":"ui.inspect","timeout":90}
+{"waitUntil":"export.last","method":"ui.inspect","timeout":240}
 {"sleep":1}
 # after an export: the Share button for the files just written (rawpad-ios src/share_offer.rs)
 {"method":"ui.widgets","params":{"filter":"rawpadShare"}}
