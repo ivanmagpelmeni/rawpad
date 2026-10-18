@@ -2259,7 +2259,10 @@ pub fn confirm_delete(app: &mut LightcraftApp) -> bool {
 
 /// Platform-appropriate label for revealing a file in the system file manager.
 pub fn reveal_label() -> &'static str {
-    if cfg!(target_os = "macos") {
+    // RawPad: the iPad has no file manager to reveal in; its host opens the share sheet instead
+    if cfg!(target_os = "ios") {
+        "Share…"
+    } else if cfg!(target_os = "macos") {
         "Show in Finder"
     } else if cfg!(target_os = "windows") {
         "Show in Explorer"

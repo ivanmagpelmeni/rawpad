@@ -149,3 +149,18 @@ Newer entries win over older ones and over the kickoff brief.
 28. **Risky native work is tested on a branch first:** push the branch, start the iPad workflow
     on it with `workflow_dispatch` (release off; releases only come from main), merge into main
     only when that run is green and its replies/screenshots look right.
+
+## 2026-10-18: Nightly session 3 (20:55 Berlin)
+
+29. **The share sheet is the iPad's `Services::reveal`.** Every upstream *Show in Finder* place
+    (Photo › Show in Finder for an original raw, a folder's context menu, Help › Open Log Folder)
+    opens `UIActivityViewController` for that file (`native::share`), labelled **Share…**
+    (`reveal_label` patched for iOS). This also covers "export the original raw to Files"
+    (*Save to Files* in the sheet) and sending the log, without a new iPad-only command. The
+    popover is anchored at the last pointer position (window points), else the window's middle.
+    `Services::log_file` is now set on iOS so Help › Open Log Folder is enabled.
+30. **The 24 MP GPU fallback is treated as simulator-only for now.** The engine's GPU device
+    (`crates/gpu/src/ctx.rs`) already asks for `adapter.limits()`; the 256 MiB storage-buffer
+    limit is what the simulator's Metal reports. Real Apple GPUs report far larger buffers. No
+    tiling work until a device log shows the fallback ("storage-buffer limit" in
+    `lightcraft.log`).

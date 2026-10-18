@@ -1,5 +1,6 @@
 //! UIKit bridges for the iPad host: the Files document picker behind `Services::picker`, the
-//! window's safe area, and saving exports to the Photos app (`photos_runner`).
+//! window's safe area, the share sheet behind `Services::reveal` (`share`), and saving exports to
+//! the Photos app (`photos_runner`).
 //!
 //! This is the only module of RawPad with `unsafe` (Objective-C messages through objc2), allowed
 //! here and nowhere else (DECISIONS.md, 2026-10-18). Every call happens on the main thread, where
@@ -185,6 +186,76 @@ pub fn safe_area(window: &winit::window::Window) -> Option<EdgeInsets> {
     let insets: EdgeInsets = unsafe { msg_send![&*view, safeAreaInsets] };
     let ok = [insets.top, insets.left, insets.bottom, insets.right].iter().all(|v| v.is_finite() && *v >= 0.0);
     ok.then_some(insets)
+}
+
+/// `CGRect` (`{CGPoint origin; CGSize size}`, CGFloat = f64), declared here like [`EdgeInsets`].
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+struct Rect {
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+}
+
+// SAFETY: four doubles in the order and nesting of UIKit's `CGRect {CGPoint {x, y}, CGSize {width, height}}`.
+unsafe impl objc2::Encode for Rect {
+    const ENCODING: objc2::Encoding = objc2::Encoding::Struct(
+        "CGRect",
+        &[
+            objc2::Encoding::Struct("CGPoint", &[objc2::Encoding::Double, objc2::Encoding::Double]),
+            objc2::Encoding::Struct("CGSize", &[objc2::Encoding::Double, objc2::Encoding::Double]),
+        ],
+    );
+}
+
+/// The share sheet (`UIActivityViewController`) for one file or folder: Save to Files, AirDrop,
+/// Mail, other apps. The iPad host's `Services::reveal`, so every *Show in Finder* place in the UI
+/// (a photo's original, a folder, Help › Open Log Folder) shares instead. On iPad the sheet is a
+/// popover and must have an anchor, or UIKit raises an exception: it points at `at` (window
+/// points, normally where the finger was), or at the middle of the window.
+pub fn share(window: &winit::window::Window, path: &str, at: Option<(f64, f64)>) -> Result<(), String> {
+    use objc2::runtime::{AnyClass, AnyObject};
+    use objc2_foundation::NSString;
+    MainThreadMarker::new().ok_or("the share sheet must be opened on the main thread")?;
+    if !std::path::Path::new(path).exists() {
+        return Err(format!("{path} isn't there any more"));
+    }
+    let vc = root_view_controller(window)?;
+    let class = AnyClass::get(c"UIActivityViewController").ok_or("no share sheet on this system")?;
+    // SAFETY: makes a file URL from a string (no file access).
+    let url = unsafe { NSURL::fileURLWithPath(&NSString::from_str(path)) };
+    let items = NSArray::from_slice(&[&*url]);
+    // SAFETY: `alloc` on UIActivityViewController's class, then its designated initializer with an
+    // array of items and no custom activities, on the main thread.
+    let sheet: Option<Retained<AnyObject>> = unsafe {
+        let a: objc2::rc::Allocated<AnyObject> = msg_send![class, alloc];
+        msg_send![a, initWithActivityItems: &*items, applicationActivities: Option::<&AnyObject>::None]
+    };
+    let sheet = sheet.ok_or("the share sheet couldn't be made")?;
+    // SAFETY: plain property reads on live view controllers, main thread.
+    let (popover, view): (Option<Retained<AnyObject>>, Option<Retained<AnyObject>>) =
+        unsafe { (msg_send![&*sheet, popoverPresentationController], msg_send![&*vc, view]) };
+    let (Some(popover), Some(view)) = (popover, view) else {
+        return Err("the share sheet has no place to appear".into());
+    };
+    // SAFETY: a property read on the live root view, main thread.
+    let bounds: Rect = unsafe { msg_send![&*view, bounds] };
+    let (x, y) = at
+        .filter(|(x, y)| x.is_finite() && y.is_finite() && (0.0..=bounds.width).contains(x) && (0.0..=bounds.height).contains(y))
+        .unwrap_or((bounds.width / 2.0, bounds.height / 2.0));
+    let anchor = Rect { x, y, width: 1.0, height: 1.0 };
+    log::info!("share sheet for {path}");
+    // SAFETY: setters on the sheet's popover controller (the view is retained by it), then
+    // presenting the sheet from the window's view controller; all on the main thread. The cast is
+    // sound: UIActivityViewController is a UIViewController subclass.
+    unsafe {
+        let _: () = msg_send![&*popover, setSourceView: &*view];
+        let _: () = msg_send![&*popover, setSourceRect: anchor];
+        let sheet: Retained<UIViewController> = Retained::cast_unchecked(sheet);
+        vc.presentViewController_animated_completion(&sheet, true, None);
+    }
+    Ok(())
 }
 
 // Photos.framework, for "Add to Photos" after an export (`photos_runner`). Its classes are looked
