@@ -77,8 +77,8 @@ fn open_session() -> Session {
         log::error!("can't create the library folder {}: {e}", dir.display());
     }
     let mut s = fresh();
-    match s.open_library(&dir, seed_demo) {
-        Ok(r) => log::info!("library {}: {} photos ({} log records replayed)", dir.display(), s.catalog.len(), r.replayed),
+    match s.open_library(&dir, seed_demo).map(|r| r.replayed) {
+        Ok(replayed) => log::info!("library {}: {} photos ({replayed} log records replayed)", dir.display(), s.catalog.len()),
         Err(e) => log::error!("can't open library {}: {e}", dir.display()),
     }
     s
