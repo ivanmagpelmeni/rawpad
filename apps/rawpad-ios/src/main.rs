@@ -11,6 +11,8 @@
 mod ios;
 #[cfg(target_os = "ios")]
 mod native;
+#[cfg(target_os = "ios")]
+mod prefs;
 // touch gestures are plain egui events, so their tests also run on the CI's macOS host
 #[cfg(any(target_os = "ios", test))]
 mod touch;

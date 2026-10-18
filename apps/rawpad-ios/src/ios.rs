@@ -47,6 +47,8 @@ pub fn run() {
         app: None,
         next_repaint: None,
         long_press: Default::default(),
+        logged_insets: None,
+        prefs: None,
     };
     if let Err(e) = event_loop.run_app(&mut host) {
         log::error!("event loop ended with an error: {e}");
@@ -66,6 +68,8 @@ struct Host {
     app: Option<LightcraftApp>,
     next_repaint: Option<Instant>,
     long_press: crate::touch::LongPress,
+    logged_insets: Option<crate::native::EdgeInsets>,
+    prefs: Option<crate::prefs::Writer>,
 }
 
 /// `<app container>/Library/Application Support/RawPad Library` (backed up with the app, not shown in Files).
@@ -142,6 +146,14 @@ impl Host {
                 }
             };
             let mut app = LightcraftApp::new(open_session(), services);
+            // the interface as it was left (panels, language, appearance…)
+            let prefs_path = crate::prefs::path();
+            let (saved, warning, keep) = prefs_path.as_deref().map_or((None, None, false), crate::prefs::load);
+            if let Some(ui) = saved {
+                app.ui = ui;
+            }
+            app.notices.extend(warning);
+            self.prefs = Some(crate::prefs::Writer::new(prefs_path, &app.ui, keep));
             lightcraft_ui_egui::i18n::set_language(app.ui.language);
             if let Some(port) = std::env::var("RAWPAD_CONTROL").ok().and_then(|p| p.parse::<u16>().ok()) {
                 let rx = control_server::start(port, self.ctx.clone());
@@ -168,9 +180,23 @@ impl Host {
     fn frame(&mut self) {
         let (Some(gfx), Some(app)) = (self.gfx.as_mut(), self.app.as_mut()) else { return };
         let mut raw = gfx.input.take_egui_input(&gfx.window);
-        // Keep the UI out from under the status bar and the home indicator.
-        if let (Some(rect), Some(insets)) = (raw.screen_rect, raw.safe_area_insets) {
-            raw.screen_rect = Some(rect - insets);
+        // Keep the UI out from under the status bar and the home indicator. egui-winit's own
+        // insets came through as nothing (CI run 8: the bottom toolbar sat on the home
+        // indicator), so read UIKit's.
+        if let Some(rect) = raw.screen_rect {
+            if let Some(i) = crate::native::safe_area(&gfx.window) {
+                if self.logged_insets != Some(i) {
+                    log::info!("safe area (points): top {} left {} bottom {} right {}", i.top, i.left, i.bottom, i.right);
+                    self.logged_insets = Some(i);
+                }
+                let (t, l, b, r) = (i.top as f32, i.left as f32, i.bottom as f32, i.right as f32);
+                let inner = egui::Rect::from_min_max(egui::pos2(rect.min.x + l, rect.min.y + t), egui::pos2(rect.max.x - r, rect.max.y - b));
+                if inner.is_positive() {
+                    raw.screen_rect = Some(inner);
+                }
+            } else if let Some(insets) = raw.safe_area_insets {
+                raw.screen_rect = Some(rect - insets);
+            }
         }
         // Imports copy into the library: picked files are temporary copies, and folders from
         // Files or an SD card stay readable only while the app runs.
@@ -198,6 +224,9 @@ impl Host {
         );
         // the library keeps every command in its journal; also catch state changed outside commands
         app.session.persist_if_dirty();
+        if let Some(p) = self.prefs.as_mut() {
+            p.tick(&app.ui);
+        }
         if let Some(vp) = out.viewport_output.get(&ViewportId::ROOT) {
             self.schedule(vp.repaint_delay);
         }
@@ -219,6 +248,9 @@ impl Host {
         if let Some(app) = self.app.as_mut() {
             app.session.persist_if_dirty();
             app.session.save_view();
+            if let Some(p) = self.prefs.as_mut() {
+                p.save(&app.ui);
+            }
         }
     }
 }

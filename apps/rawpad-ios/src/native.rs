@@ -1,4 +1,5 @@
-//! UIKit bridges for the iPad host: the Files document picker behind `Services::picker`.
+//! UIKit bridges for the iPad host: the Files document picker behind `Services::picker`, and the
+//! window's safe area.
 //!
 //! This is the only module of RawPad with `unsafe` (Objective-C messages through objc2), allowed
 //! here and nowhere else (DECISIONS.md, 2026-10-18). Every call happens on the main thread, where
@@ -150,4 +151,37 @@ pub fn pick(window: &winit::window::Window, ctx: &egui::Context, req: &PickReque
     }
     DELEGATE.with(|d| *d.borrow_mut() = Some(delegate));
     Ok(rx)
+}
+
+/// `UIEdgeInsets` (CGFloat is f64 on every 64-bit Apple target), declared here so reading the
+/// safe area needs no extra objc2-ui-kit features.
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+pub struct EdgeInsets {
+    pub top: f64,
+    pub left: f64,
+    pub bottom: f64,
+    pub right: f64,
+}
+
+// SAFETY: the layout above matches UIKit's `UIEdgeInsets {CGFloat top, left, bottom, right}`.
+unsafe impl objc2::Encode for EdgeInsets {
+    const ENCODING: objc2::Encoding = objc2::Encoding::Struct(
+        "UIEdgeInsets",
+        &[objc2::Encoding::Double, objc2::Encoding::Double, objc2::Encoding::Double, objc2::Encoding::Double],
+    );
+}
+
+/// The window's safe area (home indicator, rounded corners, status bar) in points, read from the
+/// view winit draws into. `None` off the main thread or without a UIKit view.
+pub fn safe_area(window: &winit::window::Window) -> Option<EdgeInsets> {
+    MainThreadMarker::new()?;
+    let handle = window.window_handle().ok()?;
+    let RawWindowHandle::UiKit(h) = handle.as_raw() else { return None };
+    let view = h.ui_view.as_ptr().cast::<NSObject>();
+    // SAFETY: winit's handle points at the window's live UIView (owned by the window, which
+    // outlives this call); `safeAreaInsets` is a plain UIView property read on the main thread.
+    let insets: EdgeInsets = unsafe { msg_send![&*view, safeAreaInsets] };
+    let ok = [insets.top, insets.left, insets.bottom, insets.right].iter().all(|v| v.is_finite() && *v >= 0.0);
+    ok.then_some(insets)
 }
