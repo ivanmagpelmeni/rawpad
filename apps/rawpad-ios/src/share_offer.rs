@@ -26,6 +26,29 @@ pub fn exported_paths(result: &Value) -> Vec<String> {
         .unwrap_or_default()
 }
 
+/// The button's label in the UI's language (`n` files). Kept here rather than in upstream's
+/// catalogs (`crates/ui-egui/locales`), which the iPad port doesn't patch for its own strings.
+/// Plural-heavy languages put the count in brackets so one form fits every number.
+pub fn label(language: &str, n: usize) -> String {
+    let (one, many) = match language {
+        "de" => ("Exportiertes Foto teilen…", "{n} exportierte Fotos teilen…"),
+        "fr" => ("Partager la photo exportée…", "Partager les {n} photos exportées…"),
+        "es" => ("Compartir foto exportada…", "Compartir {n} fotos exportadas…"),
+        "it" => ("Condividi foto esportata…", "Condividi {n} foto esportate…"),
+        "pt-br" => ("Compartilhar foto exportada…", "Compartilhar {n} fotos exportadas…"),
+        "ru" => ("Поделиться экспортированным фото…", "Поделиться экспортированными фото ({n})…"),
+        "uk" => ("Поділитися експортованим фото…", "Поділитися експортованими фото ({n})…"),
+        "pl" => ("Udostępnij wyeksportowane zdjęcie…", "Udostępnij wyeksportowane zdjęcia ({n})…"),
+        "cs" => ("Sdílet exportovanou fotografii…", "Sdílet exportované fotografie ({n})…"),
+        "ka" => ("ექსპორტირებული ფოტოს გაზიარება…", "ექსპორტირებული ფოტოების ({n}) გაზიარება…"),
+        "ja" => ("書き出した写真を共有…", "書き出した写真 {n} 枚を共有…"),
+        "zh-hans" => ("共享导出的照片…", "共享导出的 {n} 张照片…"),
+        "zh-hant" => ("分享匯出的照片…", "分享匯出的 {n} 張照片…"),
+        _ => ("Share Exported Photo…", "Share {n} Exported Photos…"),
+    };
+    if n == 1 { one.to_owned() } else { many.replace("{n}", &n.to_string()) }
+}
+
 /// What [`ShareOffer::show`] did this frame.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Shown {
@@ -64,12 +87,13 @@ impl ShareOffer {
     }
 
     /// Draw the offer centred above `bottom_center`. Returns `None` when there is nothing to offer.
-    pub fn show(&mut self, ctx: &Context, bottom_center: Pos2, now: f64) -> Option<Shown> {
+    /// `language` is the UI's language code (`lightcraft_ui_egui::i18n::language().code()`).
+    pub fn show(&mut self, ctx: &Context, bottom_center: Pos2, now: f64, language: &str) -> Option<Shown> {
         let n = self.paths(now).len();
         if n == 0 {
             return None;
         }
-        let label = if n == 1 { "Share Exported Photo…".to_owned() } else { format!("Share {n} Exported Photos…") };
+        let label = label(language, n);
         let (share, close) = egui::Area::new(egui::Id::new("rawpad-share-export"))
             .order(egui::Order::Foreground)
             .pivot(egui::Align2::CENTER_BOTTOM)
@@ -131,6 +155,19 @@ mod tests {
         assert!(o.paths(12.0 + SHOW_FOR + 0.1).is_empty());
     }
 
+    #[test]
+    fn labels_follow_the_language_and_count() {
+        assert_eq!(label("en", 1), "Share Exported Photo…");
+        assert_eq!(label("en", 3), "Share 3 Exported Photos…");
+        assert_eq!(label("ru", 5), "Поделиться экспортированными фото (5)…");
+        assert_eq!(label("de", 1), "Exportiertes Foto teilen…");
+        // an unknown code falls back to English; no form keeps the placeholder
+        assert_eq!(label("xx", 2), "Share 2 Exported Photos…");
+        for code in ["en", "de", "fr", "es", "it", "pt-br", "ru", "uk", "pl", "cs", "ka", "ja", "zh-hans", "zh-hant"] {
+            assert!(!label(code, 7).contains("{n}") && label(code, 7).contains('7'), "{code}");
+        }
+    }
+
     /// One frame; its font texture isn't uploaded anywhere (epaint panics on unhandled deltas).
     fn frame(ctx: &Context, input: egui::RawInput, f: impl FnMut(&mut egui::Ui)) {
         let mut out = ctx.run_ui(input, f);
@@ -145,7 +182,7 @@ mod tests {
         let mut shown = None;
         // a new area measures itself (invisibly) on its first frame
         for _ in 0..3 {
-            frame(&ctx, egui::RawInput::default(), |ui| shown = o.show(ui.ctx(), egui::pos2(400.0, 500.0), 0.0));
+            frame(&ctx, egui::RawInput::default(), |ui| shown = o.show(ui.ctx(), egui::pos2(400.0, 500.0), 0.0, "en"));
         }
         let shown = shown.unwrap();
         assert!(shown.share.is_none());
@@ -159,7 +196,7 @@ mod tests {
             egui::Event::PointerButton { pos: at, button: egui::PointerButton::Primary, pressed: false, modifiers: Default::default() },
         ];
         let mut tapped = None;
-        frame(&ctx, input, |ui| tapped = o.show(ui.ctx(), egui::pos2(400.0, 500.0), 1.0));
+        frame(&ctx, input, |ui| tapped = o.show(ui.ctx(), egui::pos2(400.0, 500.0), 1.0, "en"));
         assert_eq!(tapped.unwrap().share, Some(vec!["/x/a.jpg".to_owned()]));
         assert!(o.paths(1.0).is_empty());
     }

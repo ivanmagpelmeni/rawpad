@@ -237,7 +237,9 @@ impl Host {
             let now = ctx.input(|i| i.time);
             share_offer.update(app.last_export_result.as_ref(), now);
             let area = app.canvas_rect.unwrap_or_else(|| ctx.content_rect());
-            if let Some(shown) = share_offer.show(ctx, egui::pos2(area.center().x, area.bottom() - 90.0), now) {
+            if let Some(shown) =
+                share_offer.show(ctx, egui::pos2(area.center().x, area.bottom() - 90.0), now, lightcraft_ui_egui::i18n::language().code())
+            {
                 app.widgets.push((crate::share_offer::WIDGET_ID.to_owned(), shown.rect));
                 if let Some(files) = shown.share {
                     share = Some((files, shown.rect.center()));
