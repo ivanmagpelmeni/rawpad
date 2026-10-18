@@ -8,7 +8,9 @@
 //! - the finger stays still for [`HOLD`] → a secondary click at that spot instead, and the primary
 //!   release that follows is dropped so it can't close the menu that just opened.
 //!
-//! Presses that don't come from a touch (a trackpad or mouse) are never held back.
+//! Presses that don't come from a touch (a trackpad or mouse) are never held back, and neither
+//! are Apple Pencil touches ([`LongPress::mark_pencil`]): a brush stroke starts the moment the tip
+//! lands, even when it rests there first.
 
 use std::collections::BTreeSet;
 use std::time::{Duration, Instant};
@@ -34,9 +36,17 @@ enum State {
 pub struct LongPress {
     state: State,
     touches: BTreeSet<u64>,
+    /// Touches made with Apple Pencil (marked by the host from winit's events, before egui's).
+    pencils: BTreeSet<u64>,
 }
 
 impl LongPress {
+    /// The touch `id` (winit's, which is also egui's `TouchId`) comes from Apple Pencil: its press
+    /// goes through at once instead of waiting to become a long-press.
+    pub fn mark_pencil(&mut self, id: u64) {
+        self.pencils.insert(id);
+    }
+
     /// Rewrite this frame's events. Returns how long until the held press becomes a long-press,
     /// so the host can wake up then even without new input.
     pub fn filter(&mut self, events: &mut Vec<Event>, now: Instant) -> Option<Duration> {
@@ -78,6 +88,10 @@ impl LongPress {
                 }
                 TouchPhase::End | TouchPhase::Cancel => {
                     self.touches.remove(&id.0);
+                    self.pencils.remove(&id.0);
+                    if self.touches.is_empty() {
+                        self.pencils.clear();
+                    }
                 }
                 TouchPhase::Move => {}
             }
@@ -86,7 +100,9 @@ impl LongPress {
         }
         match std::mem::take(&mut self.state) {
             State::Idle => match event {
-                Event::PointerButton { pos, button: PointerButton::Primary, pressed: true, modifiers } if self.touches.len() == 1 => {
+                Event::PointerButton { pos, button: PointerButton::Primary, pressed: true, modifiers }
+                    if self.touches.len() == 1 && self.pencils.is_disjoint(&self.touches) =>
+                {
                     self.state = State::Pending { pos, modifiers, start: now, buffered: Vec::new() };
                 }
                 other => out.push(other),
@@ -221,6 +237,26 @@ mod tests {
         let mut ev = Vec::new();
         lp.filter(&mut ev, Instant::now());
         assert!(ev.is_empty());
+    }
+
+    #[test]
+    fn pencil_press_goes_through_at_once_and_never_long_presses() {
+        let mut lp = LongPress::default();
+        lp.mark_pencil(7);
+        let mut ev = vec![touch(7, TouchPhase::Start, 10.0), button(PointerButton::Primary, true, 10.0)];
+        assert_eq!(lp.filter(&mut ev, Instant::now()), None);
+        assert!(ev.iter().any(|e| is_button(e, PointerButton::Primary, true)), "{ev:?}");
+        lp.backdate(HOLD);
+        let mut ev = Vec::new();
+        lp.filter(&mut ev, Instant::now());
+        assert!(!ev.iter().any(|e| is_button(e, PointerButton::Secondary, true)), "{ev:?}");
+        let mut ev = vec![touch(7, TouchPhase::End, 10.0), button(PointerButton::Primary, false, 10.0)];
+        lp.filter(&mut ev, Instant::now());
+        assert!(ev.iter().any(|e| is_button(e, PointerButton::Primary, false)), "the release reaches egui");
+        // the same id later used by a finger is held back again (winit reuses UITouch addresses)
+        let mut ev = vec![touch(7, TouchPhase::Start, 10.0), button(PointerButton::Primary, true, 10.0)];
+        assert!(lp.filter(&mut ev, Instant::now()).is_some());
+        assert!(!ev.iter().any(|e| is_button(e, PointerButton::Primary, true)));
     }
 
     #[test]
