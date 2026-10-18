@@ -21,7 +21,9 @@ end. The next session reads it **first**.
     `NSPhotoLibraryAddUsageDescription`; CI pre-grants `photos-add`; tour exports once with
     `addToPhotos`. Tested on branch `p5-photos` with `workflow_dispatch`: **run 13 green**, and
     `export.photosImports` returned `"imported": 1` with a Photos asset id.
-  - Merged `p5-photos` into main with the doc updates at handoff → **run 14** (should release 1.13).
+  - Merged `p5-photos` into main with the doc updates at handoff → **run 14**: at 20:31 Berlin
+    fmt, unit tests, sim build, clippy and the **simulator tour had passed**; device build and
+    release 1.13 still running.
 - **Very next step:** check run 14 (green? release 1.13? `runs/14/replies.jsonl` shows
   `"imported": 1`?). If red, it's the merge only (code identical to green run 13): read the
   logs; revert the merge commit if you can't fix it. Then `PROGRESS.md` → *Next 3 tasks* (share sheet).
