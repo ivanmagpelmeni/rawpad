@@ -45,17 +45,18 @@ jobs:
           rustc --version
           xcodebuild -version
 
-      - name: Cache cargo + target
-        uses: actions/cache@v4
+      # restore + save split so a failing build still saves its compiled dependencies
+      - name: Restore cargo + target cache
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
             target
-          key: ipad-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain*') }}-${{ github.sha }}
+          key: ipad-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-${{ github.sha }}
           restore-keys: |
-            ipad-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain*') }}-
+            ipad-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-
             ipad-${{ runner.os }}-
 
       - name: Format check (iOS crate)
@@ -66,6 +67,17 @@ jobs:
 
       - name: Clippy (iOS crate, never-crash lints)
         run: set -o pipefail; cargo clippy --release --target aarch64-apple-ios-sim -p rawpad-ios -- -D warnings 2>&1 | tee ipad-test/clippy.log
+
+      - name: Save cargo + target cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: ipad-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}-${{ github.sha }}
 
       - name: Boot an iPad simulator
         id: sim
