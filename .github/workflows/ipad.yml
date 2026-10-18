@@ -86,6 +86,11 @@ jobs:
           xcrun simctl list devices | grep "$udid"
           xcrun simctl boot "$udid"
           xcrun simctl bootstatus "$udid" -b
+          # warm up the simulator's Photos library (photolibraryd): on a cold one the tour's
+          # "Add to Apple Photos" took 90 s or more (runs 22 and 24) instead of under a second
+          start=$(date +%s)
+          xcrun simctl addmedia "$udid" ios/icon/AppIcon-1024.png || echo "addmedia failed (ignored)"
+          echo "Photos warm-up took $(( $(date +%s) - start )) s"
           echo "udid=$udid" >> "$GITHUB_OUTPUT"
 
       - name: Install, launch and drive RawPad

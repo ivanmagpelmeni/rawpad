@@ -68,6 +68,9 @@ def main():
                         if isinstance(value, list):
                             value = value[0] if value else None
                         value = value.get(key) if isinstance(value, dict) else None
+                    if "differs" in step:
+                        # {"waitUntil": "ui.pan", "differs": [0.5, 0.5]}: until the value changes
+                        value = value is not None and value != step["differs"]
                     if value or time.time() > deadline:
                         break
                     time.sleep(2)

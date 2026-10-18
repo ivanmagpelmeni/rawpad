@@ -15,6 +15,27 @@
 {"method":"engine.execute","params":{"command":"mask.adjust","params":{"values":{"exposure":0.5,"temp":40}}}}
 {"sleep":8}
 {"shot":"03-masking"}
+# phase 4: pinch-zoom and pan in the loupe. ui.zoom is egui's pinch event; real fingers reach the
+# same code (detail.rs navigate_gesture) through egui's multi-touch input (zoom_delta/translation_delta)
+{"method":"engine.execute","params":{"command":"panel.edit"}}
+{"method":"ui.set","params":{"zoom":"fit","pan":[0.5,0.5]},"expectOk":true}
+{"sleep":2}
+{"method":"ui.pointer","params":{"events":[{"kind":"move","x":0.5,"y":0.5}]},"expectOk":true}
+{"sleep":1}
+{"method":"ui.zoom","params":{"factor":3},"expectOk":true}
+{"waitUntil":"ui.zoom.percent","method":"ui.inspect","timeout":15}
+{"sleep":5}
+{"shot":"04-pinch-zoom"}
+# two-finger pan while zoomed (egui's scroll delta)
+{"method":"ui.scroll","params":{"dx":-150,"dy":-100},"expectOk":true}
+{"waitUntil":"ui.pan","differs":[0.5,0.5],"method":"ui.inspect","timeout":15}
+# one-finger drag pan (recorded in replies.jsonl, not checked yet)
+{"method":"ui.pointer","params":{"events":[{"kind":"down","x":0.5,"y":0.5},{"kind":"drag","x":0.47,"y":0.47},{"kind":"drag","x":0.44,"y":0.44},{"kind":"up","x":0.44,"y":0.44}]},"expectOk":true}
+{"sleep":3}
+{"method":"ui.inspect"}
+{"shot":"04-panned"}
+{"method":"ui.set","params":{"zoom":"fit","pan":[0.5,0.5]}}
+{"sleep":2}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}
@@ -22,7 +43,7 @@
 # Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome)
 # in the background, as the Export dialog does (the Share button watches that path)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[2],"format":"jpeg","addToPhotos":true,"background":true}},"expectOk":true}
-{"waitUntil":"export.last","method":"ui.inspect","timeout":90}
+{"waitUntil":"export.last","method":"ui.inspect","timeout":240}
 {"sleep":1}
 # after an export: the Share button for the files just written (rawpad-ios src/share_offer.rs)
 {"method":"ui.widgets","params":{"filter":"rawpadShare"}}
