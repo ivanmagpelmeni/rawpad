@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.8",
+          "buildVersion": "8",
+          "date": "2026-10-18T13:05:27Z",
+          "localizedDescription": "RawPad 1.8 (build 8, 85b8e7b): P5: give the iPad host file writing and PNG encoding (exports said 'no writer')",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.8/RawPad.ipa",
+          "size": 19652027,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.5",
           "buildVersion": "5",
           "date": "2026-10-18T12:23:49Z",
@@ -32,11 +41,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.5",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.5/RawPad.ipa",
-      "size": 19638192,
-      "versionDate": "2026-10-18T12:23:49Z",
-      "versionDescription": "RawPad 1.5 (build 5, fac8d71): P2: request the adapter's own limits for the egui device"
+      "version": "1.8",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.8/RawPad.ipa",
+      "size": 19652027,
+      "versionDate": "2026-10-18T13:05:27Z",
+      "versionDescription": "RawPad 1.8 (build 8, 85b8e7b): P5: give the iPad host file writing and PNG encoding (exports said 'no writer')"
     }
   ],
   "news": []
