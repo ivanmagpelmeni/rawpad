@@ -1,0 +1,153 @@
+//! UIKit bridges for the iPad host: the Files document picker behind `Services::picker`.
+//!
+//! This is the only module of RawPad with `unsafe` (Objective-C messages through objc2), allowed
+//! here and nowhere else (DECISIONS.md, 2026-10-18). Every call happens on the main thread, where
+//! `LightcraftApp` runs its commands; a call from any other thread is refused, never made.
+#![allow(unsafe_code)]
+// objc2 marks some generated methods `unsafe` and others safe; one `unsafe` block per call keeps
+// the reasoning local without tracking which is which.
+#![allow(unused_unsafe)]
+
+use std::cell::RefCell;
+use std::path::PathBuf;
+use std::sync::mpsc::{Receiver, Sender, channel};
+
+use lightcraft_ui_egui::pick::{PickKind, PickRequest};
+use objc2::rc::Retained;
+use objc2::runtime::ProtocolObject;
+use objc2::{DefinedClass, MainThreadMarker, MainThreadOnly, define_class, msg_send};
+use objc2_foundation::{NSArray, NSObject, NSObjectProtocol, NSURL};
+use objc2_ui_kit::{UIDocumentPickerDelegate, UIDocumentPickerViewController, UIViewController};
+use objc2_uniform_type_identifiers::{UTType, UTTypeFolder, UTTypeImage, UTTypeItem};
+use winit::raw_window_handle::{HasWindowHandle, RawWindowHandle};
+
+/// Where exports land when a command asks for a save location: `Documents/Exports`, which the
+/// Files app shows under *On My iPad › RawPad* (`UIFileSharingEnabled`).
+pub fn exports_dir() -> Option<PathBuf> {
+    let home = std::env::var_os("HOME").filter(|h| !h.is_empty())?;
+    Some(PathBuf::from(home).join("Documents").join("Exports"))
+}
+
+pub struct Ivars {
+    /// Answers the waiting command once; `None` after that.
+    tx: RefCell<Option<Sender<Vec<String>>>>,
+    /// Picked items are originals outside the sandbox (folders): keep their security scope open.
+    scoped: bool,
+    /// Wakes the UI so the waiting command runs on the next frame.
+    ctx: egui::Context,
+}
+
+define_class!(
+    // SAFETY: NSObject has no subclassing requirements; this class doesn't implement Drop.
+    #[unsafe(super(NSObject))]
+    #[thread_kind = MainThreadOnly]
+    #[name = "RawPadDocumentPickerDelegate"]
+    #[ivars = Ivars]
+    pub struct PickerDelegate;
+
+    // SAFETY: NSObjectProtocol has no extra requirements.
+    unsafe impl NSObjectProtocol for PickerDelegate {}
+
+    // SAFETY: the signatures match UIDocumentPickerDelegate's methods.
+    unsafe impl UIDocumentPickerDelegate for PickerDelegate {
+        #[unsafe(method(documentPicker:didPickDocumentsAtURLs:))]
+        fn did_pick(&self, _controller: &UIDocumentPickerViewController, urls: &NSArray<NSURL>) {
+            let scoped = self.ivars().scoped;
+            let mut paths = Vec::new();
+            for url in urls.iter() {
+                if scoped {
+                    // SAFETY: a file URL the picker just returned. The access is kept for the
+                    // app's lifetime (imports and exports read and write it later).
+                    let ok = unsafe { url.startAccessingSecurityScopedResource() };
+                    if !ok {
+                        log::warn!("no security-scoped access to a picked folder");
+                    }
+                }
+                // SAFETY: plain property read on a valid NSURL.
+                if let Some(p) = unsafe { url.path() } {
+                    paths.push(p.to_string());
+                }
+            }
+            self.finish(paths);
+        }
+
+        #[unsafe(method(documentPickerWasCancelled:))]
+        fn cancelled(&self, _controller: &UIDocumentPickerViewController) {
+            self.finish(Vec::new());
+        }
+    }
+);
+
+impl PickerDelegate {
+    fn new(mtm: MainThreadMarker, tx: Sender<Vec<String>>, scoped: bool, ctx: egui::Context) -> Retained<Self> {
+        let this = Self::alloc(mtm).set_ivars(Ivars { tx: RefCell::new(Some(tx)), scoped, ctx });
+        // SAFETY: NSObject's designated initializer on a freshly allocated instance.
+        unsafe { msg_send![super(this), init] }
+    }
+
+    fn finish(&self, paths: Vec<String>) {
+        log::info!("document picker: {} item(s)", paths.len());
+        if let Some(tx) = self.ivars().tx.borrow_mut().take() {
+            // the command may have been abandoned meanwhile: nobody to answer then
+            let _ = tx.send(paths);
+        }
+        self.ivars().ctx.request_repaint();
+    }
+}
+
+thread_local! {
+    /// UIDocumentPickerViewController holds its delegate weakly: keep the last one alive.
+    static DELEGATE: RefCell<Option<Retained<PickerDelegate>>> = const { RefCell::new(None) };
+}
+
+/// The view controller winit made for the window: dialogs are presented from it.
+fn root_view_controller(window: &winit::window::Window) -> Result<Retained<UIViewController>, String> {
+    let handle = window.window_handle().map_err(|e| format!("no window handle: {e}"))?;
+    let RawWindowHandle::UiKit(h) = handle.as_raw() else {
+        return Err("not a UIKit window".into());
+    };
+    let ptr = h.ui_view_controller.ok_or("the window has no view controller")?;
+    // SAFETY: winit's UIKit handle points at the window's live UIViewController, owned by the
+    // window that outlives this call; retaining it keeps it alive while we use it.
+    unsafe { Retained::retain(ptr.as_ptr().cast::<UIViewController>()) }.ok_or_else(|| "null view controller".to_string())
+}
+
+/// Answer a command's request for paths with the Files picker (`Services::picker`).
+pub fn pick(window: &winit::window::Window, ctx: &egui::Context, req: &PickRequest) -> Result<Receiver<Vec<String>>, String> {
+    let (tx, rx) = channel();
+    if req.kind == PickKind::Save {
+        // No save dialog: the file goes to Documents/Exports (visible in the Files app).
+        let dir = exports_dir().ok_or("no Documents folder")?;
+        std::fs::create_dir_all(&dir).map_err(|e| format!("can't create {}: {e}", dir.display()))?;
+        let name = req.file_name.clone().unwrap_or_else(|| "export".into());
+        let _ = tx.send(vec![dir.join(name).to_string_lossy().into_owned()]);
+        return Ok(rx);
+    }
+    let mtm = MainThreadMarker::new().ok_or("the file picker must be opened on the main thread")?;
+    let vc = root_view_controller(window)?;
+    let images = req.filter.as_ref().is_some_and(|(_, exts)| exts.iter().any(|e| e.eq_ignore_ascii_case("jpg")));
+    // SAFETY: reading UniformTypeIdentifiers' constant UTType statics.
+    let ty: &UTType = unsafe {
+        match req.kind {
+            PickKind::Folder => UTTypeFolder,
+            _ if images => UTTypeImage,
+            _ => UTTypeItem,
+        }
+    };
+    let types = NSArray::from_slice(&[ty]);
+    // Files are copied into the app's inbox (no lasting access needed); folders are opened in
+    // place (an SD card, a folder in Files) and keep their security scope.
+    let folder = req.kind == PickKind::Folder;
+    // SAFETY: initializer on a freshly allocated picker, main thread.
+    let picker =
+        unsafe { UIDocumentPickerViewController::initForOpeningContentTypes_asCopy(UIDocumentPickerViewController::alloc(mtm), &types, !folder) };
+    let delegate = PickerDelegate::new(mtm, tx, folder, ctx.clone());
+    // SAFETY: setters on a live picker, main thread; the delegate is kept alive in DELEGATE.
+    unsafe {
+        picker.setAllowsMultipleSelection(req.kind == PickKind::Files);
+        picker.setDelegate(Some(ProtocolObject::from_ref(&*delegate)));
+        vc.presentViewController_animated_completion(&picker, true, None);
+    }
+    DELEGATE.with(|d| *d.borrow_mut() = Some(delegate));
+    Ok(rx)
+}

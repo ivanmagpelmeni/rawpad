@@ -110,7 +110,11 @@ impl Host {
                 // the loop may be gone while the app quits: nothing to wake then
                 let _ = proxy.send_event(UserEvent::RepaintAfter(info.delay));
             });
-            let mut app = LightcraftApp::new(open_session(), Services::default());
+            let services = {
+                let (window, ctx) = (Arc::clone(&window), self.ctx.clone());
+                Services { picker: Some(Box::new(move |req| crate::native::pick(&window, &ctx, &req))), ..Services::default() }
+            };
+            let mut app = LightcraftApp::new(open_session(), services);
             lightcraft_ui_egui::i18n::set_language(app.ui.language);
             if let Some(port) = std::env::var("RAWPAD_CONTROL").ok().and_then(|p| p.parse::<u16>().ok()) {
                 let rx = control_server::start(port, self.ctx.clone());
@@ -129,6 +133,15 @@ impl Host {
     fn frame(&mut self) {
         let (Some(gfx), Some(app)) = (self.gfx.as_mut(), self.app.as_mut()) else { return };
         let mut raw = gfx.input.take_egui_input(&gfx.window);
+        // Keep the UI out from under the status bar and the home indicator.
+        if let (Some(rect), Some(insets)) = (raw.screen_rect, raw.safe_area_insets) {
+            raw.screen_rect = Some(rect - insets);
+        }
+        // Imports copy into the library: picked files are temporary copies, and folders from
+        // Files or an SD card stay readable only while the app runs.
+        if let Some(scan) = app.scan.as_mut() {
+            scan.copy = true;
+        }
         app.raw_input_hook(&mut raw);
         let mut out = self.ctx.run_ui(raw, |ui| {
             app.logic(ui.ctx());

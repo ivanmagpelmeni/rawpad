@@ -3,11 +3,14 @@
 //! The same egui UI as the desktop app (`crates/ui-egui`), hosted by winit (UIKit) and drawn by
 //! egui-wgpu on Metal. Everything iPad-specific lives in this crate; on other targets the binary
 //! is a stub so the upstream workspace builds unchanged. See `IPAD.md` at the repo root.
-#![forbid(unsafe_code)]
+// `unsafe` is denied everywhere except `native` (UIKit calls; see DECISIONS.md).
+#![deny(unsafe_code)]
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 #[cfg(target_os = "ios")]
 mod ios;
+#[cfg(target_os = "ios")]
+mod native;
 
 fn main() {
     #[cfg(target_os = "ios")]
