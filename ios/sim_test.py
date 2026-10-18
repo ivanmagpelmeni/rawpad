@@ -57,6 +57,25 @@ def main():
             if "sleep" in step:
                 time.sleep(step["sleep"])
                 continue
+            if "waitUntil" in step:
+                # repeat a request until a dotted path in its result is truthy, e.g.
+                # {"waitUntil": "export.last", "method": "ui.inspect", "timeout": 60}
+                deadline = time.time() + step.get("timeout", 60)
+                while True:
+                    reply = request(sock, reader, step["method"], step.get("params", {}))
+                    value = reply.get("result")
+                    for key in step["waitUntil"].split("."):
+                        if isinstance(value, list):
+                            value = value[0] if value else None
+                        value = value.get(key) if isinstance(value, dict) else None
+                    if value or time.time() > deadline:
+                        break
+                    time.sleep(2)
+                log.write(json.dumps({"request": step, "reply": reply}) + "\n")
+                print(f"{'ok ' if value else 'ERR'} waitUntil {step['waitUntil']} = {json.dumps(value)[:200]}")
+                if not value:
+                    failures.append(f"{step['method']}: {step['waitUntil']} never became true: {json.dumps(reply)[:300]}")
+                continue
             if "checkFiles" in step:
                 # files the app wrote inside its container, e.g. Documents/Exports
                 data = subprocess.run(["xcrun", "simctl", "get_app_container", "booted", BUNDLE, "data"], capture_output=True, text=True).stdout.strip()
