@@ -177,3 +177,13 @@ Newer entries win over older ones and over the kickoff brief.
 32. **The tour waits instead of sleeping where it can:** `sim_test.py` has a `waitUntil` step
     (repeat a request until a dotted path in its result is truthy; fails the tour on timeout). Used
     for the background export (`export.last`) and the Photos import (`imports.imported`).
+
+## 2026-10-18: Nightly session 5 (22:54 Berlin)
+
+33. **Add to Photos uses the asynchronous `performChanges:completionHandler:`** and the runner's
+    thread waits on a channel for the answer, at most the runner's limit (`timeout_for`, 10 min +
+    5 s a file). `performChangesAndWait:error:` never returned when called from the export's
+    worker thread (the Export dialog's path; run 19), although it worked from the engine's
+    `apple-photos` thread. With the async call the same tour step saved the photo in under a second
+    (run 20). No answer in time is reported as the import's timeout, never a stuck "Adding to Apple
+    Photos…" row. The runner still refuses the main thread (it waits).
