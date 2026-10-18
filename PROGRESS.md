@@ -2,6 +2,13 @@
 
 ## Latest session summary
 
+**2026-10-18 (nightly 3, 20:55–21:35 Berlin, unattended)**
+1. Run 14 checked: green, released as 1.14 (Photos export). No new upstream release check needed (not the first run).
+2. **Share sheet** on iPad: every *Show in Finder* is now **Share…** (original raw, folder, Help › Open Log Folder → the log). *Save to Files* in the sheet covers "export original raw".
+3. Tested on branch `p5-share` (run 15): tour green, screenshot `05-share-sheet` shows the sheet with *Save to Files*. Merged into main at handoff (run 16 should release it).
+4. 24 MP GPU fallback judged simulator-only (its Metal reports 256 MiB buffers); verify with a device log (DECISIONS.md 30).
+5. Open: the Photos import still reads `running` 15 s after export in the simulator.
+
 **2026-10-18 (nightly 2, 19:54–20:40 Berlin, unattended)**
 1. Run 10 checked: toolbar clears the home indicator, mask panel shows 5 tiles. No new upstream release.
 2. On-device log: `Files › On My iPad › RawPad › Logs › lightcraft.log` (panics recorded). Released in **1.12**.
@@ -44,7 +51,8 @@
 - [~] **5. Files:**
   - Done: Files picker import (photos and folders); JPEG export to `Documents/Exports`;
     Export › Add to Apple Photos (`native::photos_runner`).
-  - To do: the share sheet, original-raw export to Files.
+    Share sheet (`native::share`, behind every *Show in Finder*), which also saves originals to Files.
+  - To do: a Share button right after an export (the exported file isn't in the library).
 - [~] **6. Performance and memory on the A16 (~6 GB):** (done: on-device log file with panics)
   - tiling, preview downscaling, a smaller thumbnail cache
   - memory warnings
@@ -59,24 +67,24 @@
 
 ## Current status
 
-Main is green: run 12 released **1.12** (log file, AI menu items hidden). The Photos export was
-tested green on the `p5-photos` branch (run 13) and merged into main at handoff (run 14 pending).
-CI checks build, fmt, unit tests, clippy, the simulator tour, the export file, the log file,
-and (in replies.jsonl) the Photos import.
+Main is green: run 14 released **1.14** (Add to Apple Photos). The share sheet was tested green on
+branch `p5-share` (run 15) and merged into main at handoff (run 16 pending, should release 1.16).
+CI checks build, fmt, unit tests, clippy, the simulator tour (incl. a share-sheet screenshot),
+the export file, the log file, and (in replies.jsonl) the Photos import.
 
 ## Next 3 tasks
 
-1. **Check run 14** (Photos merge): green, release 1.13, and in `runs/14/replies.jsonl` the
-   `export.photosImports` reply shows `"imported": 1`.
-2. **Share sheet** after export (`UIActivityViewController` in `src/native.rs`, presented from
-   the root view controller, with a popover anchor on iPad or it crashes), and "export
-   original raw" to Files. Test on a branch first (DECISIONS.md 28).
-3. **24 MP GPU export limit:** exports of 6000×4000 fall back to the CPU because egui-wgpu's
-   device asks for `adapter.limits()` and the render needs 275 MiB > 256 MiB
-   `max_storage_buffer_binding_size`. Check what the engine's own GPU device requests on iOS
-   and whether tiling is possible (phase 6). Then a `ui.zoom` pinch step in the tour.
+1. **Check run 16** (share merge): green, released, `runs/16/05-share-sheet.jpg` shows the sheet.
+2. **Share right after export:** the export dialog / finished-export toast has no button for the
+   exported file. Find where upstream reports a finished export (`Session::last_export`, export
+   toasts in `crates/ui-egui`) and add a host-side or tiny `cfg(ios)` "Share…" that calls
+   `services.reveal` with the exported path. Test on a branch first (DECISIONS.md 28).
+3. **Photos import still `running`** after 15 s in the tour (runs 14, 15): poll
+   `export.photosImports` until `running` is false (up to ~60 s) and fail the tour if it never
+   says `"imported": 1`. Then a `ui.zoom` pinch step in the tour.
 
 Also queued:
+- Top inset: iPadOS's multitasking "•••" sits over the search box (status bar hidden, top inset 0).
 - A 24 MP raw memory test in the simulator (CC0 ARW/RW2 from `cargo xtask corpus`).
 - Pencil: brush masks with the Apple Pencil (USB-C, no pressure); hardware-keyboard shortcuts.
 
@@ -96,6 +104,9 @@ Also queued:
    - Export it: **Export** → **Export**. It lands in **Files › On My iPad › RawPad › Exports**.
    - **New (1.13):** in the Export window tick **Add to Apple Photos**, then Export. The first
      time, iPadOS asks whether RawPad may add photos: tap **Allow**. Is the photo in the Photos app?
+   - **New (1.16):** press and hold a photo you imported → **Share…**: the iPad's share sheet
+     opens (Save to Files, AirDrop, Mail). **Menu › Help › Open Log Folder** now shares the log file
+     directly.
    - **New (1.12):** if something goes wrong, open **Files › On My iPad › RawPad › Logs**, press
      and hold **lightcraft.log** › **Share**, and send it to Claude in chat (the previous run's
      log is **lightcraft.1.log**).
