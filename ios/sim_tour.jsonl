@@ -1,0 +1,18 @@
+# CI tour of RawPad in the iPad simulator (ios/sim_test.py). One control request per line;
+# {"shot": "name"} takes a real simulator screenshot (xcrun simctl io), {"sleep": s} waits.
+{"method":"engine.execute","params":{"command":"library.info"},"expectPhotosAtLeast":1}
+{"method":"engine.execute","params":{"command":"view.photoGrid"}}
+{"sleep":8}
+{"shot":"01-library-grid"}
+{"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}}}
+{"method":"engine.execute","params":{"command":"view.detail"}}
+{"method":"engine.execute","params":{"command":"panel.edit"}}
+{"sleep":8}
+{"shot":"02-develop"}
+{"method":"engine.execute","params":{"command":"develop.set","params":{"values":{"light.exposure":0.6,"light.highlights":-55,"light.shadows":35,"color.vibrance":25}}}}
+{"method":"engine.execute","params":{"command":"panel.masking"}}
+{"method":"engine.execute","params":{"command":"mask.add","params":{"kind":"radial","center":[0.62,0.4],"rx":0.2,"ry":0.14,"feather":70,"name":"Glow"}}}
+{"method":"engine.execute","params":{"command":"mask.adjust","params":{"values":{"exposure":0.5,"temp":40}}}}
+{"sleep":8}
+{"shot":"03-masking"}
+{"method":"ui.inspect"}

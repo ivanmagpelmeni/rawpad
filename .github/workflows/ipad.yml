@@ -1,0 +1,186 @@
+# RawPad (LightCraft for iPad): build for the simulator and the iPad, drive the app in an iPad
+# simulator (screenshots as artifacts), and on main publish an unsigned .ipa as a GitHub Release
+# plus the SideStore source. Standard macOS runners only (free on public repos).
+name: iPad
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**.md", "docs/**", "sidestore/**", "ios/icon/make_icon.py"]
+  pull_request:
+    paths-ignore: ["**.md", "docs/**", "sidestore/**"]
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Publish a release if the simulator tests pass"
+        type: boolean
+        default: true
+
+concurrency:
+  group: ipad-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+
+jobs:
+  ipad:
+    runs-on: macos-15
+    timeout-minutes: 120
+    permissions:
+      contents: write # the ci-artifacts branch (screenshots + logs readable without a login)
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust toolchain + iOS targets
+        run: |
+          rustup toolchain install stable --profile minimal --component clippy,rustfmt --target aarch64-apple-ios,aarch64-apple-ios-sim
+          rustup default stable
+          rustc --version
+          xcodebuild -version
+
+      - name: Cache cargo + target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: ipad-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain*') }}-${{ github.sha }}
+          restore-keys: |
+            ipad-${{ runner.os }}-${{ hashFiles('Cargo.lock', 'rust-toolchain*') }}-
+            ipad-${{ runner.os }}-
+
+      - name: Format check (iOS crate)
+        run: mkdir -p ipad-test && cargo fmt -p rawpad-ios --check 2>&1 | tee ipad-test/fmt.log
+
+      - name: Build for the simulator
+        run: set -o pipefail; ios/build.sh sim 2>&1 | tee ipad-test/build-sim.log
+
+      - name: Clippy (iOS crate, never-crash lints)
+        run: set -o pipefail; cargo clippy --release --target aarch64-apple-ios-sim -p rawpad-ios -- -D warnings 2>&1 | tee ipad-test/clippy.log
+
+      - name: Boot an iPad simulator
+        id: sim
+        run: |
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          devs = json.load(sys.stdin)["devices"]
+          ipads = [(rt, d) for rt, ds in devs.items() if "iOS" in rt for d in ds if d["name"].startswith("iPad")]
+          # prefer the 11th-gen iPad (A16), then any non-Pro iPad, then anything
+          ipads.sort(key=lambda x: (("A16" not in x[1]["name"]), ("Pro" in x[1]["name"]), x[0]), reverse=False)
+          print(ipads[0][1]["udid"] if ipads else "")
+          ')
+          if [ -z "$udid" ]; then echo "no iPad simulator available"; xcrun simctl list devices available; exit 1; fi
+          xcrun simctl list devices | grep "$udid"
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
+      - name: Install, launch and drive RawPad
+        run: |
+          mkdir -p ipad-test
+          xcrun simctl install booted target/ipad/sim/RawPad.app
+          SIMCTL_CHILD_RAWPAD_DEMO=1 SIMCTL_CHILD_RAWPAD_CONTROL=7980 \
+            xcrun simctl launch --stdout="$PWD/ipad-test/app-stdout.log" --stderr="$PWD/ipad-test/app-stderr.log" \
+            booted io.github.ivanmagpelmeni.rawpad
+          sleep 15
+          xcrun simctl io booted screenshot ipad-test/00-launch.png
+          set -o pipefail; python3 ios/sim_test.py ios/sim_tour.jsonl ipad-test 7980 2>&1 | tee ipad-test/tour.log
+
+      - name: Final screenshot
+        if: always()
+        continue-on-error: true
+        run: xcrun simctl io booted screenshot ipad-test/04-final.png
+
+      - name: Crash logs
+        if: always()
+        run: |
+          mkdir -p ipad-test/crashes
+          cp ~/Library/Logs/DiagnosticReports/rawpad* ipad-test/crashes/ 2>/dev/null || true
+          ls -la ipad-test ipad-test/crashes
+          tail -n 80 ipad-test/app-stderr.log 2>/dev/null || true
+
+      - name: Upload screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipad-simulator-${{ github.run_number }}
+          path: ipad-test
+          retention-days: 30
+
+      - name: Build for the iPad (unsigned .ipa)
+        run: set -o pipefail; ios/build.sh device 2>&1 | tee ipad-test/build-device.log
+
+      # Artifacts need a GitHub login to download; this branch is readable by anyone (raw URLs),
+      # so Claude sessions can check logs and look at screenshots. Keeps the last 15 runs, one commit.
+      - name: Publish report to the ci-artifacts branch
+        if: always() && github.event_name != 'pull_request'
+        continue-on-error: true
+        env:
+          RUN: ${{ github.run_number }}
+          STATUS: ${{ job.status }}
+        run: |
+          set -x
+          report="$RUNNER_TEMP/report"
+          git clone --depth 1 --branch ci-artifacts "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" "$report" 2>/dev/null || {
+            mkdir -p "$report" && git -C "$report" init -b ci-artifacts && git -C "$report" remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}"; }
+          dest="$report/runs/$RUN"
+          mkdir -p "$dest"
+          for f in ipad-test/*.log ipad-test/*.jsonl; do [ -f "$f" ] && tail -c 400000 "$f" > "$dest/$(basename "$f")"; done
+          for f in ipad-test/*.png; do [ -f "$f" ] && sips -Z 1400 -s format jpeg -s formatOptions 70 "$f" --out "$dest/$(basename "${f%.png}").jpg" >/dev/null; done
+          cp -R ipad-test/crashes "$dest/" 2>/dev/null || true
+          printf '{"run": %s, "sha": "%s", "status": "%s", "date": "%s"}\n' "$RUN" "${{ github.sha }}" "$STATUS" "$(date -u +%FT%TZ)" > "$dest/run.json"
+          cd "$report"
+          ls -1 runs | sort -n | awk -v n="$(ls -1 runs | wc -l)" 'NR <= n - 15' | while read -r old; do rm -rf "runs/$old"; done
+          ls -1 runs | sort -n | tail -n 1 > LATEST
+          git checkout --orphan tmp && git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "CI reports (latest run $RUN)"
+          git push -f origin tmp:ci-artifacts
+
+      - id: ver
+        run: echo "version=$(cat target/ipad/device/version.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload .ipa
+        uses: actions/upload-artifact@v4
+        with:
+          name: RawPad-ipa-${{ github.run_number }}
+          path: target/ipad/device/RawPad.ipa
+          retention-days: 14
+
+  release:
+    needs: ipad
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.release)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/download-artifact@v4
+        with:
+          name: RawPad-ipa-${{ github.run_number }}
+          path: dist
+      - name: GitHub Release + SideStore source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.ipad.outputs.version }}
+        run: |
+          tag="v${VERSION}"
+          notes="RawPad ${VERSION} (build ${{ github.run_number }}, $(git log -1 --format=%h)): $(git log -1 --format=%s | cut -c1-200)"
+          gh release create "$tag" dist/RawPad.ipa --title "RawPad ${VERSION}" --notes "$notes" --target "${{ github.sha }}"
+          python3 ios/update_source.py "$VERSION" "${{ github.run_number }}" "$tag" dist/RawPad.ipa "$notes"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sidestore/source.json
+          git commit -m "SideStore source: RawPad ${VERSION}"
+          git pull --rebase origin main
+          git push origin HEAD:main
