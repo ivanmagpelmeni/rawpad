@@ -2,6 +2,13 @@
 
 ## Latest session summary
 
+**2026-10-19 (nightly 6, 23:55–00:40 Berlin, unattended)**
+1. **Pinch-zoom and pan in the loupe** are now in the CI tour (zoom to 45 %, two-finger and one-finger pan; screenshots `04-pinch-zoom`, `04-panned`).
+2. **Top gap of 20 pt** so the iPad's multitasking "•••" no longer covers the search box.
+3. **Share Exported Photo…** button now speaks the app's language (14 languages).
+4. CI flakiness found and fixed: a cold simulator took 90 s+ for Add to Photos; CI now warms Photos up first.
+5. All merged into main at handoff (branch run 25's tour green); the main run should release it (about 1.26).
+
 **2026-10-18 (nightly 5, 22:54–23:35 Berlin, unattended)**
 1. **Fixed the Photos hang:** Export dialog + *Add to Apple Photos* now finishes (async Photos call with a timeout; run 20 saved the photo in under a second).
 2. **Share Exported Photo…** button after an export: run 20 green, screenshots show the button and the share sheet for the new JPEG.
@@ -59,7 +66,7 @@
 - [x] **2. App shell** launches on the iPad simulator with the LightCraft UI on Metal and the demo
       library; CI screenshots
 - [ ] **3. First install on Ivan's iPad via SideStore**: release 1.8 is ready, waiting for Ivan
-- [~] **4. Input:** done: long-press → context menu, safe area from UIKit. To do: touch → pointer mapping, pinch-zoom/pan in loupe, Pencil (USB-C, no pressure)
+- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events). To do: real-finger check on the iPad, Pencil (USB-C, no pressure)
       for brush masks, hardware-keyboard shortcuts; rotation, Split View / Stage Manager resizing,
       safe areas
 - [~] **5. Files:**
@@ -82,22 +89,21 @@
 
 ## Current status
 
-Main has the merged `p5-share-export` (Share button after an export + the Photos hang fix); its
-branch run 20 was green with screenshots of the button and the sheet; main run 21 was green and
-released **1.21**. CI checks build, fmt, unit tests, clippy, the simulator tour
-(export in the background like the Export dialog, Add to Apple Photos finishing, Share button and
-sheet screenshots), the export file and the log file.
+Main has the merged `p4-batch` (pinch/pan tour steps, 20 pt top gap, translated Share button
+label, CI Photos warm-up). Its branch run 25 had a green tour; the main run after the merge should
+release it (about 1.26). Last confirmed release: **1.21**. CI checks build, fmt, unit tests,
+clippy, the simulator tour (sliders, mask, pinch/pan, background export with Add to Apple Photos,
+Share button and sheet), the export file and the log file.
 
 ## Next 3 tasks
 
-1. A `ui.zoom` / pinch step in the tour (phase 4: pinch-zoom and pan in the loupe).
-2. Top inset: iPadOS's multitasking "•••" sits over the search box (status bar hidden, top inset 0).
-3. Translate the "Share Exported Photo…" label.
+1. Check the main run after the merge (screenshots: top gap, share button); fix if red.
+2. Apple Pencil for brush masks (USB-C Pencil, no pressure).
+3. Hardware-keyboard shortcuts (⌘ keys) on iPad.
 
 Also queued:
 - A 24 MP raw memory test in the simulator (CC0 ARW/RW2 from `cargo xtask corpus`).
-- Pencil: brush masks with the Apple Pencil (USB-C, no pressure); hardware-keyboard shortcuts.
-- Delete merged branches `p5-photos`, `p5-share`, `p5-share-export`.
+- Delete merged branches (failed from the sandbox this session).
 
 ## Needs Ivan
 
@@ -124,4 +130,7 @@ Also queued:
    - **New (1.12):** if something goes wrong, open **Files › On My iPad › RawPad › Logs**, press
      and hold **lightcraft.log** › **Share**, and send it to Claude in chat (the previous run's
      log is **lightcraft.1.log**).
+   - **New (1.26 or later):** open a photo and pinch with two fingers: does it zoom in? Drag
+     with one or two fingers: does it move around? The **•••** button at the top middle of the
+     screen should no longer sit on the search box.
    - Anything slow, frozen or crashing: say which photo type (ARW or RW2) and what you did.

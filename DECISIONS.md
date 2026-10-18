@@ -187,3 +187,22 @@ Newer entries win over older ones and over the kickoff brief.
     `apple-photos` thread. With the async call the same tour step saved the photo in under a second
     (run 20). No answer in time is reported as the import's timeout, never a stuck "Adding to Apple
     Photos…" row. The runner still refuses the main thread (it waits).
+
+## 2026-10-18: Nightly session 6 (23:55 Berlin)
+
+34. **Pinch and pan are tested with egui's own events.** The tour sends `ui.zoom` (egui's pinch
+    event), a two-finger scroll and a one-finger drag over the loupe and checks `ui.zoom` and
+    `ui.pan` in `ui.inspect` (`sim_test.py`'s `waitUntil` got a `differs` option). Real fingers
+    reach the same upstream code (`detail.rs::navigate_gesture`) through egui's multi-touch input;
+    a pinch frame skips the one-finger drag-pan (`if !navigating`), so the two don't add up. The
+    simulator can't inject real touches without extra tools (idb), so the real-finger check is on
+    the iPad (Needs Ivan).
+35. **20 pt kept at the top** (`ios.rs::MIN_TOP_INSET`) for iPadOS's multitasking "•••" button:
+    with the status bar hidden UIKit reports a top inset of 0 and the button covered the search box.
+36. **The host's own strings get a small host-side table** (`share_offer::label`, the 14 upstream
+    languages, chosen by `i18n::language().code()`) instead of patching upstream's locale catalogs.
+    Slavic and Georgian forms put the count in brackets, so one form fits every number.
+37. **CI warms up the simulator's Photos library** (`xcrun simctl addmedia` of the app icon right
+    after boot) and waits up to 240 s for the background export: on a cold simulator "Add to Apple
+    Photos" took 92 s (run 24) or longer (run 22) instead of under a second (runs 20, 21). Not a
+    hang in the app: the photo was saved, just late.
