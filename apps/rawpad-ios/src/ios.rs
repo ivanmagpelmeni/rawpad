@@ -107,6 +107,10 @@ fn open_session() -> Session {
     s
 }
 
+/// Room kept at the top for iPadOS's multitasking "•••" button. The status bar is hidden, so
+/// UIKit reports a top inset of 0 and the button sat over the search box (CI run 21).
+const MIN_TOP_INSET: f32 = 20.0;
+
 impl Host {
     fn start(&mut self, event_loop: &ActiveEventLoop) -> Result<(), String> {
         let attrs = Window::default_attributes().with_title("RawPad");
@@ -209,7 +213,7 @@ impl Host {
                     log::info!("safe area (points): top {} left {} bottom {} right {}", i.top, i.left, i.bottom, i.right);
                     self.logged_insets = Some(i);
                 }
-                let (t, l, b, r) = (i.top as f32, i.left as f32, i.bottom as f32, i.right as f32);
+                let (t, l, b, r) = ((i.top as f32).max(MIN_TOP_INSET), i.left as f32, i.bottom as f32, i.right as f32);
                 let inner = egui::Rect::from_min_max(egui::pos2(rect.min.x + l, rect.min.y + t), egui::pos2(rect.max.x - r, rect.max.y - b));
                 if inner.is_positive() {
                     raw.screen_rect = Some(inner);
@@ -237,7 +241,9 @@ impl Host {
             let now = ctx.input(|i| i.time);
             share_offer.update(app.last_export_result.as_ref(), now);
             let area = app.canvas_rect.unwrap_or_else(|| ctx.content_rect());
-            if let Some(shown) = share_offer.show(ctx, egui::pos2(area.center().x, area.bottom() - 90.0), now) {
+            if let Some(shown) =
+                share_offer.show(ctx, egui::pos2(area.center().x, area.bottom() - 90.0), now, lightcraft_ui_egui::i18n::language().code())
+            {
                 app.widgets.push((crate::share_offer::WIDGET_ID.to_owned(), shown.rect));
                 if let Some(files) = shown.share {
                     share = Some((files, shown.rect.center()));
