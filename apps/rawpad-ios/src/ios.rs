@@ -88,7 +88,16 @@ impl Host {
     fn start(&mut self, event_loop: &ActiveEventLoop) -> Result<(), String> {
         let attrs = Window::default_attributes().with_title("RawPad");
         let window = Arc::new(event_loop.create_window(attrs).map_err(|e| format!("create window: {e}"))?);
-        let config = egui_wgpu::WgpuConfiguration::default();
+        let mut config = egui_wgpu::WgpuConfiguration::default();
+        // Ask for what the GPU actually has: egui-wgpu's default asks for WebGPU's default limits,
+        // which the iOS simulator's Metal doesn't meet (max_inter_stage_shader_variables 15 < 16).
+        if let egui_wgpu::WgpuSetup::CreateNew(create) = &mut config.wgpu_setup {
+            create.device_descriptor = Arc::new(|adapter: &wgpu::Adapter| wgpu::DeviceDescriptor {
+                label: Some("rawpad egui device"),
+                required_limits: adapter.limits(),
+                ..Default::default()
+            });
+        }
         let mut painter = pollster::block_on(egui_wgpu::winit::Painter::new(self.ctx.clone(), config, false, egui_wgpu::RendererOptions::default()));
         pollster::block_on(painter.set_window(ViewportId::ROOT, Some(Arc::clone(&window)))).map_err(|e| format!("Metal surface: {e}"))?;
         let input =
