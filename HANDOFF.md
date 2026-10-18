@@ -16,9 +16,8 @@ end. The next session reads it **first**.
     bottom of the loupe) and `06-share-sheet.jpg` (the sheet for `LC01214.jpg`). Both right.
   - **Merged `p5-share-export` into main** (merge commit pushed with these docs). That push starts
     the main run, which should release it (version = 1.<run number>, likely 1.21).
-- **Very next step:** check that main run (`https://api.github.com/repos/Ivanmagpelmeni/rawpad/actions/runs?per_page=3`)
-  is green and released, and glance at its `05-share-offer.jpg`. If red, fix or revert the merge
-  (`git revert -m 1 <merge>`). Then phase 4: add a pinch-zoom step to the tour (`ui.zoom` or the
+  - **Main run 21 green and released as 1.21** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39167124648).
+- **Very next step:** phase 4: add a pinch-zoom step to the tour (`ui.zoom` or the
   control protocol's pointer/zoom request; see `docs/control-protocol.md`), and check touch → pan in
   the loupe.
 - **Open problems:**
