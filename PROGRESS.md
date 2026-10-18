@@ -2,6 +2,13 @@
 
 ## Latest session summary
 
+**2026-10-18 (nightly 4, 21:55–22:45 Berlin, unattended)**
+1. Run 16 checked: green, released **1.16** (share sheet). Main untouched this session except docs.
+2. Built **Share Exported Photo…** (a button after an export → share sheet for the new files) on branch `p5-share-export`; unit tests green.
+3. The tour now waits for results (`waitUntil`) instead of fixed sleeps.
+4. **Found a bug:** an Export-dialog export with *Add to Apple Photos* hangs at "Adding to Apple Photos…" in the simulator (run 19). Probably in 1.14/1.16 too. Fix first next session.
+5. Branch not merged (run 19 red because of that hang). See HANDOFF.md.
+
 **2026-10-18 (nightly 3, 20:55–21:35 Berlin, unattended)**
 1. Run 14 checked: green, released as 1.14 (Photos export). No new upstream release check needed (not the first run).
 2. **Share sheet** on iPad: every *Show in Finder* is now **Share…** (original raw, folder, Help › Open Log Folder → the log). *Save to Files* in the sheet covers "export original raw".
@@ -52,7 +59,8 @@
   - Done: Files picker import (photos and folders); JPEG export to `Documents/Exports`;
     Export › Add to Apple Photos (`native::photos_runner`).
     Share sheet (`native::share`, behind every *Show in Finder*), which also saves originals to Files.
-  - To do: a Share button right after an export (the exported file isn't in the library).
+  - In progress: a Share button right after an export (branch `p5-share-export`).
+  - Bug: Export dialog + Add to Apple Photos hangs (background path), found in run 19.
 - [~] **6. Performance and memory on the A16 (~6 GB):** (done: on-device log file with panics)
   - tiling, preview downscaling, a smaller thumbnail cache
   - memory warnings
@@ -67,21 +75,17 @@
 
 ## Current status
 
-Main is green: run 14 released **1.14** (Add to Apple Photos). The share sheet was tested green on
-branch `p5-share` (run 15) and merged into main at handoff (run 16 pending, should release 1.16).
+Main is green: run 16 released **1.16** (share sheet). Branch `p5-share-export` (Share button after
+an export) is red in run 19 because a background export with Add to Apple Photos hangs (a real bug).
 CI checks build, fmt, unit tests, clippy, the simulator tour (incl. a share-sheet screenshot),
 the export file, the log file, and (in replies.jsonl) the Photos import.
 
 ## Next 3 tasks
 
-1. **Check run 16** (share merge): green, released, `runs/16/05-share-sheet.jpg` shows the sheet.
-2. **Share right after export:** the export dialog / finished-export toast has no button for the
-   exported file. Find where upstream reports a finished export (`Session::last_export`, export
-   toasts in `crates/ui-egui`) and add a host-side or tiny `cfg(ios)` "Share…" that calls
-   `services.reveal` with the exported path. Test on a branch first (DECISIONS.md 28).
-3. **Photos import still `running`** after 15 s in the tour (runs 14, 15): poll
-   `export.photosImports` until `running` is false (up to ~60 s) and fail the tour if it never
-   says `"imported": 1`. Then a `ui.zoom` pinch step in the tour.
+1. **Fix the background "Add to Apple Photos" hang** (run 19: Export dialog path stuck at
+   "Adding to Apple Photos…"). Start in `native.rs::photos_runner` and `export_task.rs`.
+2. **Merge `p5-share-export`** once its run is green and `05-share-offer` / `06-share-sheet` look right.
+3. A `ui.zoom` pinch step in the tour; then the top inset under the multitasking "•••".
 
 Also queued:
 - Top inset: iPadOS's multitasking "•••" sits over the search box (status bar hidden, top inset 0).
@@ -102,7 +106,8 @@ Also queued:
    - **New:** press and hold a photo in the grid (or a folder, or a mask) for half a second:
      a menu should open. Does it?
    - Export it: **Export** → **Export**. It lands in **Files › On My iPad › RawPad › Exports**.
-   - **New (1.13):** in the Export window tick **Add to Apple Photos**, then Export. The first
+   - **New (1.13), may be broken:** in the Export window tick **Add to Apple Photos**, then Export.
+     (The simulator shows it can hang at "Adding to Apple Photos…": if it does, tell Claude; a fix is coming.) The first
      time, iPadOS asks whether RawPad may add photos: tap **Allow**. Is the photo in the Photos app?
    - **New (1.16):** press and hold a photo you imported → **Share…**: the iPad's share sheet
      opens (Save to Files, AirDrop, Mail). **Menu › Help › Open Log Folder** now shares the log file

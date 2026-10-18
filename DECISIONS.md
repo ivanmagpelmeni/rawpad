@@ -164,3 +164,16 @@ Newer entries win over older ones and over the kickoff brief.
     limit is what the simulator's Metal reports. Real Apple GPUs report far larger buffers. No
     tiling work until a device log shows the fallback ("storage-buffer limit" in
     `lightcraft.log`).
+
+## 2026-10-18: Nightly session 4 (21:55 Berlin)
+
+31. **"Share Exported Photo…" is drawn by the host, not patched into upstream.** The host watches
+    `LightcraftApp::last_export_result` (set when a background export, i.e. the Export dialog,
+    finishes) and shows a small button above the export toast for 20 s (`src/share_offer.rs`);
+    tapping it opens one share sheet for all files written (`native::share_files`). Registered in
+    `app.widgets` as `button:rawpadShareExport` so the tour can click it. Synchronous control-channel
+    exports (no `background`) don't set that result, so they don't offer a share. The label is
+    English only for now (the module stays free of the UI crate so it unit-tests on macOS).
+32. **The tour waits instead of sleeping where it can:** `sim_test.py` has a `waitUntil` step
+    (repeat a request until a dotted path in its result is truthy; fails the tour on timeout). Used
+    for the background export (`export.last`) and the Photos import (`imports.imported`).
