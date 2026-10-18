@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.16",
+          "buildVersion": "16",
+          "date": "2026-10-18T19:50:08Z",
+          "localizedDescription": "RawPad 1.16 (build 16, 1d11188): Merge branch 'p5-share'",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.16/RawPad.ipa",
+          "size": 19785629,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.14",
           "buildVersion": "14",
           "date": "2026-10-18T18:39:48Z",
@@ -77,11 +86,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.14",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.14/RawPad.ipa",
-      "size": 19780972,
-      "versionDate": "2026-10-18T18:39:48Z",
-      "versionDescription": "RawPad 1.14 (build 14, 533f7e6): P5: handoff: run 14 tour passed"
+      "version": "1.16",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.16/RawPad.ipa",
+      "size": 19785629,
+      "versionDate": "2026-10-18T19:50:08Z",
+      "versionDescription": "RawPad 1.16 (build 16, 1d11188): Merge branch 'p5-share'"
     }
   ],
   "news": []
