@@ -71,6 +71,22 @@ The first RawPad release appears once phase 3 is ready. `PROGRESS.md` → *Needs
 2. Under the newest release, tap **RawPad.ipa** to download it.
 3. In SideStore, go to **My Apps**, tap **+**, and pick the file from **Downloads**.
 
+## Using RawPad: getting photos in and out
+
+- **Import:**
+  1. Tap **+** in the top bar (Import Photos…).
+  2. Pick photos in the Files window: iPad, iCloud Drive, or the SD card under *Locations*.
+  3. Confirm **Import**.
+
+  For a whole folder or card, use **Menu › File › Import from Folder…**.
+- **Imported photos are copied into RawPad's library.** You can remove the SD card afterwards.
+- **Export:**
+  1. Use **Export**.
+  2. The JPEGs land in the **Files** app under **On My iPad › RawPad › Exports**.
+  3. From there, tap a file, then **Share › Save Image** to put it in the Photos app.
+
+  (Direct saving to Photos is coming.)
+
 ## Every week: keep it working
 
 - Free Apple IDs sign apps for **7 days**. SideStore refreshes them, but the **VPN must be
