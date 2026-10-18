@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.9",
+          "buildVersion": "9",
+          "date": "2026-10-18T17:18:28Z",
+          "localizedDescription": "RawPad 1.9 (build 9, ee9da55): P4: long-press opens context menus (touch \u2192 secondary click)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.9/RawPad.ipa",
+          "size": 19658816,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.8",
           "buildVersion": "8",
           "date": "2026-10-18T13:05:27Z",
@@ -41,11 +50,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.8",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.8/RawPad.ipa",
-      "size": 19652027,
-      "versionDate": "2026-10-18T13:05:27Z",
-      "versionDescription": "RawPad 1.8 (build 8, 85b8e7b): P5: give the iPad host file writing and PNG encoding (exports said 'no writer')"
+      "version": "1.9",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.9/RawPad.ipa",
+      "size": 19658816,
+      "versionDate": "2026-10-18T17:18:28Z",
+      "versionDescription": "RawPad 1.9 (build 9, ee9da55): P4: long-press opens context menus (touch \u2192 secondary click)"
     }
   ],
   "news": []
