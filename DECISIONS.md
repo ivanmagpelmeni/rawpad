@@ -78,3 +78,32 @@ Newer entries win over older ones and over the kickoff brief.
 13. **Sandbox limit.** Claude's sandbox can't reach crates.io or `static.rust-lang.org` (proxy
     policy), so `cargo check` for iOS can't run in-session. CI is the compiler. GitHub works through
     the session's GitHub connection.
+
+## 2026-10-18: First CI results and Files access
+
+14. **The egui device asks for the adapter's own limits.**
+    - The iOS simulator's Metal reports `max_inter_stage_shader_variables` = 15, below WebGPU's
+      default of 16, so egui-wgpu's default request failed (black screen).
+    - We now use `required_limits: adapter.limits()`.
+15. **`unsafe` lives in `apps/rawpad-ios/src/native.rs` only.**
+    - It holds the UIKit calls through objc2 0.6 / objc2-ui-kit 0.3.
+    - `main.rs` denies `unsafe_code`; `native.rs` allows it, with a `// SAFETY:` note on each
+      block.
+    - Rejected: a separate helper crate (upstream's sysmem pattern). The crate is already
+      iOS-only and private, so a second crate would add ceremony without isolating anything new.
+16. **Files access goes through `Services::picker` (UIDocumentPickerViewController).**
+    - **Photos** (`file.addPhotos`) are picked `asCopy`, so the app gets temporary copies and no
+      lasting permission is needed.
+    - **Folders** (`file.addFolder`, export folders: SD card, Files) are opened in place, and
+      their security scope is kept for the app's lifetime.
+    - **Save requests** write to `Documents/Exports` without a dialog.
+    - The synchronous `pick_folder` and `pick_files` services stay unset, so buttons inside
+      dialogs that rely on them are hidden.
+17. **Imports always start as Copy into the library.** The host sets `ScanTask::copy` each
+    frame. Picked copies are temporary and folder access ends with the app, so "Add in place"
+    would lose originals.
+18. **Exports go to `Documents/Exports` by default,** shown in Files › On My iPad › RawPad. The
+    host seeds `Session::last_export` instead of patching upstream's `default_export_dir`
+    (`~/Pictures`, invisible in Files).
+19. **Safe area.** The host shrinks `RawInput::screen_rect` by egui-winit's iOS safe-area insets.
+    The status bar is hidden (`UIViewControllerBasedStatusBarAppearance` = false).
