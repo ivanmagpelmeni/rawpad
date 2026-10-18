@@ -92,6 +92,8 @@ jobs:
         run: |
           mkdir -p ipad-test
           xcrun simctl install booted target/ipad/sim/RawPad.app
+          # the tour's "Add to Apple Photos" export must not wait on the permission prompt
+          xcrun simctl privacy booted grant photos-add io.github.ivanmagpelmeni.rawpad || true
           SIMCTL_CHILD_RAWPAD_DEMO=1 SIMCTL_CHILD_RAWPAD_CONTROL=7980 \
             xcrun simctl launch --stdout="$PWD/ipad-test/app-stdout.log" --stderr="$PWD/ipad-test/app-stderr.log" \
             booted io.github.ivanmagpelmeni.rawpad

@@ -1,9 +1,10 @@
-//! UIKit bridges for the iPad host: the Files document picker behind `Services::picker`, and the
-//! window's safe area.
+//! UIKit bridges for the iPad host: the Files document picker behind `Services::picker`, the
+//! window's safe area, and saving exports to the Photos app (`photos_runner`).
 //!
 //! This is the only module of RawPad with `unsafe` (Objective-C messages through objc2), allowed
 //! here and nowhere else (DECISIONS.md, 2026-10-18). Every call happens on the main thread, where
-//! `LightcraftApp` runs its commands; a call from any other thread is refused, never made.
+//! `LightcraftApp` runs its commands; a call from any other thread is refused, never made. The one
+//! exception is `photos_runner`, which runs on the engine's worker thread and refuses the main one.
 #![allow(unsafe_code)]
 // objc2 marks some generated methods `unsafe` and others safe; one `unsafe` block per call keeps
 // the reasoning local without tracking which is which.
@@ -184,4 +185,75 @@ pub fn safe_area(window: &winit::window::Window) -> Option<EdgeInsets> {
     let insets: EdgeInsets = unsafe { msg_send![&*view, safeAreaInsets] };
     let ok = [insets.top, insets.left, insets.bottom, insets.right].iter().all(|v| v.is_finite() && *v >= 0.0);
     ok.then_some(insets)
+}
+
+// Photos.framework, for "Add to Photos" after an export (`photos_runner`). Its classes are looked
+// up by name at run time, so only the link is needed here.
+#[link(name = "Photos", kind = "framework")]
+unsafe extern "C" {}
+
+/// Adds exported files to the Photos app: the engine's Apple Photos import (made for macOS's
+/// osascript, see `lightcraft_engine::apple_photos`) with a runner that reads the file paths from
+/// the osascript arguments and saves each one with `PHPhotoLibrary`. Prints the new assets' local
+/// ids, one per line, as the script would. Albums aren't supported (the iPad hides the field).
+/// Runs on the engine's worker thread (`Session::apple_photos_background`): on the main thread it
+/// refuses, because `performChangesAndWait` must not block it. iPadOS asks for permission the first
+/// time (`NSPhotoLibraryAddUsageDescription` in `Info.plist`).
+pub fn photos_runner() -> lightcraft_engine::apple_photos::Runner {
+    use lightcraft_engine::apple_photos::{MARKER, Output, RunError};
+    std::sync::Arc::new(|args: &[String], _limit| {
+        if MainThreadMarker::new().is_some() {
+            return Err(RunError::Spawn("adding to Photos can't wait on the main thread".into()));
+        }
+        let paths = args.iter().position(|a| a == MARKER).and_then(|m| args.get(m.saturating_add(2)..)).unwrap_or_default();
+        let (mut ids, mut errors) = (Vec::new(), Vec::new());
+        for p in paths {
+            match save_to_photos(p) {
+                Ok(id) => ids.push(id),
+                Err(e) => errors.push(format!("{p}: {e}")),
+            }
+        }
+        let failed = ids.is_empty() && !errors.is_empty();
+        Ok(Output { status: Some(if failed { 1 } else { 0 }), stdout: ids.join("\n"), stderr: errors.join("\n") })
+    })
+}
+
+/// Save one image file to the photo library; the new asset's local id.
+fn save_to_photos(path: &str) -> Result<String, String> {
+    use objc2::runtime::{AnyClass, AnyObject};
+    use objc2_foundation::{NSError, NSString};
+    let library_class = AnyClass::get(c"PHPhotoLibrary").ok_or("the Photos framework isn't available")?;
+    let request_class = AnyClass::get(c"PHAssetChangeRequest").ok_or("the Photos framework isn't available")?;
+    // SAFETY: makes a file URL from a string (no file access).
+    let url = unsafe { NSURL::fileURLWithPath(&NSString::from_str(path)) };
+    // SAFETY: a class method of PHPhotoLibrary with no arguments, returning the shared library.
+    let library: Option<Retained<AnyObject>> = unsafe { msg_send![library_class, sharedPhotoLibrary] };
+    let library = library.ok_or("no photo library")?;
+    let id = std::sync::Arc::new(std::sync::Mutex::new(None::<String>));
+    let block = {
+        let id = std::sync::Arc::clone(&id);
+        block2::RcBlock::new(move || {
+            // SAFETY: called by Photos inside its change block, as the API requires; `url` is a
+            // live NSURL owned by this closure.
+            let request: Option<Retained<AnyObject>> = unsafe { msg_send![request_class, creationRequestForAssetFromImageAtFileURL: &*url] };
+            let Some(request) = request else { return };
+            // SAFETY: plain property reads on the request just made.
+            let placeholder: Option<Retained<AnyObject>> = unsafe { msg_send![&*request, placeholderForCreatedAsset] };
+            let Some(placeholder) = placeholder else { return };
+            // SAFETY: as above.
+            let local: Option<Retained<NSString>> = unsafe { msg_send![&*placeholder, localIdentifier] };
+            if let Some(local) = local {
+                *id.lock().unwrap_or_else(std::sync::PoisonError::into_inner) = Some(local.to_string());
+            }
+        })
+    };
+    // SAFETY: `performChangesAndWait:error:` runs the block synchronously on Photos' queue; this
+    // is a worker thread (checked by the runner), never the main thread.
+    let done: Result<(), Retained<NSError>> = unsafe { msg_send![&*library, performChangesAndWait: &*block, error: _] };
+    if let Err(e) = done {
+        // SAFETY: a property read on the error Photos returned.
+        return Err(unsafe { e.localizedDescription() }.to_string());
+    }
+    let id = id.lock().unwrap_or_else(std::sync::PoisonError::into_inner).take();
+    id.ok_or_else(|| "Photos couldn't read this file as an image".to_string())
 }

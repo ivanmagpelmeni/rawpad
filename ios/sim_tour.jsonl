@@ -19,6 +19,10 @@
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}
 {"checkFiles":"Documents/Exports","min":1}
+# Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome)
+{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[2],"format":"jpeg","addToPhotos":true}}}
+{"sleep":10}
+{"method":"engine.execute","params":{"command":"export.photosImports","params":{}}}
 # the log file (Files ▸ On My iPad ▸ RawPad ▸ Logs)
 {"checkFiles":"Documents/Logs","min":1}
 {"method":"ui.inspect"}

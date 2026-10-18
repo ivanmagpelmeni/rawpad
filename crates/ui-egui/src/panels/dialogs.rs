@@ -1043,11 +1043,14 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
                         &mut opts.conflict,
                     );
                     // After export: Apple Photos imports the files written (macOS only)
-                    #[cfg(target_os = "macos")]
+                    #[cfg(any(target_os = "macos", target_os = "ios"))]
                     {
                         let r = ui.checkbox(&mut opts.add_to_photos, crate::i18n::tr("Add to Apple Photos"));
                         crate::widgets::register(ui.ctx(), "exportAddToPhotos", r.rect);
-                        if opts.add_to_photos {
+                        // RawPad (iPadOS): no albums there, and iPadOS asks for permission itself
+                        if cfg!(target_os = "ios") {
+                            opts.photos_album.clear();
+                        } else if opts.add_to_photos {
                             field(ui, "Album", |ui| {
                                 crate::widgets::named(ui.add(egui::TextEdit::singleline(&mut opts.photos_album).hint_text(crate::i18n::tr("none")).desired_width(f32::INFINITY)), crate::i18n::tr("Album"))
                             });
@@ -1059,7 +1062,7 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
                         }
                     }
                     // nowhere to add them: a setting carried over from a Mac is dropped, not refused
-                    #[cfg(not(target_os = "macos"))]
+                    #[cfg(not(any(target_os = "macos", target_os = "ios")))]
                     {
                         opts.add_to_photos = false;
                     }
