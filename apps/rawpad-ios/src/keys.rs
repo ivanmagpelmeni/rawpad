@@ -3,7 +3,7 @@
 //! egui-winit only treats the logo key (⌘) as `command` on macOS; on other targets, iOS
 //! included, `command` follows Ctrl. On the iPad, as on the Mac, LightCraft's shortcuts
 //! (⌘Z, ⌘C, ⌘E…) must come from ⌘, so the host tracks ⌘ from winit's `ModifiersChanged` and
-//! rewrites the modifiers of this frame's events and of the input as a whole.
+//! rewrites the modifiers of this frame's events (egui 0.36 reads them from the events).
 
 use egui::{Event, Modifiers};
 
@@ -14,9 +14,8 @@ pub fn mac_like(mut m: Modifiers, logo: bool) -> Modifiers {
     m
 }
 
-/// Rewrite every event's modifiers and the input's (see the module docs).
-pub fn apply(events: &mut [Event], modifiers: &mut Modifiers, logo: bool) {
-    *modifiers = mac_like(*modifiers, logo);
+/// Rewrite every event's modifiers (see the module docs).
+pub fn apply(events: &mut [Event], logo: bool) {
     for event in events.iter_mut() {
         match event {
             Event::Key { modifiers, .. } | Event::PointerButton { modifiers, .. } | Event::MouseWheel { modifiers, .. } => {
@@ -39,9 +38,8 @@ mod tests {
     #[test]
     fn logo_key_is_command() {
         let mut ev = vec![key(Modifiers::NONE)];
-        let mut m = Modifiers::NONE;
-        apply(&mut ev, &mut m, true);
-        assert!(m.command && m.mac_cmd);
+        apply(&mut ev, true);
+        assert!(mac_like(Modifiers::NONE, true).command);
         assert!(matches!(&ev[0], Event::Key { modifiers, .. } if modifiers.command && modifiers.mac_cmd && !modifiers.ctrl));
     }
 
@@ -50,9 +48,7 @@ mod tests {
         // what egui-winit reports on iOS for Ctrl: ctrl and command both set
         let ctrl = Modifiers { ctrl: true, command: true, ..Modifiers::NONE };
         let mut ev = vec![key(ctrl)];
-        let mut m = ctrl;
-        apply(&mut ev, &mut m, false);
-        assert!(m.ctrl && !m.command);
+        apply(&mut ev, false);
         assert!(matches!(&ev[0], Event::Key { modifiers, .. } if modifiers.ctrl && !modifiers.command));
     }
 }

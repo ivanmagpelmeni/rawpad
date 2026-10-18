@@ -237,7 +237,7 @@ impl Host {
         // pointer events (CI) are never held back
         let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
         // ⌘ is `command` on the iPad as on the Mac (egui-winit maps it to Ctrl off macOS)
-        crate::keys::apply(&mut raw.events, &mut raw.modifiers, self.logo_key);
+        crate::keys::apply(&mut raw.events, self.logo_key);
         app.raw_input_hook(&mut raw);
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
