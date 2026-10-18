@@ -357,7 +357,11 @@ fn save_to_photos(path: &str, limit: std::time::Duration) -> Result<String, Save
         };
         let _ = tx.send(outcome);
     });
-    log::info!("photos: saving {path}");
+    // SAFETY: a class method of PHPhotoLibrary taking a PHAccessLevel (1 = add only) and
+    // returning a PHAuthorizationStatus (NSInteger); logged to tell a missing permission from a
+    // slow photo library (0 not asked, 1 restricted, 2 denied, 3 allowed, 4 limited).
+    let status: isize = unsafe { msg_send![library_class, authorizationStatusForAccessLevel: 1isize] };
+    log::info!("photos: saving {path} (permission status {status})");
     // SAFETY: `performChanges:completionHandler:` copies both blocks and calls them later on
     // Photos' own queues; nothing here waits on the main thread (the runner refuses it).
     let _: () = unsafe { msg_send![&*library, performChanges: &*changes, completionHandler: &*done] };
