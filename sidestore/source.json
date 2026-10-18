@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.14",
+          "buildVersion": "14",
+          "date": "2026-10-18T18:39:48Z",
+          "localizedDescription": "RawPad 1.14 (build 14, 533f7e6): P5: handoff: run 14 tour passed",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.14/RawPad.ipa",
+          "size": 19780972,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.12",
           "buildVersion": "12",
           "date": "2026-10-18T18:12:28Z",
@@ -68,11 +77,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.12",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.12/RawPad.ipa",
-      "size": 19789480,
-      "versionDate": "2026-10-18T18:12:28Z",
-      "versionDescription": "RawPad 1.12 (build 12, 63582bd): P7: hide the AI items (Object, Describe, Sky, Subject) in the mask Add/Subtract/Intersect menus on iPad"
+      "version": "1.14",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.14/RawPad.ipa",
+      "size": 19780972,
+      "versionDate": "2026-10-18T18:39:48Z",
+      "versionDescription": "RawPad 1.14 (build 14, 533f7e6): P5: handoff: run 14 tour passed"
     }
   ],
   "news": []
