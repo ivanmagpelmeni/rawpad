@@ -215,17 +215,27 @@ unsafe impl objc2::Encode for Rect {
 /// popover and must have an anchor, or UIKit raises an exception: it points at `at` (window
 /// points, normally where the finger was), or at the middle of the window.
 pub fn share(window: &winit::window::Window, path: &str, at: Option<(f64, f64)>) -> Result<(), String> {
+    share_files(window, &[path], at)
+}
+
+/// The share sheet for several files at once (the photos of one export).
+pub fn share_files(window: &winit::window::Window, paths: &[&str], at: Option<(f64, f64)>) -> Result<(), String> {
     use objc2::runtime::{AnyClass, AnyObject};
     use objc2_foundation::NSString;
     MainThreadMarker::new().ok_or("the share sheet must be opened on the main thread")?;
-    if !std::path::Path::new(path).exists() {
-        return Err(format!("{path} isn't there any more"));
-    }
+    let paths: Vec<&str> = paths.iter().copied().filter(|p| std::path::Path::new(p).exists()).collect();
+    let Some(first) = paths.first() else {
+        return Err("the exported files aren't there any more".into());
+    };
     let vc = root_view_controller(window)?;
     let class = AnyClass::get(c"UIActivityViewController").ok_or("no share sheet on this system")?;
-    // SAFETY: makes a file URL from a string (no file access).
-    let url = unsafe { NSURL::fileURLWithPath(&NSString::from_str(path)) };
-    let items = NSArray::from_slice(&[&*url]);
+    let mut urls: Vec<Retained<NSURL>> = Vec::with_capacity(paths.len());
+    for p in &paths {
+        // SAFETY: makes a file URL from a string (no file access).
+        urls.push(unsafe { NSURL::fileURLWithPath(&NSString::from_str(p)) });
+    }
+    let refs: Vec<&NSURL> = urls.iter().map(|u| &**u).collect();
+    let items = NSArray::from_slice(&refs);
     // SAFETY: `alloc` on UIActivityViewController's class, then its designated initializer with an
     // array of items and no custom activities, on the main thread.
     let sheet: Option<Retained<AnyObject>> = unsafe {
@@ -245,7 +255,7 @@ pub fn share(window: &winit::window::Window, path: &str, at: Option<(f64, f64)>)
         .filter(|(x, y)| x.is_finite() && y.is_finite() && (0.0..=bounds.width).contains(x) && (0.0..=bounds.height).contains(y))
         .unwrap_or((bounds.width / 2.0, bounds.height / 2.0));
     let anchor = Rect { x, y, width: 1.0, height: 1.0 };
-    log::info!("share sheet for {path}");
+    log::info!("share sheet for {first}{}", if paths.len() > 1 { format!(" and {} more", paths.len() - 1) } else { String::new() });
     // SAFETY: setters on the sheet's popover controller (the view is retained by it), then
     // presenting the sheet from the window's view controller; all on the main thread. The cast is
     // sound: UIActivityViewController is a UIViewController subclass.
@@ -268,20 +278,21 @@ unsafe extern "C" {}
 /// the osascript arguments and saves each one with `PHPhotoLibrary`. Prints the new assets' local
 /// ids, one per line, as the script would. Albums aren't supported (the iPad hides the field).
 /// Runs on the engine's worker thread (`Session::apple_photos_background`): on the main thread it
-/// refuses, because `performChangesAndWait` must not block it. iPadOS asks for permission the first
+/// refuses, because waiting for Photos must not block it. iPadOS asks for permission the first
 /// time (`NSPhotoLibraryAddUsageDescription` in `Info.plist`).
 pub fn photos_runner() -> lightcraft_engine::apple_photos::Runner {
     use lightcraft_engine::apple_photos::{MARKER, Output, RunError};
-    std::sync::Arc::new(|args: &[String], _limit| {
+    std::sync::Arc::new(|args: &[String], limit| {
         if MainThreadMarker::new().is_some() {
             return Err(RunError::Spawn("adding to Photos can't wait on the main thread".into()));
         }
         let paths = args.iter().position(|a| a == MARKER).and_then(|m| args.get(m.saturating_add(2)..)).unwrap_or_default();
         let (mut ids, mut errors) = (Vec::new(), Vec::new());
         for p in paths {
-            match save_to_photos(p) {
+            match save_to_photos(p, limit) {
                 Ok(id) => ids.push(id),
-                Err(e) => errors.push(format!("{p}: {e}")),
+                Err(SaveError::Failed(e)) => errors.push(format!("{p}: {e}")),
+                Err(SaveError::NoAnswer) => return Err(RunError::Timeout(limit)),
             }
         }
         let failed = ids.is_empty() && !errors.is_empty();
@@ -289,9 +300,24 @@ pub fn photos_runner() -> lightcraft_engine::apple_photos::Runner {
     })
 }
 
-/// Save one image file to the photo library; the new asset's local id.
-fn save_to_photos(path: &str) -> Result<String, String> {
-    use objc2::runtime::{AnyClass, AnyObject};
+/// Why one file wasn't saved: Photos' own error, or no answer in time (the whole request stops).
+enum SaveError {
+    Failed(String),
+    NoAnswer,
+}
+
+impl From<&str> for SaveError {
+    fn from(e: &str) -> Self {
+        Self::Failed(e.to_string())
+    }
+}
+
+/// Save one image file to the photo library; the new asset's local id. Uses the asynchronous
+/// `performChanges:completionHandler:` and waits for its answer here, at most `limit`: the
+/// synchronous `performChangesAndWait:error:` never returned when called from the export's
+/// worker thread (an Export-dialog export hung at "Adding to Apple Photos…", DECISIONS.md 33).
+fn save_to_photos(path: &str, limit: std::time::Duration) -> Result<String, SaveError> {
+    use objc2::runtime::{AnyClass, AnyObject, Bool};
     use objc2_foundation::{NSError, NSString};
     let library_class = AnyClass::get(c"PHPhotoLibrary").ok_or("the Photos framework isn't available")?;
     let request_class = AnyClass::get(c"PHAssetChangeRequest").ok_or("the Photos framework isn't available")?;
@@ -301,7 +327,7 @@ fn save_to_photos(path: &str) -> Result<String, String> {
     let library: Option<Retained<AnyObject>> = unsafe { msg_send![library_class, sharedPhotoLibrary] };
     let library = library.ok_or("no photo library")?;
     let id = std::sync::Arc::new(std::sync::Mutex::new(None::<String>));
-    let block = {
+    let changes = {
         let id = std::sync::Arc::clone(&id);
         block2::RcBlock::new(move || {
             // SAFETY: called by Photos inside its change block, as the API requires; `url` is a
@@ -318,13 +344,32 @@ fn save_to_photos(path: &str) -> Result<String, String> {
             }
         })
     };
-    // SAFETY: `performChangesAndWait:error:` runs the block synchronously on Photos' queue; this
-    // is a worker thread (checked by the runner), never the main thread.
-    let done: Result<(), Retained<NSError>> = unsafe { msg_send![&*library, performChangesAndWait: &*block, error: _] };
-    if let Err(e) = done {
-        // SAFETY: a property read on the error Photos returned.
-        return Err(unsafe { e.localizedDescription() }.to_string());
+    let (tx, rx) = std::sync::mpsc::channel::<Result<(), String>>();
+    let done = block2::RcBlock::new(move |success: Bool, error: *mut NSError| {
+        let outcome = if success.as_bool() {
+            Ok(())
+        } else {
+            // SAFETY: `error` is the NSError Photos passes to its completion handler, or null;
+            // retaining it keeps it alive while its description is read.
+            let error = unsafe { Retained::retain(error) };
+            // SAFETY: a property read on that error.
+            Err(error.map(|e| unsafe { e.localizedDescription() }.to_string()).unwrap_or_else(|| "Photos refused the file".into()))
+        };
+        let _ = tx.send(outcome);
+    });
+    log::info!("photos: saving {path}");
+    // SAFETY: `performChanges:completionHandler:` copies both blocks and calls them later on
+    // Photos' own queues; nothing here waits on the main thread (the runner refuses it).
+    let _: () = unsafe { msg_send![&*library, performChanges: &*changes, completionHandler: &*done] };
+    match rx.recv_timeout(limit) {
+        Ok(Ok(())) => {}
+        Ok(Err(e)) => return Err(SaveError::Failed(e)),
+        Err(_) => {
+            log::warn!("photos: no answer for {path} after {limit:?}");
+            return Err(SaveError::NoAnswer);
+        }
     }
+    log::info!("photos: saved {path}");
     let id = id.lock().unwrap_or_else(std::sync::PoisonError::into_inner).take();
-    id.ok_or_else(|| "Photos couldn't read this file as an image".to_string())
+    id.ok_or_else(|| SaveError::Failed("Photos couldn't read this file as an image".into()))
 }

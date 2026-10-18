@@ -13,6 +13,9 @@ mod ios;
 mod native;
 #[cfg(target_os = "ios")]
 mod prefs;
+// the Share button after an export: plain egui + JSON, tested on the CI's macOS host too
+#[cfg(any(target_os = "ios", test))]
+mod share_offer;
 // touch gestures are plain egui events, so their tests also run on the CI's macOS host
 #[cfg(any(target_os = "ios", test))]
 mod touch;
