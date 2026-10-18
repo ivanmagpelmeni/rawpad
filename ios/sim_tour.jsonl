@@ -15,6 +15,13 @@
 {"method":"engine.execute","params":{"command":"mask.adjust","params":{"values":{"exposure":0.5,"temp":40}}}}
 {"sleep":8}
 {"shot":"03-masking"}
+# a brush mask painted with a drag (Pencil touches reach the same code without the long-press wait)
+{"method":"engine.execute","params":{"command":"tool.brush","params":{"new":true}},"expectOk":true}
+{"method":"ui.pointer","params":{"events":[{"kind":"down","x":0.3,"y":0.6},{"kind":"drag","x":0.35,"y":0.62},{"kind":"drag","x":0.4,"y":0.64},{"kind":"drag","x":0.45,"y":0.65},{"kind":"drag","x":0.5,"y":0.66},{"kind":"up","x":0.5,"y":0.66}]},"expectOk":true}
+{"method":"engine.execute","params":{"command":"mask.adjust","params":{"values":{"exposure":-1}}},"expectOk":true}
+{"sleep":3}
+{"shot":"03-brush"}
+{"method":"engine.execute","params":{"command":"photo.inspect"}}
 # phase 4: pinch-zoom and pan in the loupe. ui.zoom is egui's pinch event; real fingers reach the
 # same code (detail.rs navigate_gesture) through egui's multi-touch input (zoom_delta/translation_delta)
 {"method":"engine.execute","params":{"command":"panel.edit"}}
