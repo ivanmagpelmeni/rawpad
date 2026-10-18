@@ -14,6 +14,7 @@ use serde_json::Value;
 /// How long the button stays up after an export, in seconds.
 pub const SHOW_FOR: f64 = 20.0;
 /// The button's automation id (control channel `ui.clickWidget`, `ui.widgets`).
+#[cfg_attr(not(target_os = "ios"), allow(dead_code))]
 pub const WIDGET_ID: &str = "button:rawpadShareExport";
 
 /// The files an export result says were written (`files[].path`; skipped and failed ones have none).
@@ -130,6 +131,12 @@ mod tests {
         assert!(o.paths(12.0 + SHOW_FOR + 0.1).is_empty());
     }
 
+    /// One frame; its font texture isn't uploaded anywhere (epaint panics on unhandled deltas).
+    fn frame(ctx: &Context, input: egui::RawInput, f: impl FnMut(&mut egui::Ui)) {
+        let mut out = ctx.run_ui(input, f);
+        out.textures_delta.clear();
+    }
+
     #[test]
     fn tapping_share_hands_over_the_files_once() {
         let ctx = Context::default();
@@ -138,7 +145,7 @@ mod tests {
         let mut shown = None;
         // a new area measures itself (invisibly) on its first frame
         for _ in 0..3 {
-            let _ = ctx.run_ui(egui::RawInput::default(), |ui| shown = o.show(ui.ctx(), egui::pos2(400.0, 500.0), 0.0));
+            frame(&ctx, egui::RawInput::default(), |ui| shown = o.show(ui.ctx(), egui::pos2(400.0, 500.0), 0.0));
         }
         let shown = shown.unwrap();
         assert!(shown.share.is_none());
@@ -152,7 +159,7 @@ mod tests {
             egui::Event::PointerButton { pos: at, button: egui::PointerButton::Primary, pressed: false, modifiers: Default::default() },
         ];
         let mut tapped = None;
-        let _ = ctx.run_ui(input, |ui| tapped = o.show(ui.ctx(), egui::pos2(400.0, 500.0), 1.0));
+        frame(&ctx, input, |ui| tapped = o.show(ui.ctx(), egui::pos2(400.0, 500.0), 1.0));
         assert_eq!(tapped.unwrap().share, Some(vec!["/x/a.jpg".to_owned()]));
         assert!(o.paths(1.0).is_empty());
     }
