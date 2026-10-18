@@ -41,5 +41,5 @@ objc2 = "0.6"
 # blocks for Photos' change requests (src/native.rs)
 block2 = "0.6"
 objc2-foundation = { version = "0.3", features = ["NSArray", "NSError", "NSObject", "NSString", "NSURL"] }
-objc2-ui-kit = { version = "0.3", features = ["UIDocumentPickerViewController", "UIViewController", "UIResponder", "block2", "objc2-uniform-type-identifiers"] }
+objc2-ui-kit = { version = "0.3", features = ["UIDocumentPickerViewController", "UIViewController", "UIResponder", "UIView", "block2", "objc2-uniform-type-identifiers"] }
 objc2-uniform-type-identifiers = { version = "0.3", features = ["UTType", "UTCoreTypes"] }

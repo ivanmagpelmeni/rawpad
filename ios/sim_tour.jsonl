@@ -43,6 +43,17 @@
 {"shot":"04-panned"}
 {"method":"ui.set","params":{"zoom":"fit","pan":[0.5,0.5]}}
 {"sleep":2}
+# hardware-keyboard probe, before any sheet (an open share sheet holds the keyboard, so run 30's
+# probe proved nothing). app-stderr.log: "keyboard (UIKit):" lines from native::KeyView, and
+# history.list shows whether ⌘Z undid the exposure change. Recorded, not checked yet.
+{"method":"engine.execute","params":{"command":"develop.set","params":{"values":{"light.exposure":1.5}}}}
+{"sleep":1}
+{"hostKeys":"p"}
+{"hostKeys":"z","cmd":true}
+{"sleep":3}
+{"method":"engine.execute","params":{"command":"develop.get"}}
+{"method":"engine.execute","params":{"command":"history.list"}}
+{"shot":"04-keys"}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}
@@ -58,10 +69,6 @@
 {"method":"ui.clickWidget","params":{"id":"button:rawpadShareExport"},"expectOk":true}
 {"sleep":4}
 {"shot":"06-share-sheet"}
-# hardware-keyboard probe: do keys reach the app through winit? (app-stderr.log "keyboard:" lines)
-{"hostKeys":"p"}
-{"hostKeys":"z","cmd":true}
-{"sleep":2}
 # the log file (Files ▸ On My iPad ▸ RawPad ▸ Logs)
 {"checkFiles":"Documents/Logs","min":1}
 # Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome).

@@ -54,6 +54,7 @@ pub fn run() {
         long_press: Default::default(),
         logo_key: false,
         keys_logged: 0,
+        keys: None,
         logged_insets: None,
         prefs: None,
         share_offer: Default::default(),
@@ -80,6 +81,8 @@ struct Host {
     logo_key: bool,
     /// Key presses logged so far (only the first few, so typed text doesn't fill the log).
     keys_logged: u8,
+    /// Hardware-keyboard presses read from UIKit (winit 0.30 passes none on iOS; CI run 30).
+    keys: Option<crate::native::Keys>,
     logged_insets: Option<crate::native::EdgeInsets>,
     prefs: Option<crate::prefs::Writer>,
     /// The Share button for the files of the last export.
@@ -202,6 +205,10 @@ impl Host {
             }
             self.app = Some(app);
         }
+        self.keys = crate::native::Keys::attach(&window, &self.ctx);
+        if self.keys.is_none() {
+            log::warn!("keyboard (UIKit): no key view, hardware keys reach only winit");
+        }
         window.request_redraw();
         self.gfx = Some(Gfx { window, input, painter });
         Ok(())
@@ -237,7 +244,17 @@ impl Host {
         // pointer events (CI) are never held back
         let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
         // ⌘ is `command` on the iPad as on the Mac (egui-winit maps it to Ctrl off macOS)
-        crate::keys::apply(&mut raw.events, self.logo_key);
+        // (UIKit's own presses come with their modifiers already Mac-style: added after)
+        let (uikit_events, uikit_cmd) = self
+            .keys
+            .as_ref()
+            .map(|k| {
+                k.focus();
+                k.drain()
+            })
+            .unwrap_or_default();
+        crate::keys::apply(&mut raw.events, self.logo_key || uikit_cmd);
+        raw.events.extend(uikit_events);
         app.raw_input_hook(&mut raw);
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
