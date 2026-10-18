@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.27",
+          "buildVersion": "27",
+          "date": "2026-10-18T23:21:29Z",
+          "localizedDescription": "RawPad 1.27 (build 27, bf77cb0): P5: log the Photos add-only permission status before each save",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.27/RawPad.ipa",
+          "size": 19803978,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.21",
           "buildVersion": "21",
           "date": "2026-10-18T21:32:41Z",
@@ -95,11 +104,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.21",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.21/RawPad.ipa",
-      "size": 19803555,
-      "versionDate": "2026-10-18T21:32:41Z",
-      "versionDescription": "RawPad 1.21 (build 21, 2c1282d): P5: handoff after nightly session 5 (Photos hang fixed, Share button merged); decision 33"
+      "version": "1.27",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.27/RawPad.ipa",
+      "size": 19803978,
+      "versionDate": "2026-10-18T23:21:29Z",
+      "versionDescription": "RawPad 1.27 (build 27, bf77cb0): P5: log the Photos add-only permission status before each save"
     }
   ],
   "news": []
