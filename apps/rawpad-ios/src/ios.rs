@@ -327,6 +327,13 @@ impl ApplicationHandler<UserEvent> for Host {
     }
 
     fn window_event(&mut self, event_loop: &ActiveEventLoop, _id: WindowId, event: WindowEvent) {
+        // winit gives an altitude angle only for Apple Pencil touches; egui drops it, so note
+        // them here for the long-press filter (a resting Pencil tip must draw, not open a menu)
+        if let WindowEvent::Touch(t) = &event
+            && matches!(t.force, Some(winit::event::Force::Calibrated { altitude_angle: Some(_), .. }))
+        {
+            self.long_press.mark_pencil(t.id);
+        }
         let Some(gfx) = self.gfx.as_mut() else { return };
         let response = gfx.input.on_window_event(&gfx.window, &event);
         match event {
