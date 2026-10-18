@@ -818,15 +818,19 @@ fn describe_field(app: &mut LightcraftApp, ui: &mut egui::Ui, new_mask: bool) {
 }
 
 fn component_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, op: &str) {
-    let b = ui.button(crate::i18n::tr("Object"));
-    register(ui.ctx(), format!("maskComp:{op}:object"), b.rect);
-    if b.clicked() {
-        start_object(app, ui.ctx(), op);
-    }
-    let b = ui.button(crate::i18n::tr("Describe…"));
-    register(ui.ctx(), format!("maskComp:{op}:prompt"), b.rect);
-    if b.clicked() {
-        start_describe(app, op);
+    // RawPad (iPadOS) ships without the AI models: no Object/Describe/Sky/Subject
+    let ai = !cfg!(target_os = "ios");
+    if ai {
+        let b = ui.button(crate::i18n::tr("Object"));
+        register(ui.ctx(), format!("maskComp:{op}:object"), b.rect);
+        if b.clicked() {
+            start_object(app, ui.ctx(), op);
+        }
+        let b = ui.button(crate::i18n::tr("Describe…"));
+        register(ui.ctx(), format!("maskComp:{op}:prompt"), b.rect);
+        if b.clicked() {
+            start_describe(app, op);
+        }
     }
     for (kind, label) in [
         ("brush", "Brush"),
@@ -837,7 +841,7 @@ fn component_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, op: &str) {
         ("luminanceRange", "Luminance Range"),
     ] {
         // painting only adds or erases
-        if kind == "brush" && op == "intersect" {
+        if (kind == "brush" && op == "intersect") || (!ai && matches!(kind, "sky" | "subject")) {
             continue;
         }
         let b = ui.button(menu_label(label));

@@ -26,6 +26,14 @@
 | File | Change | On merge |
 |---|---|---|
 | `crates/ui-egui/src/panels/masking.rs` (`show`, after the `tiles` array) | Filters the AI tiles (Object, Describe, Subject, Sky, Background) out of *Create New Mask* on iOS | Re-apply after the `tiles` array if upstream changes it |
+| `crates/ui-egui/src/panels/masking.rs` (`component_menu`) | On iOS (`ai = false`) skips Object, Describe…, Sky and Subject in the Add/Subtract/Intersect menus | Re-apply: wrap the Object/Describe buttons in `if ai`, skip `sky`/`subject` in the loop |
+
+### Upstream files compiled into RawPad unchanged (`#[path]` in `apps/rawpad-ios/src/ios.rs`)
+
+| File | Used for | On merge |
+|---|---|---|
+| `apps/lightcraft/src/control_server.rs` | The CI control channel | Nothing to do; a changed API shows up as a build error in CI |
+| `apps/lightcraft/src/logging.rs` | Log to stderr + `Documents/Logs/lightcraft.log`, panics recorded | Same |
 
 ## Merge log
 
