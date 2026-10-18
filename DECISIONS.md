@@ -129,3 +129,23 @@ Newer entries win over older ones and over the kickoff brief.
     the iPad always opens `RawPad Library`.
 23. **The iOS crate's unit tests run on the macOS CI host** (`cargo test -p rawpad-ios`; egui is a
     dev-dependency so pure-egui modules like `touch.rs` compile there).
+
+## 2026-10-18: Nightly session 2 (19:54 Berlin)
+
+24. **The on-device log is upstream's desktop logger, compiled in by `#[path]`** (like the
+    control server): stderr plus `Documents/Logs/lightcraft.log`, rotated each launch
+    (`lightcraft.1.log`, `.2`), panics recorded. In `Documents` (not `Library/Caches`) so Ivan can
+    find and share it in Files › On My iPad › RawPad › Logs. Filter `warn,lightcraft*=info,rawpad*=info`.
+25. **AI items are also hidden in the mask Add/Subtract/Intersect menus on iOS** (Object,
+    Describe…, Sky, Subject), patched in `masking.rs::component_menu`.
+26. **The ArtCraft Discord/website links stay for now.** They credit and point to upstream's
+    community; hiding them needs patches in five upstream files (topbar, dialogs, menus, menubar,
+    links). The brand rule only covers the ArtCraft marks/logos, which are already removed.
+    Revisit if Ivan asks.
+27. **"Add to Apple Photos" reuses the engine's Photos import with an iOS runner**
+    (`native::photos_runner`, `PHPhotoLibrary performChangesAndWait` on the engine's worker
+    thread) instead of a new iPad-only export path. Two small upstream gates opened for iOS (see
+    `UPSTREAM.md`). No albums on iPad (the field is hidden). The share sheet is still to do.
+28. **Risky native work is tested on a branch first:** push the branch, start the iPad workflow
+    on it with `workflow_dispatch` (release off; releases only come from main), merge into main
+    only when that run is green and its replies/screenshots look right.

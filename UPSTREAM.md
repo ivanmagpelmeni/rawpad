@@ -27,6 +27,8 @@
 |---|---|---|
 | `crates/ui-egui/src/panels/masking.rs` (`show`, after the `tiles` array) | Filters the AI tiles (Object, Describe, Subject, Sky, Background) out of *Create New Mask* on iOS | Re-apply after the `tiles` array if upstream changes it |
 | `crates/ui-egui/src/panels/masking.rs` (`component_menu`) | On iOS (`ai = false`) skips Object, Describe…, Sky and Subject in the Add/Subtract/Intersect menus | Re-apply: wrap the Object/Describe buttons in `if ai`, skip `sky`/`subject` in the loop |
+| `crates/engine/src/export.rs` (`apple_photos_unsupported`) | Allows iOS as well as macOS (the iPad host installs a Photos runner) | Re-apply the `any(target_os = "macos", target_os = "ios")` |
+| `crates/ui-egui/src/panels/dialogs.rs` (export dialog, *After export*) | The *Add to Apple Photos* checkbox is compiled for iOS too; on iOS the album is cleared and its field and macOS note are hidden | Re-apply both `cfg` changes and the `if cfg!(target_os = "ios")` |
 
 ### Upstream files compiled into RawPad unchanged (`#[path]` in `apps/rawpad-ios/src/ios.rs`)
 

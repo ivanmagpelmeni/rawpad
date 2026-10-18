@@ -3,44 +3,41 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-10-18, about 19:25 Berlin, end of nightly session 1 (unattended, started 18:54).
-- **Upstream:** checked `git ls-remote https://github.com/storytold/lightcraft 'refs/tags/*'`:
-  newest tag is still `v0.9.1` (our fork point). Nothing to merge. (The releases API for
-  storytold/lightcraft is blocked in this sandbox; `git ls-remote` on tags works.)
+- **Written:** 2026-10-18, about 20:25 Berlin, end of nightly session 2 (unattended, started 19:54).
+- **Upstream:** `git ls-remote https://github.com/storytold/lightcraft 'refs/tags/*'`: newest tag
+  still `v0.9.1` (our fork point). Nothing to merge.
+- **Checked:** run 10 screenshots: bottom toolbar clears the home indicator (`safe area (points):
+  top 0 left 0 bottom 25 right 0`), mask panel shows exactly 5 tiles. Good.
 - **Done this session:**
-  - `ee9da55` P4: long-press → secondary click (`apps/rawpad-ios/src/touch.rs`), 5 unit tests,
-    new CI step *Unit tests (iOS crate, on the macOS host)*. **CI run 9 green, released as
-    RawPad 1.9** (`c6fbf5f` updated the SideStore source).
-  - `fae8a97` P4: UI inside UIKit's `safeAreaInsets` (`native::safe_area`) + interface settings
-    saved to `Library/Application Support/RawPad UI.json` (`src/prefs.rs`).
-  - `e83191e` P7: AI mask tiles hidden on iOS (first upstream patch, logged in `UPSTREAM.md`);
-    `DECISIONS.md` 20–23.
-- **In progress:** CI run 10 for `e83191e` (the two commits above): at 19:33 Berlin fmt, unit
-  tests, sim build, clippy and the **simulator tour had all passed**; the device build, report
-  and release (1.10) were still running. Screenshots not yet looked at. **Check it first:**
-  - green → look at `runs/10/03-masking.jpg` (5 tiles: Brush, Linear, Radial, Luminance, Color)
-    and `02-develop.jpg` (bottom toolbar clear of the home indicator), and grep
-    `runs/10/app-stderr.log` for `safe area (points)`. If the toolbar still touches the bottom,
-    the inset read returned zeros: log says so; try `window.safeAreaInsets` of the UIWindow
-    (`view.window`) instead of the view, or read after the first layout.
-  - red → read `build-sim.log` / `clippy.log`. Likely suspects: the `msg_send!` returning
-    `EdgeInsets` (objc2 encoding check: struct name must be `UIEdgeInsets`), the
-    `lightcraft_ui_egui::docking::Workspace` path in `prefs.rs`, or a clippy lint on the
-    `cfg!` filter in `masking.rs` (clippy only lints `rawpad-ios`, so unlikely). Fix or revert
-    `fae8a97`/`e83191e`; never leave main red.
-- **Very next step after that:** `PROGRESS.md` → *Next 3 tasks* (FEEDBACK.md is still empty).
+  - `b4cd395` P6: on-device log. The host now uses upstream's desktop logger
+    (`apps/lightcraft/src/logging.rs` via `#[path]`): stderr + `Documents/Logs/lightcraft.log`,
+    rotated per launch, panics recorded. Tour checks the file.
+  - `63582bd` P7: AI items (Object, Describe…, Sky, Subject) hidden in the mask
+    Add/Subtract/Intersect menus on iOS (upstream patch, logged in `UPSTREAM.md`).
+  - Both green in **run 12, released as RawPad 1.12** (run 11 was cancelled by the second push).
+  - `6bbcf62` P5: **Export › Add to Apple Photos** on iPad: `native::photos_runner` plugs into
+    the engine's Photos import (`PHPhotoLibrary performChangesAndWait` on its worker thread);
+    upstream gates opened for iOS (export.rs, dialogs.rs; in `UPSTREAM.md`); Info.plist
+    `NSPhotoLibraryAddUsageDescription`; CI pre-grants `photos-add`; tour exports once with
+    `addToPhotos`. Tested on branch `p5-photos` with `workflow_dispatch`: **run 13 green**, and
+    `export.photosImports` returned `"imported": 1` with a Photos asset id.
+  - Merged `p5-photos` into main with the doc updates at handoff → **run 14** (should release 1.13).
+- **Very next step:** check run 14 (green? release 1.13? `runs/14/replies.jsonl` shows
+  `"imported": 1`?). If red, it's the merge only (code identical to green run 13): read the
+  logs; revert the merge commit if you can't fix it. Then `PROGRESS.md` → *Next 3 tasks* (share sheet).
+- **Open problems:**
+  - 24 MP exports fall back to the CPU in the simulator: "GPU render: 6000×4000 needs 275 MiB
+    buffers, over the device's 256 MiB storage-buffer limit" (run 13 replies). Phase 6.
+  - Long-press and Photos permission are untested on the real iPad (Needs Ivan).
+  - Top inset is 0 (status bar hidden), so iPadOS's multitasking "•••" sits over the search box
+    in the top bar. Cosmetic; consider a small top inset.
+  - Delete the merged `p5-photos` branch when convenient (harmless if left).
 - **How to check CI:**
   - Runs: `https://api.github.com/repos/Ivanmagpelmeni/rawpad/actions/runs?per_page=3`;
     steps: `…/actions/runs/<id>/jobs` (public, 60 requests/hour).
   - Reports: `git fetch --depth 1 origin ci-artifacts`; `git show origin/ci-artifacts:LATEST`;
-    files under `runs/<n>/` (now also `unit-tests.log`). Extract a screenshot with
-    `git show origin/ci-artifacts:runs/<n>/02-develop.jpg > <scratchpad>/x.jpg` and Read it.
-  - Pushing code while a run is going cancels it. Markdown-only pushes don't start a run.
-  - A full run takes about 20–25 minutes (the device build is the slow part). To get a release
-    out, wait for the run to finish before pushing more code.
-- **Open problems:**
-  - Long-press is untested on a real touchscreen (the control channel bypasses the filter by
-    design). Ask Ivan via *Needs Ivan*.
-  - AI items still appear in mask context menus (Add/Subtract → Sky/Subject…), and the ArtCraft
-    Discord/website links show.
-  - No Photos-app export or share sheet yet; no on-device log file.
+    files under `runs/<n>/` (`tour.log`, `replies.jsonl`, `app-stderr.log`, screenshots).
+  - Pushing code to main while a run is going cancels it. Markdown-only pushes don't start a run.
+  - Branch test: push a branch, then the GitHub tool `actions_run_trigger` (`run_workflow`,
+    `ipad.yml`, ref = branch, inputs `{"release": false}`). Branch runs don't cancel main runs.
+  - A full run takes about 20 minutes; the tour result is known after about 10.
