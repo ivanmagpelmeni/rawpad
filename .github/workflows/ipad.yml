@@ -62,6 +62,9 @@ jobs:
       - name: Format check (iOS crate)
         run: mkdir -p ipad-test && cargo fmt -p rawpad-ios --check 2>&1 | tee ipad-test/fmt.log
 
+      - name: Unit tests (iOS crate, on the macOS host)
+        run: set -o pipefail; cargo test -p rawpad-ios 2>&1 | tee ipad-test/unit-tests.log
+
       - name: Build for the simulator
         run: set -o pipefail; ios/build.sh sim 2>&1 | tee ipad-test/build-sim.log
 

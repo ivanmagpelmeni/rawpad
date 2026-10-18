@@ -40,7 +40,14 @@ pub fn run() {
         }
     };
     event_loop.set_control_flow(ControlFlow::Wait);
-    let mut host = Host { proxy: event_loop.create_proxy(), ctx: egui::Context::default(), gfx: None, app: None, next_repaint: None };
+    let mut host = Host {
+        proxy: event_loop.create_proxy(),
+        ctx: egui::Context::default(),
+        gfx: None,
+        app: None,
+        next_repaint: None,
+        long_press: Default::default(),
+    };
     if let Err(e) = event_loop.run_app(&mut host) {
         log::error!("event loop ended with an error: {e}");
     }
@@ -58,6 +65,7 @@ struct Host {
     gfx: Option<Gfx>,
     app: Option<LightcraftApp>,
     next_repaint: Option<Instant>,
+    long_press: crate::touch::LongPress,
 }
 
 /// `<app container>/Library/Application Support/RawPad Library` (backed up with the app, not shown in Files).
@@ -169,6 +177,9 @@ impl Host {
         if let Some(scan) = app.scan.as_mut() {
             scan.copy = true;
         }
+        // long-press → secondary click (context menus); before the hook, so control-channel
+        // pointer events (CI) are never held back
+        let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
         app.raw_input_hook(&mut raw);
         let mut out = self.ctx.run_ui(raw, |ui| {
             app.logic(ui.ctx());
@@ -189,6 +200,9 @@ impl Host {
         app.session.persist_if_dirty();
         if let Some(vp) = out.viewport_output.get(&ViewportId::ROOT) {
             self.schedule(vp.repaint_delay);
+        }
+        if let Some(delay) = long_press_in {
+            self.schedule(delay);
         }
     }
 

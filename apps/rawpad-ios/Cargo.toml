@@ -15,6 +15,10 @@ path = "src/main.rs"
 
 # Everything is iOS-only: on other targets the binary is an empty stub, so the upstream workspace
 # (`cargo xtask ci` on Linux/FreeBSD/macOS) builds and tests unchanged.
+# the touch-gesture tests (src/touch.rs) run on any host
+[dev-dependencies]
+egui = { workspace = true }
+
 [target.'cfg(target_os = "ios")'.dependencies]
 lightcraft-engine = { workspace = true }
 lightcraft-ui-egui = { workspace = true }
