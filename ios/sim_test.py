@@ -82,6 +82,21 @@ def main():
                     # "soft": true only warns (simulator-only flakiness, e.g. photolibraryd; DECISIONS.md 38)
                     (warnings if step.get("soft") else failures).append(msg)
                 continue
+            if "hostKeys" in step:
+                # type on the CI Mac into the Simulator window (a hardware-keyboard probe; never
+                # used on a person's computer). Never fails the tour: the runner may lack
+                # accessibility permission for System Events.
+                using = " using command down" if step.get("cmd") else ""
+                keys = step["hostKeys"]
+                script = f'tell application "Simulator" to activate\ndelay 1\ntell application "System Events" to keystroke "{keys}"{using}'
+                cmd = bool(step.get("cmd"))
+                try:
+                    r = subprocess.run(["osascript", "-e", script], capture_output=True, text=True, timeout=30)
+                    status, err = ("ok " if r.returncode == 0 else "WARN"), r.stderr.strip()[:200]
+                except (OSError, subprocess.TimeoutExpired) as e:
+                    status, err = "WARN", str(e)[:200]
+                print(f"{status} hostKeys {keys!r} cmd={cmd} {err}")
+                continue
             if "checkFiles" in step:
                 # files the app wrote inside its container, e.g. Documents/Exports
                 data = subprocess.run(["xcrun", "simctl", "get_app_container", "booted", BUNDLE, "data"], capture_output=True, text=True).stdout.strip()
