@@ -133,6 +133,7 @@ impl Host {
             let services = {
                 let (window, ctx) = (Arc::clone(&window), self.ctx.clone());
                 let links = ctx.clone();
+                let (share_window, share_ctx) = (Arc::clone(&window), ctx.clone());
                 Services {
                     picker: Some(Box::new(move |req| crate::native::pick(&window, &ctx, &req))),
                     // exports write files themselves (the background exporter needs the shared one)
@@ -150,6 +151,14 @@ impl Host {
                         links.open_url(egui::OpenUrl::new_tab(url));
                         Ok(())
                     })),
+                    // every "Show in Finder" (a photo's original, a folder, Help › Open Log Folder)
+                    // opens the share sheet: Save to Files, AirDrop, Mail…
+                    reveal: Some(Box::new(move |path: &str| {
+                        let zoom = f64::from(share_ctx.zoom_factor());
+                        let at = share_ctx.input(|i| i.pointer.latest_pos()).map(|p| (f64::from(p.x) * zoom, f64::from(p.y) * zoom));
+                        crate::native::share(&share_window, path, at)
+                    })),
+                    log_file: LOG_FILE.get().map(|p| p.to_string_lossy().into_owned()),
                     ..Services::default()
                 }
             };
@@ -351,6 +360,9 @@ fn logs_dir() -> Option<PathBuf> {
     Some(PathBuf::from(home).join("Documents").join("Logs"))
 }
 
+/// The current log file, once [`install_logger`] has opened it (Help › Open Log Folder shares it).
+static LOG_FILE: OnceLock<PathBuf> = OnceLock::new();
+
 /// Log lines go to stderr (the simulator's console in CI, Console.app on a Mac) and to the log
 /// file in [`logs_dir`]; panics that escape are added to the file too.
 fn install_logger() {
@@ -365,7 +377,10 @@ fn install_logger() {
     logging::record_panics(logger);
     match logs_dir() {
         Some(dir) => match logger.attach_dir(&dir) {
-            Ok(path) => log::info!("log file {}", path.display()),
+            Ok(path) => {
+                log::info!("log file {}", path.display());
+                let _ = LOG_FILE.set(path);
+            }
             Err(e) => log::warn!("no log file, standard error only: {e}"),
         },
         None => logger.no_file(),
