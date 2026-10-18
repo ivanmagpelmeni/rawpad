@@ -206,3 +206,24 @@ Newer entries win over older ones and over the kickoff brief.
     after boot) and waits up to 240 s for the background export: on a cold simulator "Add to Apple
     Photos" took 92 s (run 24) or longer (run 22) instead of under a second (runs 20, 21). Not a
     hang in the app: the photo was saved, just late.
+
+## 2026-10-19: Nightly session 7 (00:54 Berlin)
+
+38. **The CI tour's Add to Apple Photos step only warns on a timeout** (`"soft": true` in
+    `sim_test.py`'s `waitUntil`) and runs last. Same app code passed in runs 20, 21, 25 and 28 and
+    hung for 240 s in runs 22, 24 and 26 (no permission prompt on screen; the warm-up of
+    decision 37 didn't help), so it's the simulator's photolibraryd, not the app. The Share button
+    check now uses a background export without Photos, so it no longer depends on it. The app
+    logs the Photos permission status before each save (`permission status 3` = allowed) to tell
+    a missing permission from a slow library on the iPad.
+39. **Apple Pencil touches are never held back for a long-press.** winit reports an altitude angle
+    only for Pencil touches (`Force::Calibrated { altitude_angle: Some(_) }`); egui-winit drops
+    it, so the host marks those touch ids before passing the event on (`touch::LongPress::
+    mark_pencil`). A resting Pencil tip starts a brush stroke instead of opening a context menu.
+    Fingers keep the 500 ms long-press. The Pencil path can't be driven in the simulator: real
+    check on the iPad (Needs Ivan).
+40. **⌘ on a hardware keyboard is egui's `command`, as on the Mac** (`src/keys.rs`): egui-winit
+    maps `command` to Ctrl outside macOS, so the host tracks winit's logo key and rewrites the
+    modifiers of the frame's events. Whether winit delivers iPad hardware keys at all is probed in
+    CI (osascript keystrokes into Simulator.app on the CI Mac, never failing) and logged on the
+    device (first six key presses and modifier changes, `keyboard:` lines in `lightcraft.log`).

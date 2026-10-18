@@ -2,6 +2,13 @@
 
 ## Latest session summary
 
+**2026-10-19 (nightly 7, 00:54–01:40 Berlin, unattended)**
+1. Main was **red** (run 26: the simulator's Photos never answered). Fixed the CI tour (Photos step only warns, Share check no longer needs Photos); main run 27 green, released **1.27** (pinch/pan, top gap, translated Share label).
+2. **Apple Pencil:** a resting Pencil tip now starts a brush stroke at once instead of opening the long-press menu. Branch run 28 green; merged into main (the next main run should release it, about 1.31).
+3. CI tour now paints a **brush mask** (screenshot `03-brush` shows "Mask 2", the brush panel, exposure −1).
+4. **Hardware keyboard:** ⌘ becomes the shortcut key as on the Mac, plus a CI keyboard probe; on branch `p4-keys` (first try didn't compile, fixed; run 30 was running at handoff).
+5. Upstream not checked (not the first run of the night).
+
 **2026-10-19 (nightly 6, 23:55–00:40 Berlin, unattended)**
 1. **Pinch-zoom and pan in the loupe** are now in the CI tour (zoom to 45 %, two-finger and one-finger pan; screenshots `04-pinch-zoom`, `04-panned`).
 2. **Top gap of 20 pt** so the iPad's multitasking "•••" no longer covers the search box.
@@ -66,9 +73,7 @@
 - [x] **2. App shell** launches on the iPad simulator with the LightCraft UI on Metal and the demo
       library; CI screenshots
 - [ ] **3. First install on Ivan's iPad via SideStore**: release 1.8 is ready, waiting for Ivan
-- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events). To do: real-finger check on the iPad, Pencil (USB-C, no pressure)
-      for brush masks, hardware-keyboard shortcuts; rotation, Split View / Stage Manager resizing,
-      safe areas
+- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events), Pencil skips the long-press wait (brush strokes; DECISIONS.md 39), brush stroke in the CI tour. In progress: ⌘ shortcuts (`p4-keys`). To do: real-finger and Pencil check on the iPad; rotation, Split View / Stage Manager resizing
 - [~] **5. Files:**
   - Done: Files picker import (photos and folders); JPEG export to `Documents/Exports`;
     Export › Add to Apple Photos (`native::photos_runner`).
@@ -89,21 +94,25 @@
 
 ## Current status
 
-Main has the merged `p4-batch` (pinch/pan tour steps, 20 pt top gap, translated Share button
-label, CI Photos warm-up). Its branch run 25 had a green tour; the main run after the merge should
-release it (about 1.26). Last confirmed release: **1.21**. CI checks build, fmt, unit tests,
-clippy, the simulator tour (sliders, mask, pinch/pan, background export with Add to Apple Photos,
-Share button and sheet), the export file and the log file.
+Main is green: run 27 released **1.27**. Main now also has the merged `p4-pencil` (Pencil
+bypasses the long-press; brush stroke in the tour); the main run started by that push should
+release it (about 1.31). Branch `p4-keys` (⌘ = command, keyboard probe) is not merged yet. CI
+checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush masks,
+pinch/pan, background export, Share button and sheet, Add to Apple Photos as a soft check), the
+export file and the log file.
 
 ## Next 3 tasks
 
-1. Check the main run after the merge (screenshots: top gap, share button); fix if red.
-2. Apple Pencil for brush masks (USB-C Pencil, no pressure).
-3. Hardware-keyboard shortcuts (⌘ keys) on iPad.
+1. Check `p4-keys`' branch run (30 or later): green? `app-stderr.log` has `keyboard:` lines from
+   the osascript probe? If green, merge into main.
+2. If keys don't reach the app (no `keyboard:` lines), add UIKit key handling (`pressesBegan` /
+   `UIKeyCommand`) in `native.rs`; check how winit 0.30's iOS view handles presses first.
+3. Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try
+   `ui.set` window size or the Simulator menu via osascript on the CI Mac).
 
 Also queued:
 - A 24 MP raw memory test in the simulator (CC0 ARW/RW2 from `cargo xtask corpus`).
-- Delete merged branches (failed from the sandbox this session).
+- Delete merged branches (no tool for it from the sandbox).
 
 ## Needs Ivan
 
@@ -130,7 +139,13 @@ Also queued:
    - **New (1.12):** if something goes wrong, open **Files › On My iPad › RawPad › Logs**, press
      and hold **lightcraft.log** › **Share**, and send it to Claude in chat (the previous run's
      log is **lightcraft.1.log**).
-   - **New (1.26 or later):** open a photo and pinch with two fingers: does it zoom in? Drag
+   - **New (1.27):** open a photo and pinch with two fingers: does it zoom in? Drag
      with one or two fingers: does it move around? The **•••** button at the top middle of the
      screen should no longer sit on the search box.
+   - **New (1.31 or later), Apple Pencil:** open a photo › masking (the dotted circle icon on
+     the right) › **Brush**, and paint with the Pencil. Does a stroke appear right away, even if
+     you rest the tip first? If strokes stay invisible, untick **Pen Pressure** in the brush
+     settings and try again (the USB-C Pencil has no pressure), and tell Claude.
+   - **New (later), keyboard:** if you have a keyboard for the iPad, try **⌘Z** (undo) after a
+     slider change and tell Claude whether it works. The log (see above) shows `keyboard:` lines.
    - Anything slow, frozen or crashing: say which photo type (ARW or RW2) and what you did.
