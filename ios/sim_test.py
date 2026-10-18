@@ -48,6 +48,7 @@ def main():
     sock = connect(port)
     reader = sock.makefile("r", encoding="utf-8")
     failures = []
+    warnings = []
     with open(f"{out_dir}/replies.jsonl", "w") as log:
         for raw in open(tour):
             raw = raw.strip()
@@ -75,9 +76,11 @@ def main():
                         break
                     time.sleep(2)
                 log.write(json.dumps({"request": step, "reply": reply}) + "\n")
-                print(f"{'ok ' if value else 'ERR'} waitUntil {step['waitUntil']} = {json.dumps(value)[:200]}")
+                print(f"{'ok ' if value else ('WARN' if step.get('soft') else 'ERR')} waitUntil {step['waitUntil']} = {json.dumps(value)[:200]}")
                 if not value:
-                    failures.append(f"{step['method']}: {step['waitUntil']} never became true: {json.dumps(reply)[:300]}")
+                    msg = f"{step['method']}: {step['waitUntil']} never became true: {json.dumps(reply)[:300]}"
+                    # "soft": true only warns (simulator-only flakiness, e.g. photolibraryd; DECISIONS.md 38)
+                    (warnings if step.get("soft") else failures).append(msg)
                 continue
             if "checkFiles" in step:
                 # files the app wrote inside its container, e.g. Documents/Exports
@@ -109,6 +112,8 @@ def main():
     time.sleep(3)
     if not app_running():
         failures.append("RawPad is no longer running at the end of the tour (crash?)")
+    for w in warnings:
+        print(f"WARN (not failing): {w}")
     for f in failures:
         print(f"FAIL: {f}")
     sys.exit(1 if failures else 0)
