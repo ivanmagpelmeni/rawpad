@@ -71,7 +71,7 @@ Newer entries win over older ones and over the kickoff brief.
       upstream fixes arrive with merges.
     - It starts only when `RAWPAD_CONTROL=<port>` is set (CI). It listens on loopback only.
 12. **Sessions.**
-    - Every Sunday, one scheduled session per hour from 18:54 to 01:54 Berlin time (8 runs).
+    - Every Sunday, one scheduled session per hour from 18:54 to 02:54 Berlin time (9 runs, the last ends around 03:40; changed by Ivan on 2026-10-18).
     - Each run works about 45 minutes, then writes `HANDOFF.md` and pushes.
     - The next run starts by reading `HANDOFF.md`.
     - Ivan gives feedback in chat; Claude records it in `FEEDBACK.md`.
