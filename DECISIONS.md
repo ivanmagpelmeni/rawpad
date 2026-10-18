@@ -107,3 +107,25 @@ Newer entries win over older ones and over the kickoff brief.
     (`~/Pictures`, invisible in Files).
 19. **Safe area.** The host shrinks `RawInput::screen_rect` by egui-winit's iOS safe-area insets.
     The status bar is hidden (`UIViewControllerBasedStatusBarAppearance` = false).
+
+## 2026-10-18: First nightly session (18:54 Berlin)
+
+20. **Long-press → secondary click is a host-side gesture filter** (`src/touch.rs`), run on
+    `RawInput::events` before `raw_input_hook`. A touch's primary press is held back until the
+    finger lifts (tap), moves more than 10 pt (drag/scroll), a second finger lands (pinch), or
+    500 ms pass (secondary click at the landing spot; the following primary release is dropped
+    so it can't close the new menu). Mouse/trackpad presses and control-channel events are never
+    held. Rejected: relying on egui's `long_touched` (unclear in the 0.36 popup code, and the
+    primary release would still close the menu); patching upstream's context-menu calls.
+    Trade-off: a still finger gets no press feedback for up to 500 ms.
+21. **Safe area comes from UIKit, not egui-winit** (supersedes how #19 gets the insets). CI run 8
+    showed the bottom toolbar on the home indicator, so egui-winit's insets were empty; the host
+    reads `UIView.safeAreaInsets` with one `msg_send!` in `native.rs` (own `UIEdgeInsets`
+    struct, no new objc2 features) and falls back to egui's insets.
+22. **Interface settings (`UiState`) persist in `Library/Application Support/RawPad UI.json`**
+    (own small writer in `src/prefs.rs`, modelled on the desktop's `PrefsWriter`, not shared:
+    that one lives in the desktop binary). Checked every 3 s and written on background/quit;
+    damaged files are set aside as `.corrupt-<time>`. `settings.library_path` in it is ignored:
+    the iPad always opens `RawPad Library`.
+23. **The iOS crate's unit tests run on the macOS CI host** (`cargo test -p rawpad-ios`; egui is a
+    dev-dependency so pure-egui modules like `touch.rs` compile there).

@@ -105,6 +105,11 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
             ("luminanceRange", "Luminance", Icon::Sliders),
             ("colorRange", "Color", Icon::Picker),
         ];
+        // RawPad (iPadOS) ships without the AI models: no Object/Describe/Subject/Sky/Background
+        let tiles: Vec<_> = tiles
+            .into_iter()
+            .filter(|(kind, _, _)| !cfg!(target_os = "ios") || !matches!(*kind, "object" | "prompt" | "subject" | "sky" | "background"))
+            .collect();
         // four 52 pt tiles a row when they and their labels fit, else fewer (wider for a long label)
         let widest = |size: f32| {
             let font = t.font(size);

@@ -21,7 +21,11 @@
 | `CLAUDE.md` | RawPad section prepended (points agents to `IPAD.md`) | Keep our section at the top |
 | `.github/workflows/{freebsd,nix,packaging-lint,release,windows-arm64}.yml` | Deleted (desktop packaging; they would run on every upstream merge) | Keep deleted |
 
-No upstream crate source is patched yet.
+### Patched upstream crate source (all behind `cfg!(target_os = "ios")`)
+
+| File | Change | On merge |
+|---|---|---|
+| `crates/ui-egui/src/panels/masking.rs` (`show`, after the `tiles` array) | Filters the AI tiles (Object, Describe, Subject, Sky, Background) out of *Create New Mask* on iOS | Re-apply after the `tiles` array if upstream changes it |
 
 ## Merge log
 
