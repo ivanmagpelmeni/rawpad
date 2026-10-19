@@ -34,6 +34,11 @@
 {"sleep":2}
 {"shot":"07-brush-no-keyboard"}
 {"checkLog":"first responder for text field","since":"editing","absent":true}
+# a mostly vertical drag on a slider scrolls the panel and keeps the slider's value (the
+# mask's Exposure in 07-slider-no-keyboard and 07-slider-vertical-drag should read the same)
+{"method":"ui.dragWidget","params":{"id":"slider:exposure","fx":0.5,"dy":-120,"steps":8},"expectOk":true}
+{"sleep":2}
+{"shot":"07-slider-vertical-drag"}
 # Before/After by touch: the menu right of the Before/After button (bottom bar) lists every view
 {"method":"ui.clickWidget","params":{"id":"icon:beforeAfterModes"},"expectOk":true}
 {"sleep":2}
