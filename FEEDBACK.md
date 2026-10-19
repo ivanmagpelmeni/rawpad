@@ -7,7 +7,8 @@ The repo is public: no personal data, no photos, no account names.
 
 ## Open
 
-(nothing yet: the first installable build is phase 3)
+- 2026-10-19, Ivan, on his iPad: split-screen before/after compare doesn't work.
+- 2026-10-19, Ivan, on his iPad: when editing, the on-screen keyboard pops up.
 
 ## Done
 

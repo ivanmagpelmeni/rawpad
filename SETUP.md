@@ -1,6 +1,6 @@
 # Setting up RawPad on your iPad
 
-You do this once, on a Windows PC. After that, everything happens on the iPad. This follows the
+You do this once, on a Windows PC. **Managed iPad (VPN apps blocked)?** Skip to *Install with AltStore Classic* below. After that, everything happens on the iPad. This follows the
 official SideStore guide (docs.sidestore.io, checked 2026-10-18). If a screen looks different,
 the official guide wins. Tell Claude what you saw.
 
@@ -70,6 +70,43 @@ The first RawPad release appears once phase 3 is ready. `PROGRESS.md` → *Needs
 1. In Safari, open **github.com/Ivanmagpelmeni/rawpad/releases**.
 2. Under the newest release, tap **RawPad.ipa** to download it.
 3. In SideStore, go to **My Apps**, tap **+**, and pick the file from **Downloads**.
+
+## Install with AltStore Classic (managed iPads)
+
+**This is what Ivan uses (2026-10-19).** Some iPads are looked after by a company or school
+("managed", with MDM). Those can block VPN apps, and then SideStore can't work, because it needs
+the LocalDevVPN app. AltStore Classic needs no VPN: instead, a small program on your Windows PC
+(AltServer) signs the apps when the iPad is plugged in with a cable. Parts A–D above are not
+needed in that case.
+
+**Once, on the Windows PC:**
+1. Install **iTunes** and **iCloud** from Apple's website (not the Microsoft Store versions).
+2. Download **AltServer for Windows** from **altstore.io** and install it. It runs as a small icon
+   near the clock.
+3. Connect the iPad with the USB-C cable. If it asks **Trust This Computer?**, tap **Trust**.
+4. Click the AltServer icon › **Install AltStore** › pick your iPad, and sign in with your Apple ID
+   when asked (only there, never in a chat).
+5. On the iPad, if needed: **Settings › General › VPN & Device Management** › trust your Apple ID,
+   and **Settings › Privacy & Security › Developer Mode** › on.
+
+**Add RawPad (on the iPad, with the cable in and AltServer running on the PC):**
+1. Open **AltStore** › **Sources** › **+**.
+2. Paste this address and confirm:
+   ```
+   https://raw.githubusercontent.com/Ivanmagpelmeni/rawpad/main/sidestore/source.json
+   ```
+   (The same address works for SideStore and AltStore.)
+3. Open the **RawPad** source and tap **Free** (or **Get**).
+
+**Every week, and for every update:**
+- Plug the iPad into the PC with the cable and make sure AltServer is running (the icon near the
+  clock).
+- Open **AltStore › My Apps**. Tap **Refresh All** (keeps RawPad working for another 7 days), or
+  **Update** next to RawPad when a new version is listed.
+- Wi-Fi refresh only works when the PC and the iPad are on the same network. Yours aren't, so
+  always use the cable.
+- If AltStore says the source or the app's "permissions don't match", tell Claude: the source
+  lists what RawPad asks for (adding photos to Photos), and AltStore checks that list.
 
 ## Using RawPad: getting photos in and out
 
