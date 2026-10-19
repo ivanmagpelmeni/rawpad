@@ -441,7 +441,7 @@ impl KeyView {
                 unsafe { (msg_send![&*key, keyCode], msg_send![&*key, modifierFlags], msg_send![&*key, characters]) };
             let flags = usize::try_from(flags).unwrap_or_default();
             let chars = chars.map(|c| c.to_string()).unwrap_or_default();
-            iv.flags.set(flags);
+            iv.flags.set(crate::keys::uikit_flags_after(code, flags, pressed));
             if iv.logged.get() < 6 {
                 iv.logged.set(iv.logged.get().saturating_add(1));
                 log::info!("keyboard (UIKit): key 0x{code:02X} flags 0x{flags:X} {chars:?} {}", if pressed { "down" } else { "up" });

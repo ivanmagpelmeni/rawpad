@@ -43,16 +43,14 @@
 {"shot":"04-panned"}
 {"method":"ui.set","params":{"zoom":"fit","pan":[0.5,0.5]}}
 {"sleep":2}
-# hardware-keyboard probe, before any sheet (an open share sheet holds the keyboard, so run 30's
-# probe proved nothing). app-stderr.log: "keyboard (UIKit):" lines from native::KeyView, and
-# history.list shows whether ⌘Z undid the exposure change. Recorded, not checked yet.
-{"method":"engine.execute","params":{"command":"develop.set","params":{"values":{"light.exposure":1.5}}}}
-{"sleep":1}
-{"hostKeys":"p"}
+# hardware-keyboard probe, before any sheet (an open share sheet holds the keyboard). Keys come
+# from UIKit (native::KeyView; app-stderr.log "keyboard (UIKit):" lines). "5" rates the photo
+# (it had 3 stars), ⌘Z undoes that. Soft for now: osascript on the CI Mac decides delivery.
+{"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}}}
+{"hostKeys":"5"}
+{"waitUntil":"rating","equals":5,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":1}},"timeout":10,"soft":true}
 {"hostKeys":"z","cmd":true}
-{"sleep":3}
-{"method":"engine.execute","params":{"command":"develop.get"}}
-{"method":"engine.execute","params":{"command":"history.list"}}
+{"waitUntil":"rating","equals":3,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":1}},"timeout":10,"soft":true}
 {"shot":"04-keys"}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}

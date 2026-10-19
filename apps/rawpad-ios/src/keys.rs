@@ -41,6 +41,20 @@ pub fn uikit_modifiers(flags: usize) -> Modifiers {
     Modifiers { alt: flags & UI_ALTERNATE != 0, ctrl: flags & UI_CONTROL != 0, shift: flags & UI_SHIFT != 0, mac_cmd: cmd, command: cmd }
 }
 
+/// The modifier flags to remember after a press or release. UIKit reports the releasing ⌘ (or
+/// ⇧, ⌥, Ctrl) key with its own flag still set (CI run 33: `key 0xE3 flags 0x100000 up`), so the
+/// released modifier's bit is cleared here; otherwise ⌘ would stick and every tap would be a ⌘-tap.
+pub fn uikit_flags_after(code: isize, flags: usize, pressed: bool) -> usize {
+    let bit = match code {
+        0xE0 | 0xE4 => UI_CONTROL,
+        0xE1 | 0xE5 => UI_SHIFT,
+        0xE2 | 0xE6 => UI_ALTERNATE,
+        0xE3 | 0xE7 => UI_COMMAND,
+        _ => 0,
+    };
+    if pressed { flags | bit } else { flags & !bit }
+}
+
 /// The egui key for a USB HID keyboard usage (`UIKeyboardHIDUsage`, what UIKit's `UIKey.keyCode`
 /// holds). Keys egui has no name for give `None`.
 pub fn hid_key(code: isize) -> Option<Key> {
@@ -156,5 +170,17 @@ mod tests {
         // arrow keys come with a private-use character: no text
         assert_eq!(uikit_events(0x4F, 0, "\u{F703}", true).len(), 1);
         assert_eq!(uikit_events(0x28, 0, "\r", true).len(), 1);
+    }
+
+    #[test]
+    fn released_command_does_not_stick() {
+        // what UIKit sent in run 33 for ⌘Z
+        let mut flags = uikit_flags_after(0xE3, 1 << 20, true);
+        assert!(uikit_modifiers(flags).command);
+        flags = uikit_flags_after(0x1D, 1 << 20, false);
+        assert!(uikit_modifiers(flags).command, "Z released, ⌘ still held");
+        flags = uikit_flags_after(0xE3, 1 << 20, false);
+        assert!(!uikit_modifiers(flags).command);
+        assert!(!uikit_modifiers(uikit_flags_after(0xE5, 1 << 17, false)).shift);
     }
 }
