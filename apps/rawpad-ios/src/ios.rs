@@ -55,7 +55,7 @@ pub fn run() {
         logo_key: false,
         keys_logged: 0,
         keys: None,
-        text_field: false,
+        text_field: None,
         last_tap: None,
         soft_keyboard: false,
         logged_insets: None,
@@ -86,10 +86,10 @@ struct Host {
     keys_logged: u8,
     /// Hardware-keyboard presses read from UIKit (winit 0.30 passes none on iOS; CI run 30).
     keys: Option<crate::native::Keys>,
-    /// An egui text box was being edited last frame (`PlatformOutput::ime`).
-    text_field: bool,
-    /// When the last tap or press arrived (a finger, the Pencil or the CI's pointer).
-    last_tap: Option<Instant>,
+    /// The egui text box being edited last frame (`PlatformOutput::ime`), if any.
+    text_field: Option<egui::Rect>,
+    /// When and where the last tap or press was (a finger, the Pencil or the CI's pointer).
+    last_tap: Option<(Instant, egui::Pos2)>,
     /// The on-screen keyboard is up (`keys::soft_keyboard`, DECISIONS.md 45).
     soft_keyboard: bool,
     logged_insets: Option<crate::native::EdgeInsets>,
@@ -255,10 +255,10 @@ impl Host {
         // ⌘ is `command` on the iPad as on the Mac (egui-winit maps it to Ctrl off macOS)
         // (UIKit's own presses come with their modifiers already Mac-style: added after)
         // the on-screen keyboard: only for a text box being edited (last frame) that took the
-        // focus right after a tap, never for a focused slider, the photo or a mask (Ivan's iPad,
+        // focus right after a tap on it, never for a focused slider, the photo or a mask (Ivan's iPad,
         // 2026-10-19: `egui_wants_keyboard_input` is also true for a tapped slider)
-        let since_tap = self.last_tap.map(|t| Instant::now().saturating_duration_since(t));
-        self.soft_keyboard = crate::keys::soft_keyboard(self.soft_keyboard, self.text_field, since_tap);
+        let tap = self.last_tap.map(|(t, at)| (Instant::now().saturating_duration_since(t), at));
+        self.soft_keyboard = crate::keys::soft_keyboard(self.soft_keyboard, self.text_field, tap);
         let text_focus = self.soft_keyboard;
         let (uikit_events, uikit_cmd) = self
             .keys
@@ -272,8 +272,8 @@ impl Host {
         raw.events.extend(uikit_events);
         app.raw_input_hook(&mut raw);
         // (after the hook: the CI's pointer events count as taps too)
-        if crate::keys::has_tap(&raw.events) {
-            self.last_tap = Some(Instant::now());
+        if let Some(at) = crate::keys::tap_pos(&raw.events) {
+            self.last_tap = Some((Instant::now(), at));
         }
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
@@ -295,7 +295,7 @@ impl Host {
             }
         });
         // only an editable, focused TextEdit sets `ime` (egui's IME/caret output)
-        self.text_field = out.platform_output.ime.is_some();
+        self.text_field = out.platform_output.ime.as_ref().map(|ime| ime.rect);
         gfx.input.handle_platform_output(&gfx.window, std::mem::take(&mut out.platform_output));
         let clipped = self.ctx.tessellate(std::mem::take(&mut out.shapes), out.pixels_per_point);
         gfx.painter.paint_and_update_textures(
