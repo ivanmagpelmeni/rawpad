@@ -114,9 +114,63 @@ pub fn uikit_events(code: isize, flags: usize, characters: &str, pressed: bool) 
     out
 }
 
+/// A tap on a key: pressed and released, no modifiers.
+fn tap(key: Key) -> [Event; 2] {
+    let ev = |pressed| Event::Key { key, physical_key: Some(key), pressed, repeat: false, modifiers: Modifiers::NONE };
+    [ev(true), ev(false)]
+}
+
+/// The egui events for text from the on-screen keyboard (`UIKeyInput.insertText:`): Return is the
+/// Enter key, Tab the Tab key, anything else typed text.
+pub fn soft_text_events(text: &str) -> Vec<Event> {
+    let mut out = Vec::new();
+    let mut run = String::new();
+    for c in text.chars() {
+        let key = match c {
+            '\n' | '\r' => Some(Key::Enter),
+            '\t' => Some(Key::Tab),
+            c if c.is_control() => continue,
+            _ => None,
+        };
+        match key {
+            Some(key) => {
+                if !run.is_empty() {
+                    out.push(Event::Text(std::mem::take(&mut run)));
+                }
+                out.extend(tap(key));
+            }
+            None => run.push(c),
+        }
+    }
+    if !run.is_empty() {
+        out.push(Event::Text(run));
+    }
+    out
+}
+
+/// The on-screen keyboard's delete key (`UIKeyInput.deleteBackward`).
+pub fn soft_backspace() -> Vec<Event> {
+    tap(Key::Backspace).to_vec()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn soft_keyboard_text_and_return() {
+        let ev = soft_text_events("ab\nc");
+        assert!(matches!(&ev[0], Event::Text(t) if t == "ab"));
+        assert!(matches!(&ev[1], Event::Key { key: Key::Enter, pressed: true, .. }));
+        assert!(matches!(&ev[2], Event::Key { key: Key::Enter, pressed: false, .. }));
+        assert!(matches!(&ev[3], Event::Text(t) if t == "c"));
+        assert_eq!(ev.len(), 4);
+        assert!(soft_text_events("\u{7}").is_empty(), "control characters are dropped");
+        assert!(matches!(&soft_text_events("ü")[0], Event::Text(t) if t == "ü"));
+        let bs = soft_backspace();
+        assert!(matches!(&bs[0], Event::Key { key: Key::Backspace, pressed: true, .. }));
+        assert_eq!(bs.len(), 2);
+    }
 
     fn key(modifiers: Modifiers) -> Event {
         Event::Key { key: Key::Z, physical_key: Some(Key::Z), pressed: true, repeat: false, modifiers }

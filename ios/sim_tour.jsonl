@@ -52,6 +52,15 @@
 {"hostKeys":"z","cmd":true}
 {"waitUntil":"rating","equals":3,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":1}},"timeout":10,"soft":true}
 {"shot":"04-keys"}
+# on-screen keyboard: a focused text field makes native::TextKeyView (UIKeyInput) first responder
+# (app-stderr.log "first responder for text field"); Escape hands it back to KeyView. The
+# simulator hides the keyboard while its hardware keyboard is connected, so 04-text-field may not
+# show it.
+{"method":"ui.clickWidget","params":{"id":"field:search"}}
+{"sleep":2}
+{"shot":"04-text-field"}
+{"method":"ui.key","params":{"key":"Escape"}}
+{"sleep":1}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}

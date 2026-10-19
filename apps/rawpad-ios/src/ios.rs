@@ -245,11 +245,13 @@ impl Host {
         let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
         // ⌘ is `command` on the iPad as on the Mac (egui-winit maps it to Ctrl off macOS)
         // (UIKit's own presses come with their modifiers already Mac-style: added after)
+        // a focused egui text field (last frame) brings up the on-screen keyboard
+        let text_focus = self.ctx.egui_wants_keyboard_input();
         let (uikit_events, uikit_cmd) = self
             .keys
             .as_ref()
             .map(|k| {
-                k.focus();
+                k.focus(text_focus);
                 k.drain()
             })
             .unwrap_or_default();
