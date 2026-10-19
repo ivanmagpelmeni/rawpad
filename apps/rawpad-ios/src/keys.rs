@@ -155,9 +155,65 @@ pub fn soft_backspace() -> Vec<Event> {
     tap(Key::Backspace).to_vec()
 }
 
+/// How long after a tap a text field that takes the focus may still bring up the on-screen
+/// keyboard. A tap's press and release are a few frames apart, and egui gives the field its focus
+/// on one of them and reports it (`PlatformOutput::ime`) a frame later.
+pub const SOFT_KEYBOARD_TAP_WINDOW: std::time::Duration = std::time::Duration::from_millis(800);
+
+/// Whether this frame's events hold a tap or a press (a finger, the Pencil, or the CI's pointer):
+/// the only way a text field may bring up the on-screen keyboard (DECISIONS.md 45).
+pub fn has_tap(events: &[Event]) -> bool {
+    events.iter().any(|e| {
+        matches!(
+            e,
+            Event::PointerButton { button: egui::PointerButton::Primary, .. }
+                | Event::Touch { phase: egui::TouchPhase::Start | egui::TouchPhase::End, .. }
+        )
+    })
+}
+
+/// Whether the on-screen keyboard should be up (DECISIONS.md 45). `text_field`: an egui text box
+/// is being edited (`PlatformOutput::ime` was set last frame, which only a focused, editable
+/// `TextEdit` does; a focused slider, the photo or a mask never sets it). `since_tap`: time since
+/// the last tap. The keyboard comes up only when a text box takes the focus right after a tap on
+/// it (or on the slider value that opens one), stays up while that box keeps the focus, and goes
+/// away when it loses it. A text box focused by code alone (a dialog opening, a shortcut) leaves
+/// it down; a hardware keyboard types into it anyway.
+pub fn soft_keyboard(was_up: bool, text_field: bool, since_tap: Option<std::time::Duration>) -> bool {
+    text_field && (was_up || since_tap.is_some_and(|d| d <= SOFT_KEYBOARD_TAP_WINDOW))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn soft_keyboard_only_for_a_text_field_after_a_tap() {
+        use std::time::Duration;
+        let ms = |m| Some(Duration::from_millis(m));
+        // a slider, the photo, a mask: focused or dragged, but no text field → never
+        assert!(!soft_keyboard(false, false, ms(0)));
+        assert!(!soft_keyboard(true, false, ms(0)), "the keyboard goes when the field loses the focus");
+        // a tap on the search box (or a slider's value) → up, and it stays up while typing
+        assert!(soft_keyboard(false, true, ms(50)));
+        assert!(soft_keyboard(true, true, None));
+        assert!(soft_keyboard(true, true, ms(60_000)));
+        // a field focused by code long after any tap (a dialog, a shortcut) → stays down
+        assert!(!soft_keyboard(false, true, None));
+        assert!(!soft_keyboard(false, true, ms(5_000)));
+    }
+
+    #[test]
+    fn taps_are_presses_and_touch_starts_or_ends() {
+        let pos = egui::pos2(10.0, 10.0);
+        let press = Event::PointerButton { pos, button: egui::PointerButton::Primary, pressed: true, modifiers: Modifiers::NONE };
+        assert!(has_tap(&[Event::PointerMoved(pos), press]));
+        assert!(!has_tap(&[Event::PointerMoved(pos)]), "a drag's moves are not a tap");
+        let touch = |phase| Event::Touch { device_id: egui::TouchDeviceId(1), id: egui::TouchId(1), phase, pos, force: None };
+        assert!(has_tap(&[touch(egui::TouchPhase::End)]));
+        assert!(!has_tap(&[touch(egui::TouchPhase::Move)]));
+        assert!(!has_tap(&soft_text_events("a")), "typing is not a tap");
+    }
 
     #[test]
     fn soft_keyboard_text_and_return() {

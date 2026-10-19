@@ -42,6 +42,22 @@ def app_running():
     return BUNDLE in out
 
 
+def log_size(out_dir):
+    try:
+        return os.path.getsize(os.path.join(out_dir, "app-stderr.log"))
+    except OSError:
+        return 0
+
+
+def log_text(out_dir, since):
+    try:
+        with open(os.path.join(out_dir, "app-stderr.log"), "rb") as f:
+            f.seek(since)
+            return f.read().decode("utf-8", "replace")
+    except OSError:
+        return ""
+
+
 def main():
     tour, out_dir = sys.argv[1], sys.argv[2]
     port = int(sys.argv[3]) if len(sys.argv) > 3 else 7980
@@ -49,6 +65,7 @@ def main():
     reader = sock.makefile("r", encoding="utf-8")
     failures = []
     warnings = []
+    marks = {}
     with open(f"{out_dir}/replies.jsonl", "w") as log:
         for raw in open(tour):
             raw = raw.strip()
@@ -99,6 +116,23 @@ def main():
                 except (OSError, subprocess.TimeoutExpired) as e:
                     status, err = "WARN", str(e)[:200]
                 print(f"{status} hostKeys {keys!r} cmd={cmd} {err}")
+                continue
+            if "logMark" in step:
+                # remember how far the app's log (app-stderr.log, written by simctl launch) is
+                marks[step["logMark"]] = log_size(out_dir)
+                print(f"log mark {step['logMark']} at {marks[step['logMark']]}")
+                continue
+            if "checkLog" in step:
+                # {"checkLog": "text", "since": "mark", "absent": true}: the app logged (or, with
+                # absent, never logged) that text since the mark (e.g. the on-screen keyboard)
+                time.sleep(1)
+                text = log_text(out_dir, marks.get(step.get("since"), 0))
+                found = step["checkLog"] in text
+                good = (not found) if step.get("absent") else found
+                what = f"checkLog {step['checkLog']!r} {'absent' if step.get('absent') else 'present'} since {step.get('since')}"
+                print(f"{'ok ' if good else ('WARN' if step.get('soft') else 'ERR')} {what}")
+                if not good:
+                    (warnings if step.get("soft") else failures).append(f"{what}: log since the mark: {text[-600:]!r}")
                 continue
             if "checkFiles" in step:
                 # files the app wrote inside its container, e.g. Documents/Exports
