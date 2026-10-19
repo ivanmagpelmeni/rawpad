@@ -17,10 +17,10 @@ use std::sync::mpsc::{Receiver, Sender, channel};
 
 use lightcraft_ui_egui::pick::{PickKind, PickRequest};
 use objc2::rc::Retained;
-use objc2::runtime::ProtocolObject;
+use objc2::runtime::{AnyObject, ProtocolObject};
 use objc2::{DefinedClass, MainThreadMarker, MainThreadOnly, define_class, msg_send};
 use objc2_foundation::{NSArray, NSObject, NSObjectProtocol, NSURL};
-use objc2_ui_kit::{UIDocumentPickerDelegate, UIDocumentPickerViewController, UIViewController};
+use objc2_ui_kit::{UIDocumentPickerDelegate, UIDocumentPickerViewController, UIResponder, UIView, UIViewController};
 use objc2_uniform_type_identifiers::{UTType, UTTypeFolder, UTTypeImage, UTTypeItem};
 use winit::raw_window_handle::{HasWindowHandle, RawWindowHandle};
 
@@ -376,4 +376,142 @@ fn save_to_photos(path: &str, limit: std::time::Duration) -> Result<String, Save
     log::info!("photos: saved {path}");
     let id = id.lock().unwrap_or_else(std::sync::PoisonError::into_inner).take();
     id.ok_or_else(|| SaveError::Failed("Photos couldn't read this file as an image".into()))
+}
+
+/// What [`KeyView`] reads from UIKit presses, drained by the host every frame.
+pub struct KeyIvars {
+    tx: Sender<egui::Event>,
+    /// The last `modifierFlags` seen (⌘ held for pointer events and `keys::apply`).
+    flags: std::cell::Cell<usize>,
+    /// Presses logged so far (only the first few, so typed text doesn't fill the log).
+    logged: std::cell::Cell<u8>,
+    ctx: egui::Context,
+}
+
+define_class!(
+    // SAFETY: UIView may be subclassed; this class only adds responder methods and doesn't
+    // implement Drop.
+    #[unsafe(super(UIView, UIResponder, NSObject))]
+    #[thread_kind = MainThreadOnly]
+    #[name = "RawPadKeyView"]
+    #[ivars = KeyIvars]
+    pub struct KeyView;
+
+    // SAFETY: NSObjectProtocol has no extra requirements.
+    unsafe impl NSObjectProtocol for KeyView {}
+
+    // SAFETY: the selectors and signatures are UIResponder's (`canBecomeFirstResponder`,
+    // `pressesBegan:withEvent:` and friends; the NSSet and UIPressesEvent are taken as objects).
+    impl KeyView {
+        #[unsafe(method(canBecomeFirstResponder))]
+        fn can_become_first_responder(&self) -> bool {
+            true
+        }
+
+        #[unsafe(method(pressesBegan:withEvent:))]
+        fn presses_began(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
+            self.presses(presses, true);
+        }
+
+        #[unsafe(method(pressesEnded:withEvent:))]
+        fn presses_ended(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
+            self.presses(presses, false);
+        }
+
+        #[unsafe(method(pressesCancelled:withEvent:))]
+        fn presses_cancelled(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
+            self.presses(presses, false);
+        }
+    }
+);
+
+impl KeyView {
+    /// Every press of the set (`NSSet<UIPress>`) whose `key` is a keyboard key, as egui events.
+    fn presses(&self, presses: &AnyObject, pressed: bool) {
+        let iv = self.ivars();
+        // SAFETY: `allObjects` on the NSSet UIKit passes in, main thread.
+        let all: Option<Retained<NSArray<AnyObject>>> = unsafe { msg_send![presses, allObjects] };
+        for press in all.iter().flat_map(|a| a.iter()) {
+            // SAFETY: `UIPress.key` (iOS 13.4+; nil for non-keyboard presses) and the UIKey's
+            // plain properties, read on the main thread.
+            let key: Option<Retained<AnyObject>> = unsafe { msg_send![&*press, key] };
+            let Some(key) = key else { continue };
+            // (both are NSInteger-backed enums: `UIKeyboardHIDUsage`, `UIKeyModifierFlags`)
+            let (code, flags, chars): (isize, isize, Option<Retained<objc2_foundation::NSString>>) =
+                unsafe { (msg_send![&*key, keyCode], msg_send![&*key, modifierFlags], msg_send![&*key, characters]) };
+            let flags = usize::try_from(flags).unwrap_or_default();
+            let chars = chars.map(|c| c.to_string()).unwrap_or_default();
+            iv.flags.set(crate::keys::uikit_flags_after(code, flags, pressed));
+            if iv.logged.get() < 6 {
+                iv.logged.set(iv.logged.get().saturating_add(1));
+                log::info!("keyboard (UIKit): key 0x{code:02X} flags 0x{flags:X} {chars:?} {}", if pressed { "down" } else { "up" });
+            }
+            for ev in crate::keys::uikit_events(code, flags, &chars, pressed) {
+                // the host drops the receiver only when it quits
+                let _ = iv.tx.send(ev);
+            }
+        }
+        iv.ctx.request_repaint();
+    }
+}
+
+/// Hardware-keyboard keys straight from UIKit: a 1×1, input-transparent view inside winit's view
+/// that holds first responder, so the iPad's key presses reach it (`pressesBegan:`).
+pub struct Keys {
+    view: Retained<KeyView>,
+    /// Dialogs are presented from it; while one is up, it keeps the keyboard.
+    vc: Retained<UIViewController>,
+    rx: Receiver<egui::Event>,
+    /// The last `becomeFirstResponder` answer, so the log shows changes only.
+    focused: std::cell::Cell<Option<bool>>,
+}
+
+impl Keys {
+    /// Add the view to the window's view. `None` off the main thread or without a UIKit view.
+    pub fn attach(window: &winit::window::Window, ctx: &egui::Context) -> Option<Self> {
+        let mtm = MainThreadMarker::new()?;
+        let handle = window.window_handle().ok()?;
+        let RawWindowHandle::UiKit(h) = handle.as_raw() else { return None };
+        let vc = root_view_controller(window).ok()?;
+        let (tx, rx) = channel();
+        let ivars = KeyIvars { tx, flags: Default::default(), logged: Default::default(), ctx: ctx.clone() };
+        let this = KeyView::alloc(mtm).set_ivars(ivars);
+        let frame = Rect { x: 0.0, y: 0.0, width: 1.0, height: 1.0 };
+        // SAFETY: UIView's designated initializer on a fresh instance; then plain setters, adding
+        // it to winit's live UIView (which the window owns and outlives this call), and asking for
+        // first responder, all on the main thread.
+        let view: Retained<KeyView> = unsafe { msg_send![super(this), initWithFrame: frame] };
+        unsafe {
+            let parent = h.ui_view.as_ptr().cast::<AnyObject>();
+            let _: () = msg_send![&*view, setUserInteractionEnabled: false];
+            let _: () = msg_send![&*parent, addSubview: &*view];
+        }
+        let keys = Self { view, vc, rx, focused: Default::default() };
+        keys.focus();
+        Some(keys)
+    }
+
+    /// Take first responder back after a dialog or the share sheet closed, never while one is up
+    /// (the Files picker's search field needs the keyboard). Cheap; once a frame.
+    pub fn focus(&self) {
+        // SAFETY: property reads and `becomeFirstResponder` on our live view and the window's
+        // live view controller, main thread (`Keys` is made there and lives in the host, which
+        // never leaves it).
+        unsafe {
+            let presented: Option<Retained<AnyObject>> = msg_send![&*self.vc, presentedViewController];
+            let first: bool = msg_send![&*self.view, isFirstResponder];
+            if presented.is_none() && !first {
+                let ok: bool = msg_send![&*self.view, becomeFirstResponder];
+                if self.focused.replace(Some(ok)) != Some(ok) {
+                    log::info!("keyboard (UIKit): first responder {}", if ok { "taken" } else { "refused" });
+                }
+            }
+        }
+    }
+
+    /// This frame's key events, and whether ⌘ is held.
+    pub fn drain(&self) -> (Vec<egui::Event>, bool) {
+        let events = self.rx.try_iter().collect();
+        (events, self.view.ivars().flags.get() & (1 << 20) != 0)
+    }
 }

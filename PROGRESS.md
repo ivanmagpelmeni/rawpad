@@ -2,6 +2,13 @@
 
 ## Latest session summary
 
+**2026-10-19 (nightly 8, 01:54–02:40 Berlin, unattended)**
+1. Main run 32 green, released **1.32** (Pencil + ⌘ keys); `03-brush` screenshot checked (Mask 2, exposure −1).
+2. Found that winit passes **no hardware keys** on iOS (run 30's probe even ran under the share sheet).
+3. **Hardware keyboard now works in the simulator:** RawPad reads key presses from UIKit itself (`native::KeyView`). Branch run 33: `p`, ⌘ and Z all reached the app (`keyboard (UIKit):` log lines). Fixed a stuck-⌘ bug seen in that log.
+4. CI tour now presses `5` (rating) and ⌘Z (undo) and checks the photo's stars (soft check for now).
+5. Branch `p4-uikit-keys` merged into main at handoff if its second run compiled (see HANDOFF.md).
+
 **2026-10-19 (nightly 7, 00:54–01:40 Berlin, unattended)**
 1. Main was **red** (run 26: the simulator's Photos never answered). Fixed the CI tour (Photos step only warns, Share check no longer needs Photos); main run 27 green, released **1.27** (pinch/pan, top gap, translated Share label).
 2. **Apple Pencil:** a resting Pencil tip now starts a brush stroke at once instead of opening the long-press menu. Branch run 28 green; merged into main (the next main run should release it, about 1.31).
@@ -73,7 +80,7 @@
 - [x] **2. App shell** launches on the iPad simulator with the LightCraft UI on Metal and the demo
       library; CI screenshots
 - [ ] **3. First install on Ivan's iPad via SideStore**: release 1.8 is ready, waiting for Ivan
-- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events), Pencil skips the long-press wait (brush strokes; DECISIONS.md 39), brush stroke in the CI tour. In progress: ⌘ shortcuts (`p4-keys`). To do: real-finger and Pencil check on the iPad; rotation, Split View / Stage Manager resizing
+- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events), Pencil skips the long-press wait (brush strokes; DECISIONS.md 39), brush stroke in the CI tour, hardware keyboard read from UIKit with ⌘ as command (DECISIONS.md 40, 41; keys reach the app in CI run 33). To do: real-finger and Pencil check on the iPad; rotation, Split View / Stage Manager resizing
 - [~] **5. Files:**
   - Done: Files picker import (photos and folders); JPEG export to `Documents/Exports`;
     Export › Add to Apple Photos (`native::photos_runner`).
@@ -94,22 +101,24 @@
 
 ## Current status
 
-Main is green: run 27 released **1.27**. Main now also has the merged `p4-pencil` (Pencil
-bypasses the long-press; brush stroke in the tour); the main run started by that push should
-release it (about 1.31). `p4-keys` (⌘ = command, keyboard probe; run 30 tour green) was merged last, so the main run after
-that push releases both. CI
-checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush masks,
-pinch/pan, background export, Share button and sheet, Add to Apple Photos as a soft check), the
+Main run 32 green, released **1.32** (Pencil + ⌘ mapping). Branch `p4-uikit-keys` (hardware
+keys from UIKit; run 33 tour green, keys logged in the app) is merged into main at the end of
+nightly 8; the main run after that push should release it (about 1.35). CI checks build, fmt,
+unit tests, clippy, the simulator tour (sliders, radial and brush masks, pinch/pan, keyboard
+probe, background export, Share button and sheet, Add to Apple Photos as a soft check), the
 export file and the log file.
 
 ## Next 3 tasks
 
-1. Check the main run after the `p4-keys` merge: green and released? `app-stderr.log` has
-   `keyboard:` lines from the osascript probe?
-2. If keys don't reach the app (no `keyboard:` lines), add UIKit key handling (`pressesBegan` /
-   `UIKeyCommand`) in `native.rs`; check how winit 0.30's iOS view handles presses first.
-3. Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try
-   `ui.set` window size or the Simulator menu via osascript on the CI Mac).
+1. Check the main run after the `p4-uikit-keys` merge: green and released? In its `tour.log`, do
+   both keyboard `waitUntil rating` steps say `ok`? If yes, drop `"soft"` from them. If `5` works
+   but ⌘Z doesn't, check whether the Simulator's own menu ate ⌘Z (try ⌘⇧Z redo or another ⌘ key).
+2. On-screen (soft) keyboard for text fields (search box, keywords): winit 0.30 iOS probably has
+   no IME either. Let `KeyView` adopt `UIKeyInput` (`insertText:`, `deleteBackward`,
+   `hasText`) and show the keyboard when `egui_wants_keyboard_input()`; test it in CI by typing into
+   the search box with `ui.clickWidget` + `simctl io … keyboard`/osascript.
+3. Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try the
+   Simulator menu via osascript on the CI Mac).
 
 Also queued:
 - A 24 MP raw memory test in the simulator (CC0 ARW/RW2 from `cargo xtask corpus`).
@@ -147,6 +156,7 @@ Also queued:
      the right) › **Brush**, and paint with the Pencil. Does a stroke appear right away, even if
      you rest the tip first? If strokes stay invisible, untick **Pen Pressure** in the brush
      settings and try again (the USB-C Pencil has no pressure), and tell Claude.
-   - **New (later), keyboard:** if you have a keyboard for the iPad, try **⌘Z** (undo) after a
-     slider change and tell Claude whether it works. The log (see above) shows `keyboard:` lines.
+   - **New (1.35 or later), keyboard:** if you have a keyboard for the iPad, open a photo and
+     press **5** (five stars?), then **⌘Z** (undo: back to the old stars?). Also try ⌘Z after a
+     slider change. Tell Claude what happens; the log (see above) shows `keyboard (UIKit):` lines.
    - Anything slow, frozen or crashing: say which photo type (ARW or RW2) and what you did.
