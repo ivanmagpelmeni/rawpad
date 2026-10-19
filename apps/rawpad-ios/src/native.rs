@@ -19,8 +19,8 @@ use lightcraft_ui_egui::pick::{PickKind, PickRequest};
 use objc2::rc::Retained;
 use objc2::runtime::{AnyObject, ProtocolObject};
 use objc2::{DefinedClass, MainThreadMarker, MainThreadOnly, define_class, msg_send};
-use objc2_foundation::{NSArray, NSObject, NSObjectProtocol, NSURL};
-use objc2_ui_kit::{UIDocumentPickerDelegate, UIDocumentPickerViewController, UIResponder, UIView, UIViewController};
+use objc2_foundation::{NSArray, NSObject, NSObjectProtocol, NSString, NSURL};
+use objc2_ui_kit::{UIDocumentPickerDelegate, UIDocumentPickerViewController, UIKeyInput, UIResponder, UITextInputTraits, UIView, UIViewController};
 use objc2_uniform_type_identifiers::{UTType, UTTypeFolder, UTTypeImage, UTTypeItem};
 use winit::raw_window_handle::{HasWindowHandle, RawWindowHandle};
 
@@ -221,7 +221,6 @@ pub fn share(window: &winit::window::Window, path: &str, at: Option<(f64, f64)>)
 /// The share sheet for several files at once (the photos of one export).
 pub fn share_files(window: &winit::window::Window, paths: &[&str], at: Option<(f64, f64)>) -> Result<(), String> {
     use objc2::runtime::{AnyClass, AnyObject};
-    use objc2_foundation::NSString;
     MainThreadMarker::new().ok_or("the share sheet must be opened on the main thread")?;
     let paths: Vec<&str> = paths.iter().copied().filter(|p| std::path::Path::new(p).exists()).collect();
     let Some(first) = paths.first() else {
@@ -318,7 +317,7 @@ impl From<&str> for SaveError {
 /// worker thread (an Export-dialog export hung at "Adding to Apple Photos…", DECISIONS.md 33).
 fn save_to_photos(path: &str, limit: std::time::Duration) -> Result<String, SaveError> {
     use objc2::runtime::{AnyClass, AnyObject, Bool};
-    use objc2_foundation::{NSError, NSString};
+    use objc2_foundation::NSError;
     let library_class = AnyClass::get(c"PHPhotoLibrary").ok_or("the Photos framework isn't available")?;
     let request_class = AnyClass::get(c"PHAssetChangeRequest").ok_or("the Photos framework isn't available")?;
     // SAFETY: makes a file URL from a string (no file access).
@@ -378,14 +377,48 @@ fn save_to_photos(path: &str, limit: std::time::Duration) -> Result<String, Save
     id.ok_or_else(|| SaveError::Failed("Photos couldn't read this file as an image".into()))
 }
 
-/// What [`KeyView`] reads from UIKit presses, drained by the host every frame.
+/// What [`KeyView`] and [`TextKeyView`] read from UIKit, drained by the host every frame.
 pub struct KeyIvars {
     tx: Sender<egui::Event>,
-    /// The last `modifierFlags` seen (⌘ held for pointer events and `keys::apply`).
-    flags: std::cell::Cell<usize>,
-    /// Presses logged so far (only the first few, so typed text doesn't fill the log).
-    logged: std::cell::Cell<u8>,
+    /// The last `modifierFlags` seen (⌘ held for pointer events and `keys::apply`), shared by
+    /// both views.
+    flags: std::rc::Rc<std::cell::Cell<usize>>,
+    /// Presses logged so far (only the first few, so typed text doesn't fill the log), shared.
+    logged: std::rc::Rc<std::cell::Cell<u8>>,
     ctx: egui::Context,
+}
+
+impl KeyIvars {
+    /// Every press of the set (`NSSet<UIPress>`) whose `key` is a keyboard key, as egui events.
+    fn presses(&self, presses: &AnyObject, pressed: bool) {
+        // SAFETY: `allObjects` on the NSSet UIKit passes in, main thread.
+        let all: Option<Retained<NSArray<AnyObject>>> = unsafe { msg_send![presses, allObjects] };
+        for press in all.iter().flat_map(|a| a.iter()) {
+            // SAFETY: `UIPress.key` (iOS 13.4+; nil for non-keyboard presses) and the UIKey's
+            // plain properties, read on the main thread.
+            let key: Option<Retained<AnyObject>> = unsafe { msg_send![&*press, key] };
+            let Some(key) = key else { continue };
+            // (both are NSInteger-backed enums: `UIKeyboardHIDUsage`, `UIKeyModifierFlags`)
+            let (code, flags, chars): (isize, isize, Option<Retained<objc2_foundation::NSString>>) =
+                unsafe { (msg_send![&*key, keyCode], msg_send![&*key, modifierFlags], msg_send![&*key, characters]) };
+            let flags = usize::try_from(flags).unwrap_or_default();
+            let chars = chars.map(|c| c.to_string()).unwrap_or_default();
+            self.flags.set(crate::keys::uikit_flags_after(code, flags, pressed));
+            if self.logged.get() < 6 {
+                self.logged.set(self.logged.get().saturating_add(1));
+                log::info!("keyboard (UIKit): key 0x{code:02X} flags 0x{flags:X} {chars:?} {}", if pressed { "down" } else { "up" });
+            }
+            self.send(crate::keys::uikit_events(code, flags, &chars, pressed));
+        }
+    }
+
+    fn send(&self, events: Vec<egui::Event>) {
+        for ev in events {
+            // the host drops the receiver only when it quits
+            let _ = self.tx.send(ev);
+        }
+        self.ctx.request_repaint();
+    }
 }
 
 define_class!(
@@ -410,100 +443,140 @@ define_class!(
 
         #[unsafe(method(pressesBegan:withEvent:))]
         fn presses_began(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
-            self.presses(presses, true);
+            self.ivars().presses(presses, true);
         }
 
         #[unsafe(method(pressesEnded:withEvent:))]
         fn presses_ended(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
-            self.presses(presses, false);
+            self.ivars().presses(presses, false);
         }
 
         #[unsafe(method(pressesCancelled:withEvent:))]
         fn presses_cancelled(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
-            self.presses(presses, false);
+            self.ivars().presses(presses, false);
         }
     }
 );
 
-impl KeyView {
-    /// Every press of the set (`NSSet<UIPress>`) whose `key` is a keyboard key, as egui events.
-    fn presses(&self, presses: &AnyObject, pressed: bool) {
-        let iv = self.ivars();
-        // SAFETY: `allObjects` on the NSSet UIKit passes in, main thread.
-        let all: Option<Retained<NSArray<AnyObject>>> = unsafe { msg_send![presses, allObjects] };
-        for press in all.iter().flat_map(|a| a.iter()) {
-            // SAFETY: `UIPress.key` (iOS 13.4+; nil for non-keyboard presses) and the UIKey's
-            // plain properties, read on the main thread.
-            let key: Option<Retained<AnyObject>> = unsafe { msg_send![&*press, key] };
-            let Some(key) = key else { continue };
-            // (both are NSInteger-backed enums: `UIKeyboardHIDUsage`, `UIKeyModifierFlags`)
-            let (code, flags, chars): (isize, isize, Option<Retained<objc2_foundation::NSString>>) =
-                unsafe { (msg_send![&*key, keyCode], msg_send![&*key, modifierFlags], msg_send![&*key, characters]) };
-            let flags = usize::try_from(flags).unwrap_or_default();
-            let chars = chars.map(|c| c.to_string()).unwrap_or_default();
-            iv.flags.set(crate::keys::uikit_flags_after(code, flags, pressed));
-            if iv.logged.get() < 6 {
-                iv.logged.set(iv.logged.get().saturating_add(1));
-                log::info!("keyboard (UIKit): key 0x{code:02X} flags 0x{flags:X} {chars:?} {}", if pressed { "down" } else { "up" });
-            }
-            for ev in crate::keys::uikit_events(code, flags, &chars, pressed) {
-                // the host drops the receiver only when it quits
-                let _ = iv.tx.send(ev);
-            }
-        }
-        iv.ctx.request_repaint();
-    }
-}
+define_class!(
+    // SAFETY: as `KeyView`, plus UIKeyInput, so UIKit shows the on-screen keyboard while it is
+    // first responder (only while an egui text field has focus).
+    #[unsafe(super(UIView, UIResponder, NSObject))]
+    #[thread_kind = MainThreadOnly]
+    #[name = "RawPadTextKeyView"]
+    #[ivars = KeyIvars]
+    pub struct TextKeyView;
 
-/// Hardware-keyboard keys straight from UIKit: a 1×1, input-transparent view inside winit's view
-/// that holds first responder, so the iPad's key presses reach it (`pressesBegan:`).
+    // SAFETY: NSObjectProtocol has no extra requirements.
+    unsafe impl NSObjectProtocol for TextKeyView {}
+
+    // SAFETY: UITextInputTraits' methods are all optional; the defaults are kept.
+    unsafe impl UITextInputTraits for TextKeyView {}
+
+    // SAFETY: UIKeyInput's three required methods with their signatures (`BOOL hasText`,
+    // `insertText:(NSString *)`, `deleteBackward`).
+    unsafe impl UIKeyInput for TextKeyView {
+        #[unsafe(method(hasText))]
+        fn has_text(&self) -> bool {
+            // always: the delete key must reach the egui field, which knows its own text
+            true
+        }
+
+        #[unsafe(method(insertText:))]
+        fn insert_text(&self, text: &NSString) {
+            self.ivars().send(crate::keys::soft_text_events(&text.to_string()));
+        }
+
+        #[unsafe(method(deleteBackward))]
+        fn delete_backward(&self) {
+            self.ivars().send(crate::keys::soft_backspace());
+        }
+    }
+
+    // SAFETY: as in `KeyView`. Hardware presses are swallowed here too, so UIKit never turns
+    // them into `insertText:` as well (each key would arrive twice).
+    impl TextKeyView {
+        #[unsafe(method(canBecomeFirstResponder))]
+        fn can_become_first_responder(&self) -> bool {
+            true
+        }
+
+        #[unsafe(method(pressesBegan:withEvent:))]
+        fn presses_began(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
+            self.ivars().presses(presses, true);
+        }
+
+        #[unsafe(method(pressesEnded:withEvent:))]
+        fn presses_ended(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
+            self.ivars().presses(presses, false);
+        }
+
+        #[unsafe(method(pressesCancelled:withEvent:))]
+        fn presses_cancelled(&self, presses: &AnyObject, _event: Option<&AnyObject>) {
+            self.ivars().presses(presses, false);
+        }
+    }
+);
+
+/// Keyboard input straight from UIKit, through two 1×1, input-transparent views inside winit's
+/// view: [`KeyView`] holds first responder for hardware keys (`pressesBegan:`); while an egui text
+/// field has focus, [`TextKeyView`] (UIKeyInput) holds it instead, which shows the on-screen
+/// keyboard when no hardware keyboard is attached.
 pub struct Keys {
     view: Retained<KeyView>,
+    text_view: Retained<TextKeyView>,
     /// Dialogs are presented from it; while one is up, it keeps the keyboard.
     vc: Retained<UIViewController>,
     rx: Receiver<egui::Event>,
-    /// The last `becomeFirstResponder` answer, so the log shows changes only.
-    focused: std::cell::Cell<Option<bool>>,
+    flags: std::rc::Rc<std::cell::Cell<usize>>,
+    /// The last `becomeFirstResponder` answer and view, so the log shows changes only.
+    focused: std::cell::Cell<Option<(bool, bool)>>,
 }
 
 impl Keys {
-    /// Add the view to the window's view. `None` off the main thread or without a UIKit view.
+    /// Add the views to the window's view. `None` off the main thread or without a UIKit view.
     pub fn attach(window: &winit::window::Window, ctx: &egui::Context) -> Option<Self> {
         let mtm = MainThreadMarker::new()?;
         let handle = window.window_handle().ok()?;
         let RawWindowHandle::UiKit(h) = handle.as_raw() else { return None };
         let vc = root_view_controller(window).ok()?;
         let (tx, rx) = channel();
-        let ivars = KeyIvars { tx, flags: Default::default(), logged: Default::default(), ctx: ctx.clone() };
-        let this = KeyView::alloc(mtm).set_ivars(ivars);
+        let flags = std::rc::Rc::new(std::cell::Cell::new(0));
+        let logged = std::rc::Rc::new(std::cell::Cell::new(0));
+        let ivars = || KeyIvars { tx: tx.clone(), flags: flags.clone(), logged: logged.clone(), ctx: ctx.clone() };
         let frame = Rect { x: 0.0, y: 0.0, width: 1.0, height: 1.0 };
-        // SAFETY: UIView's designated initializer on a fresh instance; then plain setters, adding
-        // it to winit's live UIView (which the window owns and outlives this call), and asking for
-        // first responder, all on the main thread.
-        let view: Retained<KeyView> = unsafe { msg_send![super(this), initWithFrame: frame] };
+        // SAFETY: UIView's designated initializer on fresh instances; then plain setters and
+        // adding them to winit's live UIView (which the window owns and outlives this call), all
+        // on the main thread.
+        let view: Retained<KeyView> = unsafe { msg_send![super(KeyView::alloc(mtm).set_ivars(ivars())), initWithFrame: frame] };
+        let text_view: Retained<TextKeyView> = unsafe { msg_send![super(TextKeyView::alloc(mtm).set_ivars(ivars())), initWithFrame: frame] };
         unsafe {
             let parent = h.ui_view.as_ptr().cast::<AnyObject>();
             let _: () = msg_send![&*view, setUserInteractionEnabled: false];
+            let _: () = msg_send![&*text_view, setUserInteractionEnabled: false];
             let _: () = msg_send![&*parent, addSubview: &*view];
+            let _: () = msg_send![&*parent, addSubview: &*text_view];
         }
-        let keys = Self { view, vc, rx, focused: Default::default() };
-        keys.focus();
+        let keys = Self { view, text_view, vc, rx, flags, focused: Default::default() };
+        keys.focus(false);
         Some(keys)
     }
 
-    /// Take first responder back after a dialog or the share sheet closed, never while one is up
-    /// (the Files picker's search field needs the keyboard). Cheap; once a frame.
-    pub fn focus(&self) {
-        // SAFETY: property reads and `becomeFirstResponder` on our live view and the window's
+    /// Hold first responder with the right view: the text view (on-screen keyboard) while `text`
+    /// (an egui text field has focus), else the key view. Never while a dialog is up (the Files
+    /// picker's search field needs the keyboard). Cheap; once a frame.
+    pub fn focus(&self, text: bool) {
+        // SAFETY: property reads and `becomeFirstResponder` on our live views and the window's
         // live view controller, main thread (`Keys` is made there and lives in the host, which
         // never leaves it).
         unsafe {
             let presented: Option<Retained<AnyObject>> = msg_send![&*self.vc, presentedViewController];
-            let first: bool = msg_send![&*self.view, isFirstResponder];
+            let first: bool = if text { msg_send![&*self.text_view, isFirstResponder] } else { msg_send![&*self.view, isFirstResponder] };
             if presented.is_none() && !first {
-                let ok: bool = msg_send![&*self.view, becomeFirstResponder];
-                if self.focused.replace(Some(ok)) != Some(ok) {
-                    log::info!("keyboard (UIKit): first responder {}", if ok { "taken" } else { "refused" });
+                let ok: bool = if text { msg_send![&*self.text_view, becomeFirstResponder] } else { msg_send![&*self.view, becomeFirstResponder] };
+                if self.focused.replace(Some((text, ok))) != Some((text, ok)) {
+                    let who = if text { "text field (on-screen keyboard)" } else { "keys" };
+                    log::info!("keyboard (UIKit): first responder for {who} {}", if ok { "taken" } else { "refused" });
                 }
             }
         }
@@ -512,6 +585,6 @@ impl Keys {
     /// This frame's key events, and whether ⌘ is held.
     pub fn drain(&self) -> (Vec<egui::Event>, bool) {
         let events = self.rx.try_iter().collect();
-        (events, self.view.ivars().flags.get() & (1 << 20) != 0)
+        (events, self.flags.get() & (1 << 20) != 0)
     }
 }

@@ -66,6 +66,8 @@ pub fn hid_key(code: isize) -> Option<Key> {
     Some(match code {
         0x04..=0x1D => return at(&LETTERS, 0x04),
         0x1E..=0x27 => return at(&DIGITS, 0x1E),
+        // the numeric keypad's digits (KP1…KP9, KP0: the same order); osascript's "5" is KP5
+        0x59..=0x62 => return at(&DIGITS, 0x59),
         0x3A..=0x45 => return at(&FKEYS, 0x3A),
         0x28 | 0x58 => Enter,
         0x29 => Escape,
@@ -82,8 +84,8 @@ pub fn hid_key(code: isize) -> Option<Key> {
         0x34 => Quote,
         0x35 => Backtick,
         0x36 => Comma,
-        0x37 => Period,
-        0x38 => Slash,
+        0x37 | 0x63 => Period,
+        0x38 | 0x54 => Slash,
         0x49 => Insert,
         0x4A => Home,
         0x4B => PageUp,
@@ -114,9 +116,63 @@ pub fn uikit_events(code: isize, flags: usize, characters: &str, pressed: bool) 
     out
 }
 
+/// A tap on a key: pressed and released, no modifiers.
+fn tap(key: Key) -> [Event; 2] {
+    let ev = |pressed| Event::Key { key, physical_key: Some(key), pressed, repeat: false, modifiers: Modifiers::NONE };
+    [ev(true), ev(false)]
+}
+
+/// The egui events for text from the on-screen keyboard (`UIKeyInput.insertText:`): Return is the
+/// Enter key, Tab the Tab key, anything else typed text.
+pub fn soft_text_events(text: &str) -> Vec<Event> {
+    let mut out = Vec::new();
+    let mut run = String::new();
+    for c in text.chars() {
+        let key = match c {
+            '\n' | '\r' => Some(Key::Enter),
+            '\t' => Some(Key::Tab),
+            c if c.is_control() => continue,
+            _ => None,
+        };
+        match key {
+            Some(key) => {
+                if !run.is_empty() {
+                    out.push(Event::Text(std::mem::take(&mut run)));
+                }
+                out.extend(tap(key));
+            }
+            None => run.push(c),
+        }
+    }
+    if !run.is_empty() {
+        out.push(Event::Text(run));
+    }
+    out
+}
+
+/// The on-screen keyboard's delete key (`UIKeyInput.deleteBackward`).
+pub fn soft_backspace() -> Vec<Event> {
+    tap(Key::Backspace).to_vec()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn soft_keyboard_text_and_return() {
+        let ev = soft_text_events("ab\nc");
+        assert!(matches!(&ev[0], Event::Text(t) if t == "ab"));
+        assert!(matches!(&ev[1], Event::Key { key: Key::Enter, pressed: true, .. }));
+        assert!(matches!(&ev[2], Event::Key { key: Key::Enter, pressed: false, .. }));
+        assert!(matches!(&ev[3], Event::Text(t) if t == "c"));
+        assert_eq!(ev.len(), 4);
+        assert!(soft_text_events("\u{7}").is_empty(), "control characters are dropped");
+        assert!(matches!(&soft_text_events("ü")[0], Event::Text(t) if t == "ü"));
+        let bs = soft_backspace();
+        assert!(matches!(&bs[0], Event::Key { key: Key::Backspace, pressed: true, .. }));
+        assert_eq!(bs.len(), 2);
+    }
 
     fn key(modifiers: Modifiers) -> Event {
         Event::Key { key: Key::Z, physical_key: Some(Key::Z), pressed: true, repeat: false, modifiers }
@@ -162,6 +218,10 @@ mod tests {
     fn uikit_hid_table() {
         assert_eq!(hid_key(0x04), Some(Key::A));
         assert_eq!(hid_key(0x27), Some(Key::Num0));
+        // keypad 5 (what CI run 35 got for "5", with UIKeyModifierNumericPad) and keypad 0
+        assert_eq!(hid_key(0x5D), Some(Key::Num5));
+        assert_eq!(hid_key(0x62), Some(Key::Num0));
+        assert!(matches!(&uikit_events(0x5D, 1 << 21, "5", true)[0], Event::Key { key: Key::Num5, modifiers, .. } if !modifiers.command));
         assert_eq!(hid_key(0x45), Some(Key::F12));
         assert_eq!(hid_key(0x52), Some(Key::ArrowUp));
         assert_eq!(hid_key(0x29), Some(Key::Escape));
