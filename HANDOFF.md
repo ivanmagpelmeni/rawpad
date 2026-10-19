@@ -21,10 +21,11 @@ end. The next session reads it **first**.
     `app-stderr.log` shows `first responder for text field (on-screen keyboard) taken`, then
     `for keys taken` after Escape; `runs/37/04-text-field.jpg` shows the iPad keyboard under the
     focused search box (the simulator showed it despite the hardware-keyboard probe).
-  - **Merged `p4-soft-keyboard` into main** (`082ed01`) and pushed at about 03:28; the main run
-    for it was running at handoff and should release about 1.38.
+  - **Merged `p4-soft-keyboard` into main** (`082ed01`) and pushed at about 03:25 (with the CI's 1.35 source update merged in, `2eae72e`): main
+    run 38 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39185203734) was running at
+    handoff and should release 1.38.
 - **Very next step:**
-  1. Check the main run after `082ed01`: green and released? If red, fix or revert the merge
+  1. Check main run 38 (id 39185203734): green and released? If red, fix or revert the merge
      commit first (`git revert -m 1 082ed01`).
   2. If its two keyboard `waitUntil rating` steps say `ok` again, remove `"soft"` from them in
      `ios/sim_tour.jsonl`.
