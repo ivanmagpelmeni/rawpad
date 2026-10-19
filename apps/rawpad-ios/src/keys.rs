@@ -66,6 +66,8 @@ pub fn hid_key(code: isize) -> Option<Key> {
     Some(match code {
         0x04..=0x1D => return at(&LETTERS, 0x04),
         0x1E..=0x27 => return at(&DIGITS, 0x1E),
+        // the numeric keypad's digits (KP1…KP9, KP0: the same order); osascript's "5" is KP5
+        0x59..=0x62 => return at(&DIGITS, 0x59),
         0x3A..=0x45 => return at(&FKEYS, 0x3A),
         0x28 | 0x58 => Enter,
         0x29 => Escape,
@@ -82,8 +84,8 @@ pub fn hid_key(code: isize) -> Option<Key> {
         0x34 => Quote,
         0x35 => Backtick,
         0x36 => Comma,
-        0x37 => Period,
-        0x38 => Slash,
+        0x37 | 0x63 => Period,
+        0x38 | 0x54 => Slash,
         0x49 => Insert,
         0x4A => Home,
         0x4B => PageUp,
@@ -216,6 +218,10 @@ mod tests {
     fn uikit_hid_table() {
         assert_eq!(hid_key(0x04), Some(Key::A));
         assert_eq!(hid_key(0x27), Some(Key::Num0));
+        // keypad 5 (what CI run 35 got for "5", with UIKeyModifierNumericPad) and keypad 0
+        assert_eq!(hid_key(0x5D), Some(Key::Num5));
+        assert_eq!(hid_key(0x62), Some(Key::Num0));
+        assert!(matches!(&uikit_events(0x5D, 1 << 21, "5", true)[0], Event::Key { key: Key::Num5, modifiers, .. } if !modifiers.command));
         assert_eq!(hid_key(0x45), Some(Key::F12));
         assert_eq!(hid_key(0x52), Some(Key::ArrowUp));
         assert_eq!(hid_key(0x29), Some(Key::Escape));
