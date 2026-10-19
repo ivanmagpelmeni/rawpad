@@ -2297,9 +2297,11 @@ fn frame_long_norm(map: &CanvasMap) -> (f64, f64) {
 }
 
 /// Auto's condition for the Tool Overlay (Shift+H): the pointer is over the photo, or a pin is
-/// being dragged.
+/// being dragged. RawPad (iPad): always, as a lifted finger leaves no pointer over the photo, so
+/// the pins could never be seen before touching them (UPSTREAM.md).
 fn pins_live(app: &LightcraftApp, resp: &egui::Response, map: &CanvasMap) -> bool {
-    resp.hover_pos().is_some_and(|q| map.rect.contains(q))
+    cfg!(target_os = "ios")
+        || resp.hover_pos().is_some_and(|q| map.rect.contains(q))
         || matches!(app.gesture, Some(Gesture::SpotMove { .. } | Gesture::MaskHandle { .. }))
         // a handle moved with the keyboard stays shown while it has the focus
         || crate::canvas_keys::has_focus(&resp.ctx)
