@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.38",
+          "buildVersion": "38",
+          "date": "2026-10-19T01:45:09Z",
+          "localizedDescription": "RawPad 1.38 (build 38, 0e80da0): P4: handoff: main run 38 tour green",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.38/RawPad.ipa",
+          "size": 19827118,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.35",
           "buildVersion": "35",
           "date": "2026-10-19T00:59:08Z",
@@ -98,26 +107,17 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.9/RawPad.ipa",
           "size": 19658816,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.8",
-          "buildVersion": "8",
-          "date": "2026-10-18T13:05:27Z",
-          "localizedDescription": "RawPad 1.8 (build 8, 85b8e7b): P5: give the iPad host file writing and PNG encoding (exports said 'no writer')",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.8/RawPad.ipa",
-          "size": 19652027,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.35",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.35/RawPad.ipa",
-      "size": 19822623,
-      "versionDate": "2026-10-19T00:59:08Z",
-      "versionDescription": "RawPad 1.35 (build 35, 4e59383): P4: handoff: p4-uikit-keys merged, main run 35 running"
+      "version": "1.38",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.38/RawPad.ipa",
+      "size": 19827118,
+      "versionDate": "2026-10-19T01:45:09Z",
+      "versionDescription": "RawPad 1.38 (build 38, 0e80da0): P4: handoff: main run 38 tour green"
     }
   ],
   "news": []
