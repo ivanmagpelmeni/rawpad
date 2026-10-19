@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.32",
+          "buildVersion": "32",
+          "date": "2026-10-18T23:58:47Z",
+          "localizedDescription": "RawPad 1.32 (build 32, 4047a07): Merge branch 'p4-keys' (\u2318 = command on a hardware keyboard, keyboard probe; run 30 tour green)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.32/RawPad.ipa",
+          "size": 19810335,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.27",
           "buildVersion": "27",
           "date": "2026-10-18T23:21:29Z",
@@ -104,11 +113,11 @@
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.27",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.27/RawPad.ipa",
-      "size": 19803978,
-      "versionDate": "2026-10-18T23:21:29Z",
-      "versionDescription": "RawPad 1.27 (build 27, bf77cb0): P5: log the Photos add-only permission status before each save"
+      "version": "1.32",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.32/RawPad.ipa",
+      "size": 19810335,
+      "versionDate": "2026-10-18T23:58:47Z",
+      "versionDescription": "RawPad 1.32 (build 32, 4047a07): Merge branch 'p4-keys' (\u2318 = command on a hardware keyboard, keyboard probe; run 30 tour green)"
     }
   ],
   "news": []
