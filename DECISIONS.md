@@ -239,3 +239,6 @@ Newer entries win over older ones and over the kickoff brief.
     (Files picker, share sheet) is presented, so their own text fields keep the keyboard. It
     swallows the presses (no `super` call), so winit can't deliver them twice. The run 30 probe
     ran under an open share sheet and proved nothing; the probe now runs before any sheet.
+42. **Modifier flags are tracked per press, clearing a modifier's bit on its own release**
+    (`keys::uikit_flags_after`): UIKit reports the released ⌘ with `UIKeyModifierCommand` still
+    set (run 33), which would leave ⌘ held for every later tap.
