@@ -193,6 +193,21 @@ mod tests {
     use super::*;
 
     #[test]
+    fn soft_keyboard_text_and_return() {
+        let ev = soft_text_events("ab\nc");
+        assert!(matches!(&ev[0], Event::Text(t) if t == "ab"));
+        assert!(matches!(&ev[1], Event::Key { key: Key::Enter, pressed: true, .. }));
+        assert!(matches!(&ev[2], Event::Key { key: Key::Enter, pressed: false, .. }));
+        assert!(matches!(&ev[3], Event::Text(t) if t == "c"));
+        assert_eq!(ev.len(), 4);
+        assert!(soft_text_events("\u{7}").is_empty(), "control characters are dropped");
+        assert!(matches!(&soft_text_events("ü")[0], Event::Text(t) if t == "ü"));
+        let bs = soft_backspace();
+        assert!(matches!(&bs[0], Event::Key { key: Key::Backspace, pressed: true, .. }));
+        assert_eq!(bs.len(), 2);
+    }
+
+    #[test]
     fn soft_keyboard_only_for_a_tapped_text_field() {
         use std::time::Duration;
         let field = egui::Rect::from_min_size(egui::pos2(300.0, 20.0), egui::vec2(220.0, 28.0));
