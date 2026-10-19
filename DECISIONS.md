@@ -242,3 +242,20 @@ Newer entries win over older ones and over the kickoff brief.
 42. **Modifier flags are tracked per press, clearing a modifier's bit on its own release**
     (`keys::uikit_flags_after`): UIKit reports the released ⌘ with `UIKeyModifierCommand` still
     set (run 33), which would leave ⌘ held for every later tap.
+
+## 2026-10-19: Nightly session 9 (02:55 Berlin)
+
+43. **On-screen keyboard through a second key view** (`native::TextKeyView`, adopts `UIKeyInput`):
+    it becomes first responder only while an egui text field has focus
+    (`ctx.egui_wants_keyboard_input()`, last frame), so UIKit shows the keyboard then and only
+    then; otherwise `KeyView` (no `UIKeyInput`) holds it as before, so no keyboard or shortcut bar
+    appears while browsing. `insertText:` → egui text (Return = Enter, Tab = Tab),
+    `deleteBackward` → Backspace (`keys::soft_text_events`, `soft_backspace`; unit-tested).
+    `hasText` is always true so delete always reaches the field. Both views swallow hardware
+    presses and share one channel and one modifier state, so hardware keys never arrive twice.
+    Chosen over an `inputView` swap on one view, which would leave the iPad's shortcut bar up all
+    the time.
+44. **Keypad digits are number keys.** CI run 35 showed osascript's `5` arriving as HID 0x5D
+    (keypad 5, `UIKeyModifierNumericPad`), which the HID table dropped, so the rating never changed
+    and the ⌘Z check passed only because nothing had changed. Keypad 0x59–0x62 now map to
+    Num1…Num0 (plus keypad `/` and `.`).
