@@ -6,7 +6,7 @@
 1. Main run 35 green, **released 1.35** (hardware keyboard read from UIKit).
 2. Its log showed CI's `5` arriving as the *keypad* 5, which RawPad ignored (so the rating probe proved nothing): keypad digits now count as number keys.
 3. **On-screen keyboard:** tapping a text field (search box, keywords…) now brings up the iPad keyboard (`native::TextKeyView`, DECISIONS.md 43); screenshot `runs/37/04-text-field` shows it under the focused search box. It goes away when the field loses focus.
-4. Branch run 37 all green; for the first time CI proved hardware keys end to end (`5` → 5 stars, ⌘Z → back to 3). Merged into main at 03:27; that main run should release about 1.38.
+4. Branch run 37 all green; for the first time CI proved hardware keys end to end (`5` → 5 stars, ⌘Z → back to 3). Merged into main; main run 38 passed build, clippy and the tour by 03:38 and should release 1.38.
 5. Upstream not checked (not the first run of the night).
 
 **2026-10-19 (nightly 8, 01:54–02:40 Berlin, unattended)**

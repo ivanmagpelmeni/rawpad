@@ -23,7 +23,8 @@ end. The next session reads it **first**.
     focused search box (the simulator showed it despite the hardware-keyboard probe).
   - **Merged `p4-soft-keyboard` into main** (`082ed01`) and pushed at about 03:25 (with the CI's 1.35 source update merged in, `2eae72e`): main
     run 38 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39185203734) was running at
-    handoff and should release 1.38.
+    handoff: build, clippy and the simulator tour already passed (03:38), only the .ipa build and
+    release were left; it should release 1.38.
 - **Very next step:**
   1. Check main run 38 (id 39185203734): green and released? If red, fix or revert the merge
      commit first (`git revert -m 1 082ed01`).
