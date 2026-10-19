@@ -18,10 +18,12 @@ end. The next session reads it **first**.
     → fixed (`uikit_flags_after`) in `2b8bd92`.
   - Tour probe rewritten: select photo 1 (3 stars), host key `5` → `waitUntil rating equals 5`,
     ⌘Z → `equals 3`, both `"soft"`. `sim_test.py` gained `"equals"` for `waitUntil`.
-  - Second branch run (run 34) started for `2b8bd92`; merged `p4-uikit-keys` into main at handoff
-    if it had passed build + clippy by then (see `git log main`; if the merge isn't there, do it).
+  - Branch run 34 (`2b8bd92`) passed unit tests, build and clippy; its tour was still running.
+    **Merged `p4-uikit-keys` into main** (`f489485`, plus the 1.32 source update `a06e6ae`): main
+    run 35 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39181393085) was running at
+    handoff and should release about 1.35.
 - **Very next step:**
-  1. Check the main run after the merge (about run 35): green and released? If red, fix or revert
+  1. Check the main run after the merge (run 35, id 39181393085): green and released? If red, fix or revert
      the merge commit first.
   2. In its `tour.log`: the two `waitUntil rating` lines (`ok` or `WARN`). Both ok → remove
      `"soft"`. `5` ok but ⌘Z WARN → the Simulator app's own Edit menu may take ⌘Z; try another ⌘

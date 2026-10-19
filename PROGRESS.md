@@ -7,7 +7,7 @@
 2. Found that winit passes **no hardware keys** on iOS (run 30's probe even ran under the share sheet).
 3. **Hardware keyboard now works in the simulator:** RawPad reads key presses from UIKit itself (`native::KeyView`). Branch run 33: `p`, ⌘ and Z all reached the app (`keyboard (UIKit):` log lines). Fixed a stuck-⌘ bug seen in that log.
 4. CI tour now presses `5` (rating) and ⌘Z (undo) and checks the photo's stars (soft check for now).
-5. Branch `p4-uikit-keys` merged into main at handoff if its second run compiled (see HANDOFF.md).
+5. Branch `p4-uikit-keys` merged into main at handoff (its second run compiled and passed clippy); main run 35 should release it (about 1.35).
 
 **2026-10-19 (nightly 7, 00:54–01:40 Berlin, unattended)**
 1. Main was **red** (run 26: the simulator's Photos never answered). Fixed the CI tour (Photos step only warns, Share check no longer needs Photos); main run 27 green, released **1.27** (pinch/pan, top gap, translated Share label).
