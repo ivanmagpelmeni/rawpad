@@ -252,6 +252,20 @@ impl Host {
         // long-press → secondary click (context menus); before the hook, so control-channel
         // pointer events (CI) are never held back
         let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
+        // a quick two-finger tap undoes, a three-finger tap redoes (DECISIONS.md 47); not while
+        // a text box is being edited
+        if let Some(gesture) = self.long_press.take_gesture()
+            && self.text_field.is_none()
+        {
+            let id = match gesture {
+                crate::touch::Gesture::Undo => "edit.undo",
+                crate::touch::Gesture::Redo => "edit.redo",
+            };
+            match app.run(id, serde_json::json!({})) {
+                Ok(_) => log::info!("touch: multi-finger tap → {id}"),
+                Err(e) => log::info!("touch: multi-finger tap → {id} refused: {e}"),
+            }
+        }
         // ⌘ is `command` on the iPad as on the Mac (egui-winit maps it to Ctrl off macOS)
         // (UIKit's own presses come with their modifiers already Mac-style: added after)
         // the on-screen keyboard: only for a text box being edited (last frame) that took the
