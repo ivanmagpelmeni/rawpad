@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.35",
+          "buildVersion": "35",
+          "date": "2026-10-19T00:59:08Z",
+          "localizedDescription": "RawPad 1.35 (build 35, 4e59383): P4: handoff: p4-uikit-keys merged, main run 35 running",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.35/RawPad.ipa",
+          "size": 19822623,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.32",
           "buildVersion": "32",
           "date": "2026-10-18T23:58:47Z",
@@ -98,26 +107,17 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.8/RawPad.ipa",
           "size": 19652027,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.5",
-          "buildVersion": "5",
-          "date": "2026-10-18T12:23:49Z",
-          "localizedDescription": "RawPad 1.5 (build 5, fac8d71): P2: request the adapter's own limits for the egui device",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.5/RawPad.ipa",
-          "size": 19638192,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.32",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.32/RawPad.ipa",
-      "size": 19810335,
-      "versionDate": "2026-10-18T23:58:47Z",
-      "versionDescription": "RawPad 1.32 (build 32, 4047a07): Merge branch 'p4-keys' (\u2318 = command on a hardware keyboard, keyboard probe; run 30 tour green)"
+      "version": "1.35",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.35/RawPad.ipa",
+      "size": 19822623,
+      "versionDate": "2026-10-19T00:59:08Z",
+      "versionDescription": "RawPad 1.35 (build 35, 4e59383): P4: handoff: p4-uikit-keys merged, main run 35 running"
     }
   ],
   "news": []
