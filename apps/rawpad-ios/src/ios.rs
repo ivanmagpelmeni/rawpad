@@ -56,6 +56,9 @@ pub fn run() {
         keys_logged: 0,
         keys: None,
         logged_insets: None,
+        avoid: Default::default(),
+        logged_cover: 0,
+        last_cover: 0,
         prefs: None,
         share_offer: Default::default(),
     };
@@ -84,6 +87,12 @@ struct Host {
     /// Hardware-keyboard presses read from UIKit (winit 0.30 passes none on iOS; CI run 30).
     keys: Option<crate::native::Keys>,
     logged_insets: Option<crate::native::EdgeInsets>,
+    /// Keyboard avoidance: shrinks the UI while the on-screen keyboard covers a focused field.
+    avoid: crate::keyboard::Avoid,
+    /// The last keyboard height logged (whole points), so the log shows changes only.
+    logged_cover: i32,
+    /// The keyboard height of the last frame (whole points).
+    last_cover: i32,
     prefs: Option<crate::prefs::Writer>,
     /// The Share button for the files of the last export.
     share_offer: crate::share_offer::ShareOffer,
@@ -217,6 +226,7 @@ impl Host {
     fn frame(&mut self) {
         let (Some(gfx), Some(app)) = (self.gfx.as_mut(), self.app.as_mut()) else { return };
         let mut raw = gfx.input.take_egui_input(&gfx.window);
+        let mut keep_drawing = false;
         // Keep the UI out from under the status bar and the home indicator. egui-winit's own
         // insets came through as nothing (CI run 8: the bottom toolbar sat on the home
         // indicator), so read UIKit's.
@@ -226,8 +236,24 @@ impl Host {
                     log::info!("safe area (points): top {} left {} bottom {} right {}", i.top, i.left, i.bottom, i.right);
                     self.logged_insets = Some(i);
                 }
-                let (t, l, b, r) = ((i.top as f32).max(MIN_TOP_INSET), i.left as f32, i.bottom as f32, i.right as f32);
-                let inner = egui::Rect::from_min_max(egui::pos2(rect.min.x + l, rect.min.y + t), egui::pos2(rect.max.x - r, rect.max.y - b));
+                // UIKit points → egui points (egui's zoom factor, 1 unless changed in the UI)
+                let zoom = self.ctx.zoom_factor().max(0.1);
+                let (t, l, b, r) = ((i.top as f32 / zoom).max(MIN_TOP_INSET), i.left as f32 / zoom, i.bottom as f32 / zoom, i.right as f32 / zoom);
+                // the docked on-screen keyboard, beyond the safe area it sits on
+                let cover = crate::native::keyboard_cover(&gfx.window).map_or(0.0, |c| (c - i.bottom).max(0.0) as f32 / zoom);
+                let focused = self.ctx.memory(|m| m.focused()).filter(|_| self.ctx.egui_wants_keyboard_input());
+                let field_bottom = focused.and_then(|id| self.ctx.read_response(id)).map(|r| r.rect.bottom());
+                let kb = self.avoid.inset(cover, focused, field_bottom, rect.max.y - b);
+                // log the keyboard once it has settled (same height two frames running)
+                let whole = cover.round() as i32;
+                if whole == self.last_cover && whole != self.logged_cover {
+                    self.logged_cover = whole;
+                    log::info!("keyboard (UIKit): on-screen keyboard covers {cover:.0} pt, UI shrunk by {kb:.0} pt");
+                }
+                // the keyboard slides in and out over a few frames: keep drawing until it settles
+                keep_drawing = whole != 0 || self.last_cover != 0 || self.avoid.active();
+                self.last_cover = whole;
+                let inner = egui::Rect::from_min_max(egui::pos2(rect.min.x + l, rect.min.y + t), egui::pos2(rect.max.x - r, rect.max.y - b - kb));
                 if inner.is_positive() {
                     raw.screen_rect = Some(inner);
                 }
@@ -261,6 +287,9 @@ impl Host {
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
         let mut out = self.ctx.run_ui(raw, |ui| {
+            if keep_drawing {
+                ui.ctx().request_repaint_after(Duration::from_millis(100));
+            }
             app.logic(ui.ctx());
             app.ui(ui);
             // after an export: a Share button for the files just written, above the export toast

@@ -48,9 +48,9 @@
 # (it had 3 stars), ⌘Z undoes that. Soft for now: osascript on the CI Mac decides delivery.
 {"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}}}
 {"hostKeys":"5"}
-{"waitUntil":"rating","equals":5,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":1}},"timeout":10,"soft":true}
+{"waitUntil":"rating","equals":5,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":1}},"timeout":10}
 {"hostKeys":"z","cmd":true}
-{"waitUntil":"rating","equals":3,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":1}},"timeout":10,"soft":true}
+{"waitUntil":"rating","equals":3,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":1}},"timeout":10}
 {"shot":"04-keys"}
 # on-screen keyboard: a focused text field makes native::TextKeyView (UIKeyInput) first responder
 # (app-stderr.log "first responder for text field"); Escape hands it back to KeyView. The
@@ -59,8 +59,24 @@
 {"method":"ui.clickWidget","params":{"id":"field:search"}}
 {"sleep":2}
 {"shot":"04-text-field"}
+# typing reaches the field once (hardware presses through the text view, never twice): type,
+# select all, copy, read ui.inspect → copied. Soft: osascript on the CI Mac decides delivery.
+{"hostKeys":"rq"}
+{"hostKeys":"a","cmd":true}
+{"method":"ui.clipboard","params":{"action":"copy"}}
+{"waitUntil":"copied","equals":"rq","method":"ui.inspect","params":{},"timeout":10,"soft":true}
 {"method":"ui.key","params":{"key":"Escape"}}
 {"sleep":1}
+# keyboard avoidance (DECISIONS.md 45): a field low on the screen (the caption in the Info panel)
+# lifts the UI above the on-screen keyboard; app-stderr.log "on-screen keyboard covers … UI shrunk by …"
+{"method":"ui.set","params":{"right":"info"}}
+{"sleep":2}
+{"method":"ui.clickWidget","params":{"id":"field:caption"}}
+{"sleep":3}
+{"shot":"04-caption-keyboard"}
+{"method":"ui.key","params":{"key":"Escape"}}
+{"method":"engine.execute","params":{"command":"panel.edit"}}
+{"sleep":2}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}

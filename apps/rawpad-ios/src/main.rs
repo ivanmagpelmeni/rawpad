@@ -12,6 +12,9 @@ mod ios;
 // ⌘ shortcuts from a hardware keyboard: plain egui, tested on the CI's macOS host too
 #[cfg(any(target_os = "ios", test))]
 mod keys;
+// keyboard avoidance (on-screen keyboard over a focused field): plain egui, tested on the CI's macOS host too
+#[cfg(any(target_os = "ios", test))]
+mod keyboard;
 #[cfg(target_os = "ios")]
 mod native;
 #[cfg(target_os = "ios")]
