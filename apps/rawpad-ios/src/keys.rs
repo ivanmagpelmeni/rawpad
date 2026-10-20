@@ -160,6 +160,18 @@ pub fn soft_backspace() -> Vec<Event> {
 /// on one of them and reports it (`PlatformOutput::ime`) a frame later.
 pub const SOFT_KEYBOARD_TAP_WINDOW: std::time::Duration = std::time::Duration::from_millis(800);
 
+/// A tap also counts as recent while at most this many frames have been drawn since it, however
+/// long they took. After a tap the app may draw its next frame only at the cursor blink (about
+/// half a second later), and the CI simulator draws a frame every second or so; CI run 41 lost the
+/// keyboard for a tapped search box to the time window alone.
+pub const SOFT_KEYBOARD_TAP_FRAMES: u64 = 4;
+
+/// How old a tap counts as for [`soft_keyboard`]: no age at all while it is at most
+/// [`SOFT_KEYBOARD_TAP_FRAMES`] frames back, otherwise the time since it.
+pub fn tap_age(elapsed: std::time::Duration, frames_since: u64) -> std::time::Duration {
+    if frames_since <= SOFT_KEYBOARD_TAP_FRAMES { std::time::Duration::ZERO } else { elapsed }
+}
+
 /// How far outside a text box a tap still counts as a tap on it (points).
 const SOFT_KEYBOARD_TAP_SLOP: f32 = 8.0;
 
@@ -205,6 +217,19 @@ mod tests {
         let bs = soft_backspace();
         assert!(matches!(&bs[0], Event::Key { key: Key::Backspace, pressed: true, .. }));
         assert_eq!(bs.len(), 2);
+    }
+
+    #[test]
+    fn a_tap_a_few_slow_frames_back_still_counts() {
+        use std::time::Duration;
+        let slow = Duration::from_secs(3);
+        assert_eq!(tap_age(slow, 0), Duration::ZERO);
+        assert_eq!(tap_age(slow, SOFT_KEYBOARD_TAP_FRAMES), Duration::ZERO);
+        assert_eq!(tap_age(slow, SOFT_KEYBOARD_TAP_FRAMES + 1), slow);
+        let field = egui::Rect::from_min_size(egui::pos2(324.0, 32.0), egui::vec2(170.0, 17.0));
+        let on_field = egui::pos2(409.0, 40.0);
+        assert!(soft_keyboard(false, Some(field), Some((tap_age(slow, 2), on_field))), "CI run 41: slow frames");
+        assert!(!soft_keyboard(false, Some(field), Some((tap_age(slow, 60), on_field))), "long after the tap");
     }
 
     #[test]

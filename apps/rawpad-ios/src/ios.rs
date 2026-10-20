@@ -57,6 +57,8 @@ pub fn run() {
         keys: None,
         text_field: None,
         last_tap: None,
+        frames: 0,
+        last_logged_field: None,
         soft_keyboard: false,
         logged_insets: None,
         avoid: Default::default(),
@@ -92,7 +94,11 @@ struct Host {
     /// The egui text box being edited last frame (`PlatformOutput::ime`), if any.
     text_field: Option<egui::Rect>,
     /// When and where the last tap or press was (a finger, the Pencil or the CI's pointer).
-    last_tap: Option<(Instant, egui::Pos2)>,
+    last_tap: Option<(Instant, u64, egui::Pos2)>,
+    /// Frames drawn so far (for the tap window, `keys::tap_age`).
+    frames: u64,
+    /// The text box last frame, to log a refused keyboard once per field.
+    last_logged_field: Option<egui::Rect>,
     /// The on-screen keyboard is up (`keys::soft_keyboard`, DECISIONS.md 47).
     soft_keyboard: bool,
     logged_insets: Option<crate::native::EdgeInsets>,
@@ -297,8 +303,17 @@ impl Host {
         // the on-screen keyboard: only for a text box being edited (last frame) that took the
         // focus right after a tap on it, never for a focused slider, the photo or a mask (Ivan's iPad,
         // 2026-10-19: `egui_wants_keyboard_input` is also true for a tapped slider)
-        let tap = self.last_tap.map(|(t, at)| (Instant::now().saturating_duration_since(t), at));
-        self.soft_keyboard = crate::keys::soft_keyboard(self.soft_keyboard, self.text_field, tap);
+        self.frames = self.frames.wrapping_add(1);
+        let frames = self.frames;
+        let tap =
+            self.last_tap.map(|(t, frame, at)| (crate::keys::tap_age(Instant::now().saturating_duration_since(t), frames.saturating_sub(frame)), at));
+        let was_up = self.soft_keyboard;
+        self.soft_keyboard = crate::keys::soft_keyboard(was_up, self.text_field, tap);
+        if !self.soft_keyboard && self.text_field.is_some() && self.last_logged_field != self.text_field {
+            // once per focused field: why the keyboard stayed down (CI run 41)
+            log::info!("keyboard: text field {:?} focused without a tap on it (last tap {tap:?}): on-screen keyboard stays down", self.text_field);
+        }
+        self.last_logged_field = self.text_field;
         let text_focus = self.soft_keyboard;
         let (uikit_events, uikit_cmd) = self
             .keys
@@ -313,7 +328,7 @@ impl Host {
         app.raw_input_hook(&mut raw);
         // (after the hook: the CI's pointer events count as taps too)
         if let Some(at) = crate::keys::tap_pos(&raw.events) {
-            self.last_tap = Some((Instant::now(), at));
+            self.last_tap = Some((Instant::now(), self.frames, at));
         }
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
