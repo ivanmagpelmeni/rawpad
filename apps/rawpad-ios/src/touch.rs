@@ -10,7 +10,7 @@
 //!   release that follows is dropped so it can't close the menu that just opened.
 //!
 //! A quick tap with two fingers is Undo and with three Redo, as in other iPad drawing apps
-//! ([`LongPress::take_gesture`], DECISIONS.md 47): every finger lifts within [`MULTI_TAP`] of the
+//! ([`LongPress::take_gesture`], DECISIONS.md 49): every finger lifts within [`MULTI_TAP`] of the
 //! first landing and none wandered more than [`SLOP`].
 //!
 //! Presses that don't come from a touch (a trackpad or mouse) are never held back, and neither

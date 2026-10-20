@@ -93,7 +93,7 @@ struct Host {
     text_field: Option<egui::Rect>,
     /// When and where the last tap or press was (a finger, the Pencil or the CI's pointer).
     last_tap: Option<(Instant, egui::Pos2)>,
-    /// The on-screen keyboard is up (`keys::soft_keyboard`, DECISIONS.md 45).
+    /// The on-screen keyboard is up (`keys::soft_keyboard`, DECISIONS.md 47).
     soft_keyboard: bool,
     logged_insets: Option<crate::native::EdgeInsets>,
     /// Keyboard avoidance: shrinks the UI while the on-screen keyboard covers a focused field.
@@ -278,7 +278,7 @@ impl Host {
         // long-press → secondary click (context menus); before the hook, so control-channel
         // pointer events (CI) are never held back
         let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
-        // a quick two-finger tap undoes, a three-finger tap redoes (DECISIONS.md 47); not while
+        // a quick two-finger tap undoes, a three-finger tap redoes (DECISIONS.md 49); not while
         // a text box is being edited
         if let Some(gesture) = self.long_press.take_gesture()
             && self.text_field.is_none()

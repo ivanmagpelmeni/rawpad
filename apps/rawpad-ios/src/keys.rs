@@ -165,7 +165,7 @@ const SOFT_KEYBOARD_TAP_SLOP: f32 = 8.0;
 
 /// Where the last tap or press of this frame's events was (a finger, the Pencil, or the CI's
 /// pointer), if any: the only way a text box may bring up the on-screen keyboard
-/// (DECISIONS.md 45).
+/// (DECISIONS.md 47).
 pub fn tap_pos(events: &[Event]) -> Option<egui::Pos2> {
     events.iter().rev().find_map(|e| match e {
         Event::PointerButton { pos, button: egui::PointerButton::Primary, .. } => Some(*pos),
@@ -174,7 +174,7 @@ pub fn tap_pos(events: &[Event]) -> Option<egui::Pos2> {
     })
 }
 
-/// Whether the on-screen keyboard should be up (DECISIONS.md 45). `field`: the rectangle of the
+/// Whether the on-screen keyboard should be up (DECISIONS.md 47). `field`: the rectangle of the
 /// egui text box being edited, if any (`PlatformOutput::ime`, last frame: only a focused, editable
 /// `TextEdit` sets it; a focused slider, the photo or a mask never does). `tap`: how long ago the
 /// last tap was, and where. The keyboard comes up only when a text box has the focus right after

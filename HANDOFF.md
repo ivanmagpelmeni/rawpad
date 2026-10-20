@@ -3,52 +3,52 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-10-20, about 09:17 Berlin, end of a morning session (unattended, started
-  08:40).
-- **Upstream:** not checked (not the first run of the night).
-- **Done this session:**
-  - Main run 38 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39185203734) was green and
-    **released 1.38** (on-screen keyboard). Both keyboard rating checks said `ok` again, so they
-    are hard checks now (DECISIONS.md 46).
-  - **Keyboard avoidance** (`src/keyboard.rs`, `native::keyboard_cover`, DECISIONS.md 45): the
-    docked keyboard's height comes from `keyboardLayoutGuide`; while it covers the focused text
-    field the egui screen rect shrinks by it. Decided once per field (no layout jumping),
-    6 unit tests.
-  - Tour: types `rq` into the search box, ⌘A, copy, checks `ui.inspect` → `copied` = "rq"
-    (soft; it passed: typing arrives once), then opens the Info panel and focuses the caption
-    with the keyboard up (`04-caption-keyboard`).
-  - Branch run 39 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39382129144) passed
-    build, unit tests, clippy, the tour and the .ipa build. Log: `on-screen keyboard covers 257
-    pt, UI shrunk by 0 pt` for both the search box and the caption: correct, both sit above the
-    keyboard (screenshot `runs/39/04-caption-keyboard.jpg` looked at).
-  - Merged `p4-keyboard-avoid` into main and pushed at about 09:17; the main run after that push
-    should release about 1.40.
+- **Written:** 2026-10-20, about 09:50 Berlin, by an interactive session (Ivan asked to upload the
+  work the 2026-10-19 audit session couldn't push).
+- **Upstream:** not checked.
+- **State of the branches:**
+  - **main** = this morning's session (`e773b29`): keyboard avoidance merged, main run 40
+    (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39385342769) should release about 1.40.
+    Check it first; if red, fix or `git revert -m 1 3681a8a`.
+  - **`audit-2026-10-19`** = the audit session's 7 code commits (applied from the Project's
+    `claude/rawpad-audit-2026-10-19.mbox` unchanged, every file's blob hash checked against the
+    patches) + a merge of main + this session's doc commit. Its 8th patch (docs only) was not
+    applied as is: its content went into PROGRESS.md (audit table, summaries, next tasks, Needs
+    Ivan) and DECISIONS.md (renumbered **47–52**, because the morning session took 45 and 46).
+    Code comments were renumbered to match (keyboard 47, gestures 49).
+  - Merge conflict resolved: `ios/sim_tour.jsonl` after `04-text-field`: kept the audit's
+    `checkLog` *and* the morning's typing check (`hostKeys rq` → `copied`).
+- **None of the audit code has been compiled yet.** The branch's CI run is the first compile.
 - **Very next step:**
-  1. Check main run 40 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39385342769, head `2c00f7b`): green and released? If red, fix or
-     `git revert -m 1 3681a8a`.
-  2. The **shrinking path itself is not exercised in CI yet** (both fields were above the
-     keyboard). Add a tour step with a field low on the screen: e.g. in the Info panel scroll
-     down (`ui.scroll` over the right panel) and click `field:gps` or a field near the bottom,
-     then expect `UI shrunk by` > 0 in `app-stderr.log` and look at the screenshot.
-  3. Check the keyboard height: the guide said 257 pt above a 25 pt safe area, but the keyboard
-     in the screenshot looks about 300+ pt tall. If a field just above the keyboard still ends
-     up covered, the guide's frame may need converting (`convertRect:toView:`) or `MARGIN`
-     raising.
+  1. Find the branch's CI run: `https://api.github.com/repos/Ivanmagpelmeni/rawpad/actions/runs?branch=audit-2026-10-19`.
+     If there is none, trigger `ipad.yml` on ref `audit-2026-10-19` with `{"release": false}`
+     (branch pushes don't start it by themselves).
+  2. Fix compile / clippy / test failures on the branch. Likely spots: `egui::Popup::menu(&modes)`
+     in `panels/bottombar.rs`; `ui.scroll_with_delta` needing `&mut Ui` in `widgets.rs`
+     `touch_scrolls` (it takes `&Ui`); `let … && …` chains (edition 2024) in `touch.rs` / `ios.rs`;
+     unused-import warnings; the unit tests in `keys.rs` / `touch.rs`.
+  3. Look at `runs/<n>/07-slider-no-keyboard`, `07-brush-no-keyboard` (no keyboard),
+     `04-text-field` and `04-caption-keyboard` (keyboard up), `07-slider-vertical-drag` (mask
+     Exposure unchanged), `08-before-after-menu`, `08-split`, `08-top-bottom`,
+     `08-split-top-bottom`, `08-original`, `08-side-by-side`; and the tour log's `checkLog` lines.
+  4. Only then merge `audit-2026-10-19` into main (a release follows) and put the real version
+     number into PROGRESS.md › Editing audit and Needs Ivan.
 - **Open problems:**
-  - Keyboard height may be under-read (see step 3); the shrink path is only unit-tested.
-  - A field inside a scroll area that ends up below the shrunk panel's bottom edge is only
-    scrolled into view when typing starts (egui's TextEdit scrolls to its cursor).
-  - Simulator Photos flakiness is only tolerated (soft step), not explained.
-  - "Pen Pressure" is ticked by default; the USB-C Pencil has no pressure (asked Ivan).
-  - Nothing tested on the real iPad yet (Needs Ivan).
-  - Merged branches (`p5-*`, `p4-*`) not deleted.
+  - Ivan's "split doesn't work": cause not confirmed. Code showed the split views were reachable
+    only by keyboard or Menu › View; if the new menu works in CI but Ivan still sees a problem,
+    look at the `Slot::Before` render in the device log.
+  - Keyboard avoidance (DECISIONS.md 45) finds the focused field with
+    `egui_wants_keyboard_input()`; with decision 47 the keyboard only comes up for a tapped text
+    box, so a focused slider can't trigger it, but check `04-caption-keyboard` still shows the
+    keyboard and the log still says `UI shrunk by`.
+  - The shrink path itself isn't exercised in CI yet (both fields sit above the keyboard).
+  - Real-device checks (Pencil, fingers, two-finger tap) need Ivan.
+  - Audit backlog: PROGRESS.md › Next 3 tasks and the queue.
 - **How to check CI:**
   - Runs: `https://api.github.com/repos/Ivanmagpelmeni/rawpad/actions/runs?per_page=3`;
     steps: `…/actions/runs/<id>/jobs` (public, 60 requests/hour). Releases: `…/releases?per_page=2`.
   - Reports: `git fetch --depth 1 origin ci-artifacts`; `git show FETCH_HEAD:LATEST`; files under
     `runs/<n>/` (`tour.log`, `replies.jsonl`, `app-stderr.log`, `build-sim.log`, screenshots).
-    raw.githubusercontent.com is blocked from this sandbox; use git. The report is published
-    only after the .ipa build (about 25 minutes into a run).
   - Pushing code to main while a run is going cancels it. Markdown-only pushes don't start a run.
-  - Branch runs: `actions_run_trigger`, `ipad.yml`, ref = branch, `{"release": false}`. They don't
-    cancel main runs. A full run takes 25–30 minutes; the tour result is known after about 17.
+  - Branch runs: `workflow_dispatch` of `ipad.yml` on the branch with `{"release": false}`; they
+    don't cancel main runs. A full run takes 25–30 minutes; the tour result is known after about 17.
