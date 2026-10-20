@@ -352,8 +352,11 @@ impl Host {
                 }
             }
         });
-        // only an editable, focused TextEdit sets `ime` (egui's IME/caret output)
-        self.text_field = out.platform_output.ime.as_ref().map(|ime| ime.rect);
+        // only an editable, focused TextEdit sets `ime` (egui's IME/caret output). Its `rect` is
+        // only the text cursor's (zero wide in an empty box, CI run 42), so the box is the focused
+        // widget's whole rectangle, with the cursor's for good measure
+        let focused_rect = self.ctx.memory(|m| m.focused()).and_then(|id| self.ctx.read_response(id)).map(|r| r.rect);
+        self.text_field = out.platform_output.ime.as_ref().map(|ime| focused_rect.map_or(ime.rect, |r| r.union(ime.rect)));
         gfx.input.handle_platform_output(&gfx.window, std::mem::take(&mut out.platform_output));
         let clipped = self.ctx.tessellate(std::mem::take(&mut out.shapes), out.pixels_per_point);
         gfx.painter.paint_and_update_textures(

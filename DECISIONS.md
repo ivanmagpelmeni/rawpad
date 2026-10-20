@@ -285,8 +285,10 @@ morning session, which had taken 45 and 46.
     since decision 43) is true for *any* focused widget, and every slider takes the focus on a tap
     or drag (`widgets.rs` `slider`: `resp.request_focus()`), so moving a slider brought the
     keyboard up. Now the host uses egui's `PlatformOutput::ime` (set only while an editable
-    `TextEdit` has the focus, with its rectangle) and brings the keyboard up only when that box
-    took the focus within 0.8 s of a tap that landed on it (8 pt slop). It stays up while a text
+    `TextEdit` has the focus; its `rect` is just the text cursor, so the box is the focused
+    widget's rectangle, CI run 42) and brings the keyboard up only when that box took the focus
+    within 0.8 s or 4 frames of a tap that landed on it (8 pt slop; frames because the simulator
+    draws slowly and a real iPad may wait for the cursor blink, CI run 41). It stays up while a text
     box keeps the focus and goes when none has it. A box focused by code after a tap elsewhere (the
     mask Effect menu's search, a dialog's name field) leaves it down until tapped. Typing a slider
     value still works: tapping the number opens a text box in its place, under the finger. A
