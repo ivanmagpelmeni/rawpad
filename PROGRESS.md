@@ -2,11 +2,11 @@
 
 ## Editing audit (2026-10-19)
 
-**Status (2026-10-20, 09:45 Berlin):** the audit session couldn't upload its work on the 19th; it
-was uploaded on the 20th to branch `audit-2026-10-19`, merged with that morning's keyboard
-avoidance, and is being built and tested in CI there. It reaches Ivan only after that branch is
-green and merged into main (the release after 1.40). Until then the fixes below are **not** in
-the app yet.
+**Status (2026-10-20, about 11:00 Berlin):** uploaded on the 20th (the audit session couldn't
+push), merged with that morning's keyboard avoidance, fixed twice in CI (runs 41 and 42: a tapped
+text box no longer brought the keyboard up) and **all green in branch run 43**, then merged into
+main. The main run after that merge releases it: **update RawPad in AltStore to the first version
+after 1.40** (about 1.44).
 
 How each item was checked: "CI" = seen in the simulator screenshots of run 38; "code" = by reading
 the program (no screenshot yet). Statuses are for 1.38, the version on Ivan's iPad.
@@ -70,7 +70,11 @@ Classic setup steps and source fix.
    `audit-2026-10-19`, unchanged (file hashes checked against the patch series).
 2. Merged main (this morning's keyboard avoidance) into it: one tour conflict (kept both sides);
    the audit's decisions renumbered 47–52.
-3. Started CI on the branch; merge into main only when it's green (see HANDOFF.md).
+3. Branch run 41: everything worked (no keyboard while editing, every Before/After view) except
+   that tapping the search box no longer brought the keyboard up. Two fixes: a tap counts for 4
+   frames as well as 0.8 s (the simulator draws slowly), and the tapped box is the focused
+   widget's rectangle (egui's IME rect is only the text cursor, run 42's log). Run 43 all green
+   (`04-text-field` shows the keyboard, `07-*` show none, `08-*` show every view). Merged into main.
 
 **2026-10-19 (editing audit, evening, unattended)**
 1. Couldn't upload (no write access); saved as a patch series in the Project (DECISIONS.md 52).
@@ -229,7 +233,7 @@ Also queued:
 
 ## Needs Ivan
 
-**Re-test after the next update (the first version after 1.40 that AltStore lists), in this order,
+**Re-test after the next update (the first version after 1.40 that AltStore lists, about 1.44), in this order,
 and tell Claude what you see:**
 1. **Keyboard:** open a photo, move several sliders, paint a brush mask with the Pencil, tap the
    photo. The keyboard must **not** appear. Then tap **Search Photos**: it must appear. Tap a
