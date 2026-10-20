@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.40",
+          "buildVersion": "40",
+          "date": "2026-10-20T07:38:00Z",
+          "localizedDescription": "RawPad 1.40 (build 40, e773b29): P4: handoff: main run 40 link",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.40/RawPad.ipa",
+          "size": 19827576,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.38",
           "buildVersion": "38",
           "date": "2026-10-19T01:45:09Z",
@@ -98,26 +107,17 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.10/RawPad.ipa",
           "size": 19776480,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.9",
-          "buildVersion": "9",
-          "date": "2026-10-18T17:18:28Z",
-          "localizedDescription": "RawPad 1.9 (build 9, ee9da55): P4: long-press opens context menus (touch \u2192 secondary click)",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.9/RawPad.ipa",
-          "size": 19658816,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
         "privacy": {}
       },
-      "version": "1.38",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.38/RawPad.ipa",
-      "size": 19827118,
-      "versionDate": "2026-10-19T01:45:09Z",
-      "versionDescription": "RawPad 1.38 (build 38, 0e80da0): P4: handoff: main run 38 tour green"
+      "version": "1.40",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.40/RawPad.ipa",
+      "size": 19827576,
+      "versionDate": "2026-10-20T07:38:00Z",
+      "versionDescription": "RawPad 1.40 (build 40, e773b29): P4: handoff: main run 40 link"
     }
   ],
   "news": []
