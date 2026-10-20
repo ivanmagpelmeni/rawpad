@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.44",
+          "buildVersion": "44",
+          "date": "2026-10-20T09:47:30Z",
+          "localizedDescription": "RawPad 1.44 (build 44, 8f782ac): Merge audit-2026-10-19 (editing audit: keyboard only for a tapped text box, Before/After menu, two-finger undo, slider scrolling, pins visible, AltStore setup; branch run 43 green)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.44/RawPad.ipa",
+          "size": 19836879,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.40",
           "buildVersion": "40",
           "date": "2026-10-20T07:38:00Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.12/RawPad.ipa",
           "size": 19789480,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.10",
-          "buildVersion": "10",
-          "date": "2026-10-18T17:43:02Z",
-          "localizedDescription": "RawPad 1.10 (build 10, e2f361a): P4: handoff: run 10 tour passed",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.10/RawPad.ipa",
-          "size": 19776480,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.40",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.40/RawPad.ipa",
-      "size": 19827576,
-      "versionDate": "2026-10-20T07:38:00Z",
-      "versionDescription": "RawPad 1.40 (build 40, e773b29): P4: handoff: main run 40 link"
+      "version": "1.44",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.44/RawPad.ipa",
+      "size": 19836879,
+      "versionDate": "2026-10-20T09:47:30Z",
+      "versionDescription": "RawPad 1.44 (build 44, 8f782ac): Merge audit-2026-10-19 (editing audit: keyboard only for a tapped text box, Before/After menu, two-finger undo, slider scrolling, pins visible, AltStore setup; branch run 43 green)"
     }
   ],
   "news": []
