@@ -2,6 +2,13 @@
 
 ## Latest session summary
 
+**2026-10-20 (morning, 08:40–09:20 Berlin, unattended)**
+1. Main run 38 green, **released 1.38** (on-screen keyboard); the hardware-key checks passed again and are now hard checks.
+2. **Keyboard avoidance:** when the on-screen keyboard would cover the text field you're typing in, the whole UI now moves up above it (DECISIONS.md 45). Fields higher up (search box, caption) leave the layout alone.
+3. CI now types into the search box and checks the text arrives once (it did), and focuses the caption with the keyboard up (screenshot checked).
+4. Branch run 39 all green; merged into main, whose run should release about 1.40.
+5. Next: make CI focus a field low enough to trigger the shrink, and double-check the measured keyboard height.
+
 **2026-10-19 (nightly 9, 02:55–03:40 Berlin, unattended, last run of the night)**
 1. Main run 35 green, **released 1.35** (hardware keyboard read from UIKit).
 2. Its log showed CI's `5` arriving as the *keypad* 5, which RawPad ignored (so the rating probe proved nothing): keypad digits now count as number keys.
@@ -87,7 +94,7 @@
 - [x] **2. App shell** launches on the iPad simulator with the LightCraft UI on Metal and the demo
       library; CI screenshots
 - [ ] **3. First install on Ivan's iPad via SideStore**: release 1.8 is ready, waiting for Ivan
-- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events), Pencil skips the long-press wait (brush strokes; DECISIONS.md 39), brush stroke in the CI tour, hardware keyboard read from UIKit with ⌘ as command (DECISIONS.md 40, 41; keys reach the app in CI run 33). To do: real-finger and Pencil check on the iPad; rotation, Split View / Stage Manager resizing
+- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events), Pencil skips the long-press wait (brush strokes; DECISIONS.md 39), brush stroke in the CI tour, hardware keyboard read from UIKit with ⌘ as command (DECISIONS.md 40, 41; keys reach the app in CI run 33), on-screen keyboard (DECISIONS.md 43) and keyboard avoidance (DECISIONS.md 45). To do: real-finger and Pencil check on the iPad; rotation, Split View / Stage Manager resizing
 - [~] **5. Files:**
   - Done: Files picker import (photos and folders); JPEG export to `Documents/Exports`;
     Export › Add to Apple Photos (`native::photos_runner`).
@@ -108,24 +115,20 @@
 
 ## Current status
 
-Main run 35 green, released **1.35** (hardware keyboard from UIKit). Branch `p4-soft-keyboard`
-(on-screen keyboard for text fields, keypad digits; run 37 all green, keyboard screenshot checked)
-was merged into main at the end of nightly 9; the main run after that push should release it
-(about 1.38). CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and
-brush masks, pinch/pan, keyboard probe with rating 5 and ⌘Z undo, search box with on-screen
-keyboard, background export, Share button and sheet, Add to Apple Photos as a soft check), the
-export file and the log file.
+Main run 38 green, released **1.38** (on-screen keyboard). Branch `p4-keyboard-avoid` (keyboard
+avoidance, typing check; run 39 all green) was merged into main at the end of the morning session
+of 2026-10-20; the main run after that push should release it (about 1.40). CI checks build, fmt,
+unit tests, clippy, the simulator tour (sliders, radial and brush masks, pinch/pan, hardware keys
+with rating 5 and ⌘Z undo as hard checks, search box with on-screen keyboard and typing, caption
+field with keyboard, background export, Share button and sheet, Add to Apple Photos as a soft
+check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. Check the main run after the `p4-soft-keyboard` merge (green, released ~1.38?). If both
-   keyboard `waitUntil rating` steps say `ok` again, drop `"soft"` from them (run 37 was the first
-   time they did).
-2. Keyboard avoidance: the on-screen keyboard covers the bottom ~40 % of the screen and egui
-   doesn't know. Read the keyboard frame (`UIKeyboardWillChangeFrameNotification` or
-   `keyboardLayoutGuide`) and shrink the egui screen rect so a focused field near the bottom
-   (keywords, captions) stays visible. Also type into the search box in CI (`hostKeys`) and
-   check the text arrives once.
+1. Check the main run after the `p4-keyboard-avoid` merge (green, released ~1.40?).
+2. Exercise the keyboard shrink in CI: focus a field low on the screen (Info panel scrolled
+   down, or a keyword field) and expect `UI shrunk by` > 0 in `app-stderr.log`; check the
+   measured keyboard height (257 pt logged vs. the screenshot) and fix it if it's short.
 3. Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try the
    Simulator menu via osascript on the CI Mac).
 
@@ -172,6 +175,10 @@ in step 3.
      the right) › **Brush**, and paint with the Pencil. Does a stroke appear right away, even if
      you rest the tip first? If strokes stay invisible, untick **Pen Pressure** in the brush
      settings and try again (the USB-C Pencil has no pressure), and tell Claude.
+   - **New (1.40 or later), keyboard avoidance:** open a photo, tap the **ⓘ** (Info) button at
+     the bottom right, scroll the panel down and tap a box near the bottom (e.g. Creator): when
+     the keyboard comes up, does the whole screen move up so you can still see the box you're
+     typing in?
    - **New (1.38 or later), on-screen keyboard:** without a keyboard attached, tap the
      **Search Photos** box at the top: the iPad keyboard should come up. Type a word: does it
      appear in the box, and does the delete key work? Tap somewhere on the photo: does the

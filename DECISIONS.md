@@ -259,3 +259,18 @@ Newer entries win over older ones and over the kickoff brief.
     (keypad 5, `UIKeyModifierNumericPad`), which the HID table dropped, so the rating never changed
     and the ⌘Z check passed only because nothing had changed. Keypad 0x59–0x62 now map to
     Num1…Num0 (plus keypad `/` and `.`).
+
+## 2026-10-20: Morning session (08:40 Berlin)
+
+45. **Keyboard avoidance shrinks egui's screen rect, but only for a covered field**
+    (`src/keyboard.rs`, `native::keyboard_cover`). The docked keyboard's height comes from the
+    view's `keyboardLayoutGuide` (iOS 15+, RawPad needs 17; no notification observer needed); a
+    floating or undocked keyboard leaves the guide on the safe area, so nothing shrinks. The UI
+    shrinks only when the focused field's bottom edge (last frame) would sit under the keyboard,
+    and that decision is kept for the field until it loses focus or the keyboard goes, because
+    after shrinking the field moves up and re-deciding would make the layout jump. A field near
+    the top (search box) leaves the layout alone. The host repaints every 100 ms while the
+    keyboard is up or moving so the layout follows its slide. Safe-area insets are now divided by
+    egui's zoom factor (UIKit points → egui points), a no-op at the default zoom.
+46. **The tour's hardware-keyboard rating checks are hard checks again** (no `"soft"`): runs 37
+    and 38 both passed them. Typing into the search box (`ui.inspect` → `copied`) starts soft.
