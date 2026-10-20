@@ -24,7 +24,7 @@ end. The next session reads it **first**.
   - Merged `p4-keyboard-avoid` into main and pushed at about 09:17; the main run after that push
     should release about 1.40.
 - **Very next step:**
-  1. Check that main run (the first after `3681a8a`): green and released? If red, fix or
+  1. Check main run 40 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/39385342769, head `2c00f7b`): green and released? If red, fix or
      `git revert -m 1 3681a8a`.
   2. The **shrinking path itself is not exercised in CI yet** (both fields were above the
      keyboard). Add a tour step with a field low on the screen: e.g. in the Info panel scroll
