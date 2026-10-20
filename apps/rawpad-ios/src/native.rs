@@ -188,6 +188,27 @@ pub fn safe_area(window: &winit::window::Window) -> Option<EdgeInsets> {
     ok.then_some(insets)
 }
 
+/// How far up from the bottom of winit's view the docked on-screen keyboard reaches, in points,
+/// read from the view's `keyboardLayoutGuide` (iOS 15+; RawPad needs 17). With the keyboard
+/// hidden or floating the guide sits on the bottom safe area, so the answer is then the safe
+/// area's bottom inset. `None` off the main thread, without a UIKit view or on odd numbers.
+pub fn keyboard_cover(window: &winit::window::Window) -> Option<f64> {
+    MainThreadMarker::new()?;
+    let handle = window.window_handle().ok()?;
+    let RawWindowHandle::UiKit(h) = handle.as_raw() else { return None };
+    let view = h.ui_view.as_ptr().cast::<NSObject>();
+    // SAFETY: winit's handle points at the window's live UIView (owned by the window, which
+    // outlives this call); `keyboardLayoutGuide` (created lazily by UIKit, owned by the view),
+    // its `layoutFrame` and the view's `bounds` are plain property reads on the main thread.
+    let (bounds, frame): (Rect, Rect) = unsafe {
+        let guide: Option<Retained<AnyObject>> = msg_send![&*view, keyboardLayoutGuide];
+        let guide = guide?;
+        (msg_send![&*view, bounds], msg_send![&*guide, layoutFrame])
+    };
+    let cover = bounds.y + bounds.height - frame.y;
+    (cover.is_finite() && bounds.height.is_finite() && bounds.height > 0.0).then(|| cover.clamp(0.0, bounds.height))
+}
+
 /// `CGRect` (`{CGPoint origin; CGSize size}`, CGFloat = f64), declared here like [`EdgeInsets`].
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
