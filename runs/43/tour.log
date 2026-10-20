@@ -1,0 +1,126 @@
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/01-library-grid.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/02-develop.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/03-masking.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/03-brush.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/07-slider-no-keyboard.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/07-brush-no-keyboard.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/07-slider-vertical-drag.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/08-before-after-menu.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/08-split.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/08-top-bottom.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/08-split-top-bottom.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/08-original.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/08-side-by-side.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/04-pinch-zoom.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/04-panned.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/04-keys.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/04-text-field.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/04-caption-keyboard.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/05-share-offer.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/06-share-sheet.png
+ok  engine.execute {"command": "library.info"}
+ok  engine.execute {"command": "view.photoGrid"}
+screenshot ipad-test/01-library-grid.png
+ok  engine.execute {"command": "library.select", "params": {"ids": [1]}}
+ok  engine.execute {"command": "view.detail"}
+ok  engine.execute {"command": "panel.edit"}
+screenshot ipad-test/02-develop.png
+ok  engine.execute {"command": "develop.set", "params": {"values": {"light.exposure": 0.6, "light.highlights": -55, "light.shadows": 35, "c
+ok  engine.execute {"command": "panel.masking"}
+ok  engine.execute {"command": "mask.add", "params": {"kind": "radial", "center": [0.62, 0.4], "rx": 0.2, "ry": 0.14, "feather": 70, "name"
+ok  engine.execute {"command": "mask.adjust", "params": {"values": {"exposure": 0.5, "temp": 40}}}
+screenshot ipad-test/03-masking.png
+ok  engine.execute {"command": "tool.brush", "params": {"new": true}}
+ok  ui.pointer {"events": [{"kind": "down", "x": 0.3, "y": 0.6}, {"kind": "drag", "x": 0.35, "y": 0.62}, {"kind": "drag", "x": 0.4, "y"
+ok  engine.execute {"command": "mask.adjust", "params": {"values": {"exposure": -1}}}
+screenshot ipad-test/03-brush.png
+ok  engine.execute {"command": "photo.inspect"}
+log mark editing at 3697
+ok  ui.dragWidget {"id": "slider:exposure", "fx": 0.5, "dx": 30, "steps": 8}
+ok  ui.clickWidget {"id": "slider:exposure", "fx": 0.4}
+screenshot ipad-test/07-slider-no-keyboard.png
+ok  ui.pointer {"events": [{"kind": "down", "x": 0.2, "y": 0.45}, {"kind": "drag", "x": 0.25, "y": 0.47}, {"kind": "drag", "x": 0.3, "y
+screenshot ipad-test/07-brush-no-keyboard.png
+ok  checkLog 'first responder for text field' absent since editing
+ok  ui.dragWidget {"id": "slider:exposure", "fx": 0.5, "dy": -120, "steps": 8}
+screenshot ipad-test/07-slider-vertical-drag.png
+ok  ui.clickWidget {"id": "icon:beforeAfterModes"}
+screenshot ipad-test/08-before-after-menu.png
+ok  ui.clickWidget {"id": "beforeAfterMode:split"}
+screenshot ipad-test/08-split.png
+ok  ui.clickWidget {"id": "icon:beforeAfterModes"}
+ok  ui.clickWidget {"id": "beforeAfterMode:topBottom"}
+screenshot ipad-test/08-top-bottom.png
+ok  ui.clickWidget {"id": "icon:beforeAfterModes"}
+ok  ui.clickWidget {"id": "beforeAfterMode:splitTopBottom"}
+screenshot ipad-test/08-split-top-bottom.png
+ok  ui.clickWidget {"id": "icon:beforeAfterModes"}
+ok  ui.clickWidget {"id": "beforeAfterMode:original"}
+screenshot ipad-test/08-original.png
+ok  ui.clickWidget {"id": "icon:beforeAfter"}
+screenshot ipad-test/08-side-by-side.png
+ok  ui.clickWidget {"id": "icon:beforeAfter"}
+ok  engine.execute {"command": "panel.edit"}
+ok  ui.set {"zoom": "fit", "pan": [0.5, 0.5]}
+ok  ui.pointer {"events": [{"kind": "move", "x": 0.5, "y": 0.5}]}
+ok  ui.zoom {"factor": 3}
+ok  waitUntil ui.zoom.percent = 45.150001525878906
+screenshot ipad-test/04-pinch-zoom.png
+ok  ui.scroll {"dx": -150, "dy": -100}
+ok  waitUntil ui.pan = true
+ok  ui.pointer {"events": [{"kind": "down", "x": 0.5, "y": 0.5}, {"kind": "drag", "x": 0.47, "y": 0.47}, {"kind": "drag", "x": 0.44, "y
+ok  ui.inspect {}
+screenshot ipad-test/04-panned.png
+ok  ui.set {"zoom": "fit", "pan": [0.5, 0.5]}
+ok  engine.execute {"command": "library.select", "params": {"ids": [1]}}
+ok  hostKeys '5' cmd=False 
+ok  waitUntil rating = true
+ok  hostKeys 'z' cmd=True 
+ok  waitUntil rating = true
+screenshot ipad-test/04-keys.png
+log mark search at 4319
+ok  ui.clickWidget {"id": "field:search"}
+screenshot ipad-test/04-text-field.png
+ok  checkLog 'first responder for text field' present since search
+ok  hostKeys 'rq' cmd=False 
+ok  hostKeys 'a' cmd=True 
+ok  ui.clipboard {"action": "copy"}
+ok  waitUntil copied = true
+ok  ui.key {"key": "Escape"}
+ok  ui.set {"right": "info"}
+ok  ui.clickWidget {"id": "field:caption"}
+screenshot ipad-test/04-caption-keyboard.png
+ok  ui.key {"key": "Escape"}
+ok  engine.execute {"command": "panel.edit"}
+ok  engine.execute {"command": "app.export", "params": {"ids": [1], "format": "jpeg"}}
+files in Documents/Exports: ['LC01207.jpg']
+ok  engine.execute {"command": "app.export", "params": {"ids": [2], "format": "jpeg", "background": true}}
+ok  waitUntil export.last = {"applePhotos": null, "cancelled": false, "files": [{"bytes": 629929, "gpuFallback": "GPU render: 6000\u00d74000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit", "height": 4000,
+ok  ui.widgets {"filter": "rawpadShare"}
+screenshot ipad-test/05-share-offer.png
+ok  ui.clickWidget {"id": "button:rawpadShareExport"}
+screenshot ipad-test/06-share-sheet.png
+files in Documents/Logs: ['lightcraft.log']
+ok  engine.execute {"command": "app.export", "params": {"ids": [3], "format": "jpeg", "addToPhotos": true, "background": true}}
+ok  waitUntil imports.imported = 1
+ok  ui.inspect {}

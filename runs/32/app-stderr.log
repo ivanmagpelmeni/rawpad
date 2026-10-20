@@ -1,0 +1,31 @@
+2026-10-18T23:47:00.012Z INFO  [main] rawpad::ios: log file /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/AAEAEF78-3D10-49CF-B91A-24E0361AB77D/Documents/Logs/lightcraft.log
+2026-10-18T23:47:00.013Z INFO  [main] rawpad::ios: RawPad 0.9.1 starting
+2026-10-18T23:47:00.507Z WARN  [main] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-10-18T23:47:00.509Z WARN  [main] wgpu_core::instance: DownlevelCapabilities {
+    flags: DownlevelFlags(
+        COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+    ),
+    limits: DownlevelLimits,
+    shader_model: Sm5,
+}
+2026-10-18T23:47:01.956Z INFO  [main] rawpad::ios: library /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/AAEAEF78-3D10-49CF-B91A-24E0361AB77D/Library/Application Support/RawPad Library: 24 photos (0 log records replayed)
+2026-10-18T23:47:01.958Z INFO  [main] rawpad::ios::control_server: control server listening on 127.0.0.1:7980
+2026-10-18T23:47:01.962Z INFO  [main] rawpad::ios: safe area (points): top 0 left 0 bottom 25 right 0
+2026-10-18T23:47:01.982Z WARN  [main] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-10-18T23:47:01.982Z WARN  [main] wgpu_core::instance: DownlevelCapabilities {
+    flags: DownlevelFlags(
+        COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+    ),
+    limits: DownlevelLimits,
+    shader_model: Sm5,
+}
+2026-10-18T23:47:02.905Z INFO  [main] lightcraft_gpu::ctx: gpu: Apple iOS simulator GPU (Metal), buffers ≤ 256 MiB
+2026-10-18T23:48:22.403Z WARN  [main] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-18T23:48:56.218Z WARN  [export] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-18T23:49:07.413Z INFO  [main] rawpad::native: share sheet for /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/AAEAEF78-3D10-49CF-B91A-24E0361AB77D/Documents/Exports/LC01214.jpg
+2026-10-18 23:49:17.270 rawpad[23761:71774] Simulator slow-motion animations are now off
+2026-10-18T23:49:37.932Z WARN  [export] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-18T23:49:50.483Z INFO  [export] rawpad::native: photos: saving /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/AAEAEF78-3D10-49CF-B91A-24E0361AB77D/Documents/Exports/LC01221.jpg (permission status 3)
+2026-10-18T23:49:51.084Z INFO  [export] rawpad::native: photos: saved /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/AAEAEF78-3D10-49CF-B91A-24E0361AB77D/Documents/Exports/LC01221.jpg

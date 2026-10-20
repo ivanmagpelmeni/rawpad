@@ -1,0 +1,66 @@
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/01-library-grid.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/02-develop.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/03-masking.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/03-brush.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/04-pinch-zoom.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/04-panned.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/04-keys.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/05-share-offer.png
+Detected file type 'PNG' from extension
+Wrote screenshot to: ipad-test/06-share-sheet.png
+ok  engine.execute {"command": "library.info"}
+ok  engine.execute {"command": "view.photoGrid"}
+screenshot ipad-test/01-library-grid.png
+ok  engine.execute {"command": "library.select", "params": {"ids": [1]}}
+ok  engine.execute {"command": "view.detail"}
+ok  engine.execute {"command": "panel.edit"}
+screenshot ipad-test/02-develop.png
+ok  engine.execute {"command": "develop.set", "params": {"values": {"light.exposure": 0.6, "light.highlights": -55, "light.shadows": 35, "c
+ok  engine.execute {"command": "panel.masking"}
+ok  engine.execute {"command": "mask.add", "params": {"kind": "radial", "center": [0.62, 0.4], "rx": 0.2, "ry": 0.14, "feather": 70, "name"
+ok  engine.execute {"command": "mask.adjust", "params": {"values": {"exposure": 0.5, "temp": 40}}}
+screenshot ipad-test/03-masking.png
+ok  engine.execute {"command": "tool.brush", "params": {"new": true}}
+ok  ui.pointer {"events": [{"kind": "down", "x": 0.3, "y": 0.6}, {"kind": "drag", "x": 0.35, "y": 0.62}, {"kind": "drag", "x": 0.4, "y"
+ok  engine.execute {"command": "mask.adjust", "params": {"values": {"exposure": -1}}}
+screenshot ipad-test/03-brush.png
+ok  engine.execute {"command": "photo.inspect"}
+ok  engine.execute {"command": "panel.edit"}
+ok  ui.set {"zoom": "fit", "pan": [0.5, 0.5]}
+ok  ui.pointer {"events": [{"kind": "move", "x": 0.5, "y": 0.5}]}
+ok  ui.zoom {"factor": 3}
+ok  waitUntil ui.zoom.percent = 45.150001525878906
+screenshot ipad-test/04-pinch-zoom.png
+ok  ui.scroll {"dx": -150, "dy": -100}
+ok  waitUntil ui.pan = true
+ok  ui.pointer {"events": [{"kind": "down", "x": 0.5, "y": 0.5}, {"kind": "drag", "x": 0.47, "y": 0.47}, {"kind": "drag", "x": 0.44, "y
+ok  ui.inspect {}
+screenshot ipad-test/04-panned.png
+ok  ui.set {"zoom": "fit", "pan": [0.5, 0.5]}
+ok  engine.execute {"command": "library.select", "params": {"ids": [1]}}
+ok  hostKeys '5' cmd=False 
+WARN waitUntil rating = false
+ok  hostKeys 'z' cmd=True 
+ok  waitUntil rating = true
+screenshot ipad-test/04-keys.png
+ok  engine.execute {"command": "app.export", "params": {"ids": [1], "format": "jpeg"}}
+files in Documents/Exports: ['LC01207.jpg']
+ok  engine.execute {"command": "app.export", "params": {"ids": [2], "format": "jpeg", "background": true}}
+ok  waitUntil export.last = {"applePhotos": null, "cancelled": false, "files": [{"bytes": 629929, "gpuFallback": "GPU render: 6000\u00d74000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit", "height": 4000,
+ok  ui.widgets {"filter": "rawpadShare"}
+screenshot ipad-test/05-share-offer.png
+ok  ui.clickWidget {"id": "button:rawpadShareExport"}
+screenshot ipad-test/06-share-sheet.png
+files in Documents/Logs: ['lightcraft.log']
+ok  engine.execute {"command": "app.export", "params": {"ids": [3], "format": "jpeg", "addToPhotos": true, "background": true}}
+ok  waitUntil imports.imported = 1
+ok  ui.inspect {}
+WARN (not failing): engine.execute: rating never became true: {"id": null, "ok": true, "result": {"albums": [2, 7], "as_shot_wb": null, "captured": "2026-03-01T05:00:00", "deleted": false, "develop": {"bw_mix": {"aqua": 0.0, "blue": 0.0, "green": 0.0, "magenta": 0.0, "orange": 0.0, "purple": 0.0, "red": 0.0, "yellow": 0.0}, "calibration": {"blue_hue": 0.0, "bl
