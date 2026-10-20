@@ -155,6 +155,51 @@ pub fn soft_backspace() -> Vec<Event> {
     tap(Key::Backspace).to_vec()
 }
 
+/// How long after a tap a text field that takes the focus may still bring up the on-screen
+/// keyboard. A tap's press and release are a few frames apart, and egui gives the field its focus
+/// on one of them and reports it (`PlatformOutput::ime`) a frame later.
+pub const SOFT_KEYBOARD_TAP_WINDOW: std::time::Duration = std::time::Duration::from_millis(800);
+
+/// A tap also counts as recent while at most this many frames have been drawn since it, however
+/// long they took. After a tap the app may draw its next frame only at the cursor blink (about
+/// half a second later), and the CI simulator draws a frame every second or so; CI run 41 lost the
+/// keyboard for a tapped search box to the time window alone.
+pub const SOFT_KEYBOARD_TAP_FRAMES: u64 = 4;
+
+/// How old a tap counts as for [`soft_keyboard`]: no age at all while it is at most
+/// [`SOFT_KEYBOARD_TAP_FRAMES`] frames back, otherwise the time since it.
+pub fn tap_age(elapsed: std::time::Duration, frames_since: u64) -> std::time::Duration {
+    if frames_since <= SOFT_KEYBOARD_TAP_FRAMES { std::time::Duration::ZERO } else { elapsed }
+}
+
+/// How far outside a text box a tap still counts as a tap on it (points).
+const SOFT_KEYBOARD_TAP_SLOP: f32 = 8.0;
+
+/// Where the last tap or press of this frame's events was (a finger, the Pencil, or the CI's
+/// pointer), if any: the only way a text box may bring up the on-screen keyboard
+/// (DECISIONS.md 47).
+pub fn tap_pos(events: &[Event]) -> Option<egui::Pos2> {
+    events.iter().rev().find_map(|e| match e {
+        Event::PointerButton { pos, button: egui::PointerButton::Primary, .. } => Some(*pos),
+        Event::Touch { pos, phase: egui::TouchPhase::Start | egui::TouchPhase::End, .. } => Some(*pos),
+        _ => None,
+    })
+}
+
+/// Whether the on-screen keyboard should be up (DECISIONS.md 47). `field`: the rectangle of the
+/// egui text box being edited, if any (`PlatformOutput::ime`, last frame: only a focused, editable
+/// `TextEdit` sets it; a focused slider, the photo or a mask never does). `tap`: how long ago the
+/// last tap was, and where. The keyboard comes up only when a text box has the focus right after
+/// a tap on that box (or on the slider value that opens one in its place), stays up while a text
+/// box keeps the focus, and goes away when none has it. A box focused by code after a tap
+/// elsewhere (a menu's search field, a dialog's name field) leaves it down until it is tapped; a
+/// hardware keyboard types into it anyway.
+pub fn soft_keyboard(was_up: bool, field: Option<egui::Rect>, tap: Option<(std::time::Duration, egui::Pos2)>) -> bool {
+    field.is_some_and(|rect| {
+        was_up || tap.is_some_and(|(ago, at)| ago <= SOFT_KEYBOARD_TAP_WINDOW && rect.expand(SOFT_KEYBOARD_TAP_SLOP).contains(at))
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -172,6 +217,52 @@ mod tests {
         let bs = soft_backspace();
         assert!(matches!(&bs[0], Event::Key { key: Key::Backspace, pressed: true, .. }));
         assert_eq!(bs.len(), 2);
+    }
+
+    #[test]
+    fn a_tap_a_few_slow_frames_back_still_counts() {
+        use std::time::Duration;
+        let slow = Duration::from_secs(3);
+        assert_eq!(tap_age(slow, 0), Duration::ZERO);
+        assert_eq!(tap_age(slow, SOFT_KEYBOARD_TAP_FRAMES), Duration::ZERO);
+        assert_eq!(tap_age(slow, SOFT_KEYBOARD_TAP_FRAMES + 1), slow);
+        let field = egui::Rect::from_min_size(egui::pos2(324.0, 32.0), egui::vec2(170.0, 17.0));
+        let on_field = egui::pos2(409.0, 40.0);
+        assert!(soft_keyboard(false, Some(field), Some((tap_age(slow, 2), on_field))), "CI run 41: slow frames");
+        assert!(!soft_keyboard(false, Some(field), Some((tap_age(slow, 60), on_field))), "long after the tap");
+    }
+
+    #[test]
+    fn soft_keyboard_only_for_a_tapped_text_field() {
+        use std::time::Duration;
+        let field = egui::Rect::from_min_size(egui::pos2(300.0, 20.0), egui::vec2(220.0, 28.0));
+        let on_field = egui::pos2(400.0, 34.0);
+        let elsewhere = egui::pos2(400.0, 600.0);
+        let tap = |ms, at| Some((Duration::from_millis(ms), at));
+        // a slider, the photo, a mask: focused or dragged, but no text box → never
+        assert!(!soft_keyboard(false, None, tap(0, elsewhere)));
+        assert!(!soft_keyboard(true, None, tap(0, on_field)), "the keyboard goes when the box loses the focus");
+        // a tap on the search box (or a slider's value) → up, and it stays up while typing
+        assert!(soft_keyboard(false, Some(field), tap(50, on_field)));
+        assert!(soft_keyboard(false, Some(field), tap(50, egui::pos2(296.0, 34.0))), "a near miss counts");
+        assert!(soft_keyboard(true, Some(field), None));
+        assert!(soft_keyboard(true, Some(field), tap(60_000, elsewhere)));
+        // a box focused by code: after a tap elsewhere (a menu's search), or long after any tap
+        assert!(!soft_keyboard(false, Some(field), tap(50, elsewhere)));
+        assert!(!soft_keyboard(false, Some(field), None));
+        assert!(!soft_keyboard(false, Some(field), tap(5_000, on_field)));
+    }
+
+    #[test]
+    fn taps_are_presses_and_touch_starts_or_ends() {
+        let (a, b) = (egui::pos2(10.0, 10.0), egui::pos2(50.0, 60.0));
+        let press = |pos| Event::PointerButton { pos, button: egui::PointerButton::Primary, pressed: true, modifiers: Modifiers::NONE };
+        assert_eq!(tap_pos(&[Event::PointerMoved(a), press(a), press(b)]), Some(b), "the last tap counts");
+        assert_eq!(tap_pos(&[Event::PointerMoved(a)]), None, "a drag's moves are not a tap");
+        let touch = |phase| Event::Touch { device_id: egui::TouchDeviceId(1), id: egui::TouchId(1), phase, pos: a, force: None };
+        assert_eq!(tap_pos(&[touch(egui::TouchPhase::End)]), Some(a));
+        assert_eq!(tap_pos(&[touch(egui::TouchPhase::Move)]), None);
+        assert_eq!(tap_pos(&soft_text_events("a")), None, "typing is not a tap");
     }
 
     fn key(modifiers: Modifiers) -> Event {

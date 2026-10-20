@@ -55,6 +55,11 @@ pub fn run() {
         logo_key: false,
         keys_logged: 0,
         keys: None,
+        text_field: None,
+        last_tap: None,
+        frames: 0,
+        last_logged_field: None,
+        soft_keyboard: false,
         logged_insets: None,
         avoid: Default::default(),
         logged_cover: 0,
@@ -86,6 +91,16 @@ struct Host {
     keys_logged: u8,
     /// Hardware-keyboard presses read from UIKit (winit 0.30 passes none on iOS; CI run 30).
     keys: Option<crate::native::Keys>,
+    /// The egui text box being edited last frame (`PlatformOutput::ime`), if any.
+    text_field: Option<egui::Rect>,
+    /// When and where the last tap or press was (a finger, the Pencil or the CI's pointer).
+    last_tap: Option<(Instant, u64, egui::Pos2)>,
+    /// Frames drawn so far (for the tap window, `keys::tap_age`).
+    frames: u64,
+    /// The text box last frame, to log a refused keyboard once per field.
+    last_logged_field: Option<egui::Rect>,
+    /// The on-screen keyboard is up (`keys::soft_keyboard`, DECISIONS.md 47).
+    soft_keyboard: bool,
     logged_insets: Option<crate::native::EdgeInsets>,
     /// Keyboard avoidance: shrinks the UI while the on-screen keyboard covers a focused field.
     avoid: crate::keyboard::Avoid,
@@ -269,10 +284,37 @@ impl Host {
         // long-press → secondary click (context menus); before the hook, so control-channel
         // pointer events (CI) are never held back
         let long_press_in = self.long_press.filter(&mut raw.events, Instant::now());
+        // a quick two-finger tap undoes, a three-finger tap redoes (DECISIONS.md 49); not while
+        // a text box is being edited
+        if let Some(gesture) = self.long_press.take_gesture()
+            && self.text_field.is_none()
+        {
+            let id = match gesture {
+                crate::touch::Gesture::Undo => "edit.undo",
+                crate::touch::Gesture::Redo => "edit.redo",
+            };
+            match app.run(id, serde_json::json!({})) {
+                Ok(_) => log::info!("touch: multi-finger tap → {id}"),
+                Err(e) => log::info!("touch: multi-finger tap → {id} refused: {e}"),
+            }
+        }
         // ⌘ is `command` on the iPad as on the Mac (egui-winit maps it to Ctrl off macOS)
         // (UIKit's own presses come with their modifiers already Mac-style: added after)
-        // a focused egui text field (last frame) brings up the on-screen keyboard
-        let text_focus = self.ctx.egui_wants_keyboard_input();
+        // the on-screen keyboard: only for a text box being edited (last frame) that took the
+        // focus right after a tap on it, never for a focused slider, the photo or a mask (Ivan's iPad,
+        // 2026-10-19: `egui_wants_keyboard_input` is also true for a tapped slider)
+        self.frames = self.frames.wrapping_add(1);
+        let frames = self.frames;
+        let tap =
+            self.last_tap.map(|(t, frame, at)| (crate::keys::tap_age(Instant::now().saturating_duration_since(t), frames.saturating_sub(frame)), at));
+        let was_up = self.soft_keyboard;
+        self.soft_keyboard = crate::keys::soft_keyboard(was_up, self.text_field, tap);
+        if !self.soft_keyboard && self.text_field.is_some() && self.last_logged_field != self.text_field {
+            // once per focused field: why the keyboard stayed down (CI run 41)
+            log::info!("keyboard: text field {:?} focused without a tap on it (last tap {tap:?}): on-screen keyboard stays down", self.text_field);
+        }
+        self.last_logged_field = self.text_field;
+        let text_focus = self.soft_keyboard;
         let (uikit_events, uikit_cmd) = self
             .keys
             .as_ref()
@@ -284,6 +326,10 @@ impl Host {
         crate::keys::apply(&mut raw.events, self.logo_key || uikit_cmd);
         raw.events.extend(uikit_events);
         app.raw_input_hook(&mut raw);
+        // (after the hook: the CI's pointer events count as taps too)
+        if let Some(at) = crate::keys::tap_pos(&raw.events) {
+            self.last_tap = Some((Instant::now(), self.frames, at));
+        }
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
         let mut out = self.ctx.run_ui(raw, |ui| {
@@ -306,6 +352,11 @@ impl Host {
                 }
             }
         });
+        // only an editable, focused TextEdit sets `ime` (egui's IME/caret output). Its `rect` is
+        // only the text cursor's (zero wide in an empty box, CI run 42), so the box is the focused
+        // widget's whole rectangle, with the cursor's for good measure
+        let focused_rect = self.ctx.memory(|m| m.focused()).and_then(|id| self.ctx.read_response(id)).map(|r| r.rect);
+        self.text_field = out.platform_output.ime.as_ref().map(|ime| focused_rect.map_or(ime.rect, |r| r.union(ime.rect)));
         gfx.input.handle_platform_output(&gfx.window, std::mem::take(&mut out.platform_output));
         let clipped = self.ctx.tessellate(std::mem::take(&mut out.shapes), out.pixels_per_point);
         gfx.painter.paint_and_update_textures(

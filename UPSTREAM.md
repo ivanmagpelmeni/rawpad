@@ -30,6 +30,9 @@
 | `crates/engine/src/export.rs` (`apple_photos_unsupported`) | Allows iOS as well as macOS (the iPad host installs a Photos runner) | Re-apply the `any(target_os = "macos", target_os = "ios")` |
 | `crates/ui-egui/src/panels/dialogs.rs` (export dialog, *After export*) | The *Add to Apple Photos* checkbox is compiled for iOS too; on iOS the album is cleared and its field and macOS note are hidden | Re-apply both `cfg` changes and the `if cfg!(target_os = "ios")` |
 | `crates/ui-egui/src/menus.rs` (`reveal_label`) | Returns "Share…" on iOS (the host's `reveal` opens the share sheet) | Re-apply the `if cfg!(target_os = "ios")` branch at the top |
+| `crates/ui-egui/src/panels/bottombar.rs` (`show`, before the Before/After button; `before_after_menu`) | On iOS a chevron button right of Before/After opens a menu with every Before/After view (Split, Top/Bottom, Split Top/Bottom, Show Original); ids `icon:beforeAfterModes`, `beforeAfterMode:<key>` (CI tour) | Re-apply the `if cfg!(target_os = "ios")` block and the function |
+| `crates/ui-egui/src/widgets.rs` (`slider`, `touch_scrolls`) | On iOS a drag on a slider's track that sets off mostly vertically scrolls the panel and leaves the value alone | Re-apply the `else if touch_scrolls(…)` branch before the drag code, and the function |
+| `crates/ui-egui/src/panels/detail.rs` (`pins_live`) | On iOS the Tool Overlay's Auto mode always shows mask and spot pins (no hover on a touch screen) | Re-apply the `cfg!(target_os = "ios") ||` at the start |
 
 ### Upstream files compiled into RawPad unchanged (`#[path]` in `apps/rawpad-ios/src/ios.rs`)
 

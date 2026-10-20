@@ -111,7 +111,9 @@
       ],
       "appPermissions": {
         "entitlements": [],
-        "privacy": {}
+        "privacy": {
+          "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
+        }
       },
       "version": "1.40",
       "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.40/RawPad.ipa",

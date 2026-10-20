@@ -22,6 +22,51 @@
 {"sleep":3}
 {"shot":"03-brush"}
 {"method":"engine.execute","params":{"command":"photo.inspect"}}
+# Ivan's iPad (2026-10-19): editing brought up the on-screen keyboard (a tapped or dragged slider
+# takes egui's focus). Drag and tap sliders and paint: the log must not show the text-field
+# keyboard view taking first responder, and the screenshots must show no keyboard (DECISIONS.md 47)
+{"logMark":"editing"}
+{"method":"ui.dragWidget","params":{"id":"slider:exposure","fx":0.5,"dx":30,"steps":8},"expectOk":true}
+{"method":"ui.clickWidget","params":{"id":"slider:exposure","fx":0.4},"expectOk":true}
+{"sleep":2}
+{"shot":"07-slider-no-keyboard"}
+{"method":"ui.pointer","params":{"events":[{"kind":"down","x":0.2,"y":0.45},{"kind":"drag","x":0.25,"y":0.47},{"kind":"drag","x":0.3,"y":0.49},{"kind":"up","x":0.3,"y":0.49}]},"expectOk":true}
+{"sleep":2}
+{"shot":"07-brush-no-keyboard"}
+{"checkLog":"first responder for text field","since":"editing","absent":true}
+# a mostly vertical drag on a slider scrolls the panel and keeps the slider's value (the
+# mask's Exposure in 07-slider-no-keyboard and 07-slider-vertical-drag should read the same)
+{"method":"ui.dragWidget","params":{"id":"slider:exposure","fx":0.5,"dy":-120,"steps":8},"expectOk":true}
+{"sleep":2}
+{"shot":"07-slider-vertical-drag"}
+# Before/After by touch: the menu right of the Before/After button (bottom bar) lists every view
+{"method":"ui.clickWidget","params":{"id":"icon:beforeAfterModes"},"expectOk":true}
+{"sleep":2}
+{"shot":"08-before-after-menu"}
+{"method":"ui.clickWidget","params":{"id":"beforeAfterMode:split"},"expectOk":true}
+{"sleep":8}
+{"shot":"08-split"}
+{"method":"ui.clickWidget","params":{"id":"icon:beforeAfterModes"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"beforeAfterMode:topBottom"},"expectOk":true}
+{"sleep":8}
+{"shot":"08-top-bottom"}
+{"method":"ui.clickWidget","params":{"id":"icon:beforeAfterModes"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"beforeAfterMode:splitTopBottom"},"expectOk":true}
+{"sleep":8}
+{"shot":"08-split-top-bottom"}
+{"method":"ui.clickWidget","params":{"id":"icon:beforeAfterModes"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"beforeAfterMode:original"},"expectOk":true}
+{"sleep":6}
+{"shot":"08-original"}
+# the button itself: side by side, then off again
+{"method":"ui.clickWidget","params":{"id":"icon:beforeAfter"},"expectOk":true}
+{"sleep":8}
+{"shot":"08-side-by-side"}
+{"method":"ui.clickWidget","params":{"id":"icon:beforeAfter"},"expectOk":true}
+{"sleep":2}
 # phase 4: pinch-zoom and pan in the loupe. ui.zoom is egui's pinch event; real fingers reach the
 # same code (detail.rs navigate_gesture) through egui's multi-touch input (zoom_delta/translation_delta)
 {"method":"engine.execute","params":{"command":"panel.edit"}}
@@ -56,9 +101,11 @@
 # (app-stderr.log "first responder for text field"); Escape hands it back to KeyView. The
 # simulator hides the keyboard while its hardware keyboard is connected, so 04-text-field may not
 # show it.
+{"logMark":"search"}
 {"method":"ui.clickWidget","params":{"id":"field:search"}}
 {"sleep":2}
 {"shot":"04-text-field"}
+{"checkLog":"first responder for text field","since":"search"}
 # typing reaches the field once (hardware presses through the text view, never twice): type,
 # select all, copy, read ui.inspect → copied. Soft: osascript on the CI Mac decides delivery.
 {"hostKeys":"rq"}

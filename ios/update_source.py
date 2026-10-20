@@ -8,11 +8,25 @@ The newest version goes first; the last 10 are kept. SideStore checks `version` 
 import datetime
 import json
 import os
+import plistlib
 import sys
 
 REPO = "Ivanmagpelmeni/rawpad"
 RAW = f"https://raw.githubusercontent.com/{REPO}/main"
 PATH = os.path.join(os.path.dirname(__file__), "..", "sidestore", "source.json")
+PLIST = os.path.join(os.path.dirname(__file__), "Info.plist")
+
+
+def permissions():
+    """AltStore 2.x (AltStore Classic) refuses an app whose Info.plist usage descriptions or
+    entitlements aren't listed in the source, so list every `...UsageDescription` key."""
+    try:
+        with open(PLIST, "rb") as f:
+            info = plistlib.load(f)
+    except (OSError, ValueError, plistlib.InvalidFileException):
+        info = {}
+    privacy = {k: v for k, v in sorted(info.items()) if k.endswith("UsageDescription") and isinstance(v, str)}
+    return {"entitlements": [], "privacy": privacy}
 
 
 def base():
@@ -66,6 +80,7 @@ def main():
     app.update({k: entry[k] for k in ("version", "downloadURL", "size")})
     app["versionDate"] = entry["date"]
     app["versionDescription"] = notes
+    app["appPermissions"] = permissions()
     os.makedirs(os.path.dirname(PATH), exist_ok=True)
     with open(PATH, "w") as f:
         json.dump(source, f, indent=2)

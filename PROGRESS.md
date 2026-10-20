@@ -1,6 +1,88 @@
 # Progress
 
+## Editing audit (2026-10-19)
+
+**Status (2026-10-20, about 11:00 Berlin):** uploaded on the 20th (the audit session couldn't
+push), merged with that morning's keyboard avoidance, fixed twice in CI (runs 41 and 42: a tapped
+text box no longer brought the keyboard up) and **all green in branch run 43**, then merged into
+main. The main run after that merge releases it: **update RawPad in AltStore to the first version
+after 1.40** (about 1.44).
+
+How each item was checked: "CI" = seen in the simulator screenshots of run 38; "code" = by reading
+the program (no screenshot yet). Statuses are for 1.38, the version on Ivan's iPad.
+
+| # | Item | Status on 1.38 | Note |
+|---|---|---|---|
+| 1 | Open a photo in Develop, back to the grid | Works (CI) | Double-tap a photo; Back button top left or the grid icon bottom left. |
+| 2 | Basic panel sliders (temp, tint, exposure … saturation) | **Broken** (Ivan) | Moving a slider brings up the keyboard. **Fixed in the audit.** |
+| 3 | Scrolling the Edit panel with a finger | **Broken** (code) | Starting the scroll on a slider changes that slider. **Fixed in the audit:** an up/down drag scrolls. |
+| 4 | White-balance eyedropper, Auto button | Works (code) | Tap the eyedropper, then tap the photo. |
+| 5 | Reset one slider (double-tap its name or knob), reset all (Reset button) | Works, hard to discover (code) | The "double-tap to reset" hint only appears on hover, which a finger can't do. |
+| 6 | Type a value into a slider | Works (code) | Tap the number. After the fix this is the one slider action that brings up the keyboard. |
+| 7 | Tone curve: drag and add points | Works, fiddly (code) | Points are small (10 pt) for a finger. |
+| 8 | Tone curve: remove a point | **Unusable by touch** (code) | Needs a precise double-tap on the tiny point. |
+| 9 | HSL / colour mixer, targeted adjustment (drag on photo) | Works (code) | The sample spot is taken a little after where the finger lands. |
+| 10 | Colour grading wheels | Works (code) | The small "hide" eye on each wheel only shows on hover. |
+| 11 | Detail (sharpening, noise), lens corrections, transform / Upright | Works (code) | |
+| 12 | Crop, straighten, aspect, rotate, flip | Works, fiddly (code) | Corner handles are small and grabbed a bit off; to finish, double-tap inside the crop (no Done button). |
+| 13 | Masks: create brush / linear / radial | Works (CI) | Screenshots 03-masking and 03-brush. |
+| 14 | Masks: move, resize, rotate, erase, delete, invert, overlay | Works, fiddly (code) | Pins were invisible until touched (**fixed in the audit**); handles are small, the radial rotate knob is tiny. Erase = the Erase button. |
+| 15 | Spot removal / healing | Works (code) | The first few millimetres of a stroke are lost. |
+| 16 | Presets: apply, create | Works (code) | |
+| 17 | Presets: preview on hover | **Unusable by touch** (code) | Needs hover. The preset thumbnails still show each look. |
+| 18 | Copy / paste settings | Works (code) | Bottom-bar Copy and Paste. |
+| 19 | Sync settings to other photos | **Unusable by touch** (code) | Picking several photos needs Shift or ⌘; only Select All works by touch. |
+| 20 | Undo / redo without a keyboard | **Unusable** (code) | Only Menu › Edit › Undo (3 taps). **Fixed in the audit:** two-finger tap = undo, three-finger tap = redo. |
+| 21 | History and snapshots | Works (code) | Tap a history step to go back. The snapshot preview on hover is unreachable. |
+| 22 | Virtual copies | Works (code) | Photo menu, or press and hold a photo. |
+| 23 | Before/After side by side | Works (code) | The Before/After button in the bottom bar. |
+| 24 | Before/After split, top/bottom, split top/bottom | **Broken** (Ivan) | Only via Menu › View, otherwise keyboard shortcuts. **Fixed in the audit:** a small ⌄ button next to Before/After lists every view. Ivan's exact problem isn't confirmed yet: please re-test. |
+| 25 | Show original | Hard to reach (code) | Was hold `\` or Menu › View. **Fixed in the audit:** in the same ⌄ menu. |
+| 26 | Draggable split divider | Not in the desktop app either | The split line stays in the middle. |
+| 27 | Zoom (fit, 1:1, pinch), navigator | Works (CI) | Screenshots 04-pinch-zoom, 04-panned. Real fingers not checked. |
+| 28 | Histogram and clipping warnings | Works (code) | Tap the triangles on the histogram. |
+| 29 | Ratings, flags | Works (CI) | Stars in the bottom bar are small (19 pt). |
+| 30 | Colour labels | Works (code) | Info panel or Photo menu; not in the bottom bar. |
+| 31 | Export | Works (CI) | Export, Share button, Add to Apple Photos. |
+| 32 | Search box and keyword fields bring up the keyboard | Works (CI) | Screenshot 04-text-field. |
+| — | Apple Pencil, real-finger pinch, two-finger tap, long-press | Not checked | Need the real iPad (see Needs Ivan). |
+
+**Still broken or hard to use, most painful first** (queued below):
+1. Small touch targets: curve points, mask handles, crop corners, the radial mask's rotate knob,
+   rating stars.
+2. Handles are grabbed where the finger is after it moved a little, not where it landed (crop,
+   targeted adjustment, first bit of a brush or spot stroke).
+3. Sync to several photos: no way to pick several photos by touch.
+4. Removing a tone-curve point needs a precise double-tap.
+5. Crop has no Done button (double-tap inside the crop, or Return).
+6. Hover-only things: preset preview, snapshot preview, the colour wheels' eye, the reset hints.
+7. ~~The on-screen keyboard covers the bottom of the screen~~ (keyboard avoidance, 2026-10-20
+   morning, DECISIONS.md 45).
+
+**In the audit fixes:** keyboard only for a tapped text box; ⌄ Before/After menu; two-finger undo,
+three-finger redo; up/down drags on sliders scroll the panel; mask pins always visible; AltStore
+Classic setup steps and source fix.
+
 ## Latest session summary
+
+**2026-10-20 (interactive, about 09:40 Berlin)**
+1. Uploaded the 2026-10-19 audit session's 8 commits (they couldn't be pushed that night) to branch
+   `audit-2026-10-19`, unchanged (file hashes checked against the patch series).
+2. Merged main (this morning's keyboard avoidance) into it: one tour conflict (kept both sides);
+   the audit's decisions renumbered 47–52.
+3. Branch run 41: everything worked (no keyboard while editing, every Before/After view) except
+   that tapping the search box no longer brought the keyboard up. Two fixes: a tap counts for 4
+   frames as well as 0.8 s (the simulator draws slowly), and the tapped box is the focused
+   widget's rectangle (egui's IME rect is only the text cursor, run 42's log). Run 43 all green
+   (`04-text-field` shows the keyboard, `07-*` show none, `08-*` show every view). Merged into main.
+
+**2026-10-19 (editing audit, evening, unattended)**
+1. Couldn't upload (no write access); saved as a patch series in the Project (DECISIONS.md 52).
+2. Recorded Ivan's two iPad findings (FEEDBACK.md), his AltStore Classic setup (SETUP.md), and
+   fixed the source for AltStore 2.x (it now lists the Photos permission).
+3. Wrote fixes: keyboard only for a tapped text box; ⌄ menu with every Before/After view;
+   two-finger undo / three-finger redo; vertical drags on sliders scroll; mask pins visible.
+4. Full editing audit: table at the top of this file.
 
 **2026-10-20 (morning, 08:40–09:20 Berlin, unattended)**
 1. Main run 38 green, **released 1.38** (on-screen keyboard); the hardware-key checks passed again and are now hard checks.
@@ -125,20 +207,53 @@ check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. Check the main run after the `p4-keyboard-avoid` merge (green, released ~1.40?).
-2. Exercise the keyboard shrink in CI: focus a field low on the screen (Info panel scrolled
-   down, or a keyword field) and expect `UI shrunk by` > 0 in `app-stderr.log`; check the
-   measured keyboard height (257 pt logged vs. the screenshot) and fix it if it's short.
-3. Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try the
-   Simulator menu via osascript on the CI Mac).
+1. **Finish the audit branch** (HANDOFF.md has the exact steps): branch `audit-2026-10-19` (audit
+   fixes + this morning's keyboard avoidance). Check its CI run; fix compile, clippy or test
+   failures (none of the audit code had been compiled before); look at the new screenshots
+   (07-*, 08-*); then merge into main so a release goes out. Also check main run 40 (keyboard
+   avoidance, ~1.40). FEEDBACK.md's two items move to Done after Ivan confirms.
+2. **Touch targets and grab position:** a `cfg(ios)` touch hit radius (~22 pt) for tone-curve
+   points (`panels/edit.rs` ~1048), mask handles and pins (`panels/detail.rs` ~2160), crop handles
+   (~1587) and the radial rotate knob; and hit-test those grabs at `pointer.press_origin()`
+   instead of `interact_pointer_pos()` (crop ~1587, targeted adjustment ~1319).
+3. **Remove a curve point by touch** ("Delete Point" in the curve's long-press menu,
+   `panels/edit.rs` ~970) and a **Done button for crop** on iOS.
 
 Also queued:
+- Exercise the keyboard shrink in CI: focus a field low on the screen and expect `UI shrunk by`
+  > 0 in `app-stderr.log`; check the measured keyboard height (257 pt logged vs. the screenshot).
+- Pick several photos by touch for Sync (a "Select" toggle in the bottom bar, or "Add to
+  Selection" in the long-press menu; `panels/grid.rs` ~771).
+- Hover-only things on iOS: show the colour wheels' eye always (`panels/edit.rs` ~1601); a
+  long-press "Preview" for presets; show reset hints without hover.
+- Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try the
+  Simulator menu via osascript on the CI Mac).
 - A 24 MP raw memory test in the simulator (CC0 ARW/RW2 from `cargo xtask corpus`).
 - Delete merged branches (no tool for it from the sandbox).
 
 ## Needs Ivan
 
-**This week, in short:** install SideStore (steps 1–2 below) if it isn't there yet, update RawPad
+**Re-test after the next update (the first version after 1.40 that AltStore lists, about 1.44), in this order,
+and tell Claude what you see:**
+1. **Keyboard:** open a photo, move several sliders, paint a brush mask with the Pencil, tap the
+   photo. The keyboard must **not** appear. Then tap **Search Photos**: it must appear. Tap a
+   slider's number (right of its name): it should appear so you can type a value.
+2. **Before/After:** in Develop, tap the small **⌄** right of the Before/After button (bottom
+   right). Try each entry: Split, Top/Bottom, Split Top/Bottom, Show Original. Does each one show
+   the photo before and after your edits? If split still "doesn't work", say what you see (one
+   photo? no line? the same picture on both sides?).
+3. **Undo:** after a slider change, tap the photo with **two fingers** at once (quick tap): the
+   change should be undone. Three fingers: redo.
+4. **Scrolling:** scroll the right-hand Edit panel with a finger, starting on a slider. The slider
+   should not move.
+5. Things only the real iPad can show: Pencil strokes, pinch-zoom with fingers, press-and-hold
+   menus.
+
+**Install:** you use **AltStore Classic** (your iPad blocks VPN apps, so SideStore can't work).
+Steps are in `SETUP.md` › *Install with AltStore Classic*. Updates and the weekly refresh: plug the
+iPad into the PC with the cable, make sure AltServer runs, then AltStore › My Apps.
+
+**Earlier list (still useful):** install SideStore (steps 1–2 below) if it isn't there yet, update RawPad
 to the newest version (1.38 if it's listed, else 1.35), then try in this order and tell Claude in
 chat what you see: open the app → import a few photos → open one, move sliders → pinch to zoom →
 Pencil brush mask → export with *Add to Apple Photos* → *Share Exported Photo…* → tap **Search

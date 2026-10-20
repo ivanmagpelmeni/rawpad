@@ -191,6 +191,12 @@ fn right_side(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, compact_zo
     if app.ui.view == ViewMode::Survey {
         // no zoom or thumbnail size in Survey
     } else if matches!(app.ui.view, ViewMode::Detail | ViewMode::Compare) {
+        // RawPad (iPad): every Before/After view in a menu right of the button. On the desktop
+        // they are Shift+Y, Alt+Y, Alt+Shift+Y, \ and the View menu, out of reach by touch.
+        if cfg!(target_os = "ios") {
+            let modes = icon_button(&mut child, "beforeAfterModes", Icon::ChevronDown, vec2(26.0, 30.0), false, true, "Before/After views");
+            egui::Popup::menu(&modes).show(|ui| before_after_menu(app, ui));
+        }
         if icon_button(&mut child, "beforeAfter", Icon::BeforeAfter, vec2(30.0, 30.0), app.ui.before_after.is_layout(), true, "Before/After (Y)")
             .clicked()
         {
@@ -256,6 +262,26 @@ fn right_side(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, compact_zo
         }
     }
     if child.min_rect().width() > 0.0 { child.min_rect().left() } else { full.right() }
+}
+
+/// Every Before/After view, for touch (RawPad: without a keyboard the iPad has no Y, Shift+Y,
+/// Alt+Y or `\`). Picking the view that is on turns it off.
+fn before_after_menu(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+    use crate::state::BeforeAfter;
+    for (key, label, mode) in [
+        ("sideBySide", "Compare Before and After", BeforeAfter::SideBySide),
+        ("split", "Before/After Split", BeforeAfter::Split),
+        ("topBottom", "Before/After Top/Bottom", BeforeAfter::TopBottom),
+        ("splitTopBottom", "Before/After Split Top/Bottom", BeforeAfter::SplitTopBottom),
+        ("original", "Show Original", BeforeAfter::Original),
+    ] {
+        let on = app.ui.before_after == mode;
+        let r = ui.selectable_label(on, crate::i18n::tr(label));
+        register(ui.ctx(), format!("beforeAfterMode:{key}"), r.rect);
+        if r.clicked() {
+            app.ui.before_after = if on { BeforeAfter::Off } else { mode };
+        }
+    }
 }
 
 fn click_zoom_menu(app: &mut LightcraftApp, ui: &mut egui::Ui) {

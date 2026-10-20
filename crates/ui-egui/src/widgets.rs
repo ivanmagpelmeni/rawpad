@@ -222,6 +222,26 @@ pub(crate) fn shown_value(spec: &ControlSpec, v: f64) -> String {
 /// scrub rather than a click that types a value.
 const SCRUB_START: f32 = 3.0;
 
+/// RawPad (iPad): whether this drag on a slider's track scrolls the panel instead of moving the
+/// slider, because it set off more up or down than sideways; the panel is scrolled by the drag.
+/// With a finger, scrolling the Edit panel used to change whatever slider the finger started on.
+/// Off the iPad, always false (UPSTREAM.md).
+fn touch_scrolls(ui: &Ui, resp: &Response, id: egui::Id) -> bool {
+    if !cfg!(target_os = "ios") {
+        return false;
+    }
+    let key = id.with("touch-scroll");
+    if resp.drag_started() {
+        let moved = ui.input(|i| i.pointer.press_origin().zip(i.pointer.latest_pos()).map(|(a, b)| b - a)).unwrap_or_default();
+        ui.data_mut(|m| m.insert_temp(key, moved.y.abs() > moved.x.abs()));
+    }
+    let scrolling = (resp.dragged() || resp.drag_stopped()) && ui.data(|m| m.get_temp::<bool>(key)).unwrap_or(false);
+    if scrolling && resp.dragged() {
+        ui.scroll_with_delta(resp.drag_delta());
+    }
+    scrolling
+}
+
 /// The radius of a slider's hollow ring thumb.
 const THUMB_RING: f32 = 7.0;
 
@@ -394,6 +414,8 @@ pub fn slider(ui: &mut Ui, spec: &ControlSpec, value: f64, enabled: bool, label_
         out.reset = true;
         out.value = Some(spec.default);
         v = spec.default;
+    } else if touch_scrolls(ui, &resp, id) {
+        // RawPad (iPad): the drag scrolled the panel, the slider keeps its value
     } else {
         if resp.drag_started() {
             out.drag_started = true;

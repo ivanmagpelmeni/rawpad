@@ -274,3 +274,53 @@ Newer entries win over older ones and over the kickoff brief.
     egui's zoom factor (UIKit points → egui points), a no-op at the default zoom.
 46. **The tour's hardware-keyboard rating checks are hard checks again** (no `"soft"`): runs 37
     and 38 both passed them. Typing into the search box (`ui.inspect` → `copied`) starts soft.
+
+## 2026-10-19: Editing audit session (evening, unattended; pushed 2026-10-20)
+
+Written on 2026-10-19 as decisions 45–50; renumbered 47–52 when merged after the 2026-10-20
+morning session, which had taken 45 and 46.
+
+47. **The on-screen keyboard comes up only for a text box that was tapped** (`keys::soft_keyboard`,
+    `keys::tap_pos`). Ivan's iPad showed it while editing: `ctx.egui_wants_keyboard_input()` (used
+    since decision 43) is true for *any* focused widget, and every slider takes the focus on a tap
+    or drag (`widgets.rs` `slider`: `resp.request_focus()`), so moving a slider brought the
+    keyboard up. Now the host uses egui's `PlatformOutput::ime` (set only while an editable
+    `TextEdit` has the focus; its `rect` is just the text cursor, so the box is the focused
+    widget's rectangle, CI run 42) and brings the keyboard up only when that box took the focus
+    within 0.8 s or 4 frames of a tap that landed on it (8 pt slop; frames because the simulator
+    draws slowly and a real iPad may wait for the cursor blink, CI run 41). It stays up while a text
+    box keeps the focus and goes when none has it. A box focused by code after a tap elsewhere (the
+    mask Effect menu's search, a dialog's name field) leaves it down until tapped. Typing a slider
+    value still works: tapping the number opens a text box in its place, under the finger. A
+    hardware keyboard is unchanged (`KeyView` turns presses into text, decision 41). Keyboard
+    avoidance (decision 45) only acts while the keyboard is up, so it follows the same rule.
+48. **Every Before/After view is reachable by touch:** on iOS a chevron button right of the bottom
+    bar's Before/After button opens a menu (Side by Side, Split, Top/Bottom, Split Top/Bottom, Show
+    Original; picking the active one turns it off). The button alone only toggles Side by Side; the
+    other views were behind Shift+Y, Alt+Y, Alt+Shift+Y, `\` and the View menu. Upstream's split
+    line sits at the middle of the photo and can't be dragged on the desktop either, so no
+    draggable divider was added. Small patch in `panels/bottombar.rs` (UPSTREAM.md).
+49. **Two-finger tap = Undo, three-finger tap = Redo** (as in Procreate and other iPad apps):
+    every finger lifts within 350 ms of the first landing and none moves more than 10 pt; not while
+    a text box is being edited; a Pencil touch spoils it. Runs `edit.undo` / `edit.redo`
+    (`touch::Gesture`, host). Before this, undo needed Menu › Edit › Undo (three taps). Also: a
+    second finger landing now *drops* the first finger's held press instead of passing it to egui,
+    so a pinch or a multi-finger tap can't leave a stray brush dot, spot or click.
+50. **Touch scrolling of the Edit panel no longer moves sliders:** on iOS a drag on a slider track
+    that sets off more vertically than sideways scrolls the panel (`widgets.rs` `touch_scrolls`).
+    And the Tool Overlay's Auto mode always shows mask and spot pins on iOS (`detail.rs`
+    `pins_live`): Auto showed them only while a pointer hovered the photo, which a lifted finger
+    never does. Both are small `cfg!(target_os = "ios")` patches (UPSTREAM.md).
+51. **Ivan installs with AltStore Classic, not SideStore:** his iPad is managed by an MDM that
+    blocks VPN apps, so SideStore's LocalDevVPN can't run. AltServer runs on his Windows PC; he
+    installs, updates and refreshes over a USB-C cable (PC and iPad are on different networks, so
+    Wi-Fi refresh doesn't work). SETUP.md has a section for it. The source now lists RawPad's
+    privacy permission (`NSPhotoLibraryAddUsageDescription`) in `appPermissions.privacy`, read
+    from `ios/Info.plist` by `update_source.py`: AltStore 2.x checks that the source declares every
+    usage description and entitlement of the .ipa and refuses to install on a mismatch
+    (faq.altstore.io, "Make a Source"). Entitlements stay empty (the unsigned .ipa carries none).
+52. **The audit session could not push** (the repo wasn't attached with write access). Its commits
+    went to the claude.ai Project as a patch series (`claude/rawpad-audit-2026-10-19.mbox`) and
+    were applied unchanged (blob hashes checked) in an interactive session on 2026-10-20, then
+    merged with the morning session's keyboard avoidance on branch `audit-2026-10-19`. Scheduled
+    tasks must attach the repo with push access (their prompts already say so).
