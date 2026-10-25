@@ -370,5 +370,5 @@ morning session, which had taken 45 and 46.
     *Reset <name>* (`sliderMenu:reset:<control>`), which does what a double-tap on the name or knob
     does. The desktop's "double-click to reset it" tooltip needs hover, which a finger can't do, and
     a long-press menu is how iPad apps offer such actions. iOS only plus `cfg!(test)`, so the
-    upstream unit test `the_names_menu_resets_the_slider` checks it; CI's unit-test step now runs
-    `tests_curve` and `slider_reset_tests`.
+    upstream unit test `tests_curve::a_sliders_name_menu_resets_it` checks it (in
+    the `tests_curve` module, which CI already runs).
