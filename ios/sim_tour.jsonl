@@ -96,6 +96,13 @@
 # the toast lasts 1.4 s: run 54's shot after a 1 s sleep came too late to show it
 {"sleep":0.3}
 {"shot":"10-select-several-synced"}
+# the loupe says Select Several is on too: a pill above the filmstrip with the count and Done (DECISIONS.md 64)
+{"method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
+{"sleep":3}
+{"method":"ui.widgets","params":{"filter":"SelectSeveral"}}
+{"shot":"10-select-several-loupe"}
+{"method":"engine.execute","params":{"command":"view.photoGrid"},"expectOk":true}
+{"sleep":2}
 # the strip under the title says taps now add or remove photos; its Done turns Select Several off
 {"method":"ui.widgets","params":{"filter":"selectSeveral"}}
 {"method":"ui.clickWidget","params":{"id":"button:selectSeveralDone"},"expectOk":true}
