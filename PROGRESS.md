@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-10-25 (evening 3, 20:54–21:40 Berlin, unattended)**
+1. Run 49's tour failure was the test, not the app: `thumb:2` sat above the screen. New tour step `clickVisible` taps photos that are fully on screen; branch run 50 green, 3 photos selected (screenshot checked).
+2. Run 48's last-step failure was a flake (re-run green); the Add-to-Photos step after the share sheet no longer fails the tour.
+3. **Merged `p4-select-several` into main** (radial knob, bigger star touch area, Select Several, colour-wheel eye): main's run releases about 1.5x.
+4. Branch `p4-select-bar`: a strip "Tap photos to add or remove them · Done" while Select Several is on (DECISIONS 59). Run 51 showed the strip fine but the tour tapped under it; fixed, run 52 going.
+5. Next: merge `p4-select-bar` when run 52 is green, then hover-only leftovers.
+
 **2026-10-25 (evening 2, 19:54–20:35 Berlin, unattended)**
 1. Main run 47 green, **released 1.47** (touch grabs, curve Delete Point, Crop Done; screenshots checked). Upstream still 0.9.1.
 2. Branch `p4-touch-2`: radial rotate knob bigger and 44 pt out, targeted adjustment at the press, rating stars 36 pt tall to touch. Built fine; tour failed only at the last (Photos) step, re-run started.
@@ -219,11 +226,12 @@ check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p4-select-several`** (contains `p4-touch-2`) once its run is green; see HANDOFF.md.
+1. **Merge `p4-select-bar`** once branch run 52 is green (check `10-select-several` shows the
+   strip and 3 selected, `10-select-several-done` shows it gone); see HANDOFF.md.
 2. **Hover-only leftovers on iPad:** a long-press "Preview" for presets; show reset hints
    ("double-tap to reset") without hover; snapshot preview.
-3. **An on-screen hint while *Select Several* is on** (e.g. "Selecting: tap photos · Done" pill
-   in the grid's title bar), and a "Sync…" shortcut in that pill.
+3. **A "Sync…" button in the Select Several strip** (runs the existing Sync Settings command for
+   the selected photos), so the whole touch flow is: long-press › Select Several › taps › Sync.
 
 Also queued:
 - Exercise the keyboard shrink in CI: focus a field low on the screen and expect `UI shrunk by`
@@ -250,6 +258,11 @@ and tell Claude what you see:**
    should not move.
 5. Things only the real iPad can show: Pencil strokes, pinch-zoom with fingers, press-and-hold
    menus.
+7. **New in the version after 1.47 (about 1.50, once AltStore lists it):** in the photo grid,
+   press and hold a photo → **Select Several** (top of the menu). Then each tap adds a photo or
+   takes it out (the title row says "3 selected"). Long-press again → **Done Selecting**. With
+   several photos picked, the right panel shows Quick Develop for all of them. Also: the round
+   mask's rotate knob is bigger and further out; rating stars are easier to tap.
 6. **New in 1.47:** in the Tone Curve,
    drag a point with your finger (it should be easy to catch); press and hold a point for half a
    second → **Delete Point**. In Crop, there is now a **Done** button next to Reset. Crop corners
