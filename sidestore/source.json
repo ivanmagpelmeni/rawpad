@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.60",
+          "buildVersion": "60",
+          "date": "2026-10-25T23:05:01Z",
+          "localizedDescription": "RawPad 1.60 (build 60, 4b6deef): P4: handoff: main run 60 tour flake re-run, run 61 status",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.60/RawPad.ipa",
+          "size": 19859407,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.57",
           "buildVersion": "57",
           "date": "2026-10-25T22:08:55Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.27/RawPad.ipa",
           "size": 19803978,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.21",
-          "buildVersion": "21",
-          "date": "2026-10-18T21:32:41Z",
-          "localizedDescription": "RawPad 1.21 (build 21, 2c1282d): P5: handoff after nightly session 5 (Photos hang fixed, Share button merged); decision 33",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.21/RawPad.ipa",
-          "size": 19803555,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.57",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.57/RawPad.ipa",
-      "size": 19847837,
-      "versionDate": "2026-10-25T22:08:55Z",
-      "versionDescription": "RawPad 1.57 (build 57, f536a18): P4: handoff links main run 57 and branch run 56"
+      "version": "1.60",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.60/RawPad.ipa",
+      "size": 19859407,
+      "versionDate": "2026-10-25T23:05:01Z",
+      "versionDescription": "RawPad 1.60 (build 60, 4b6deef): P4: handoff: main run 60 tour flake re-run, run 61 status"
     }
   ],
   "news": []
