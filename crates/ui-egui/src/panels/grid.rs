@@ -1067,7 +1067,7 @@ fn select_several_bar(app: &mut LightcraftApp, ui: &mut egui::Ui) {
     let sync_rect = Rect::from_min_size(pos2(done_rect.left() - 12.0 - sync_w, r.center().y - 16.0), vec2(sync_w, 32.0));
     // syncing needs a photo to copy from and at least one other to copy to
     let can_sync = app.session.selection.ids.len() > 1 && app.session.selection.active.is_some();
-    let sync = ui.put(sync_rect, egui::Button::new(crate::i18n::tr("Sync Settings")).sense(if can_sync { Sense::click() } else { Sense::hover() }));
+    let sync = ui.add_enabled_ui(can_sync, |ui| ui.put(sync_rect, egui::Button::new(crate::i18n::tr("Sync Settings")))).inner;
     crate::widgets::register(ui.ctx(), "button:selectSeveralSync", sync.rect);
     if can_sync && sync.clicked() {
         match app.run("develop.sync", json!({})) {
