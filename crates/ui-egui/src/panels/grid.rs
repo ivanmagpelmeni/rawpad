@@ -170,7 +170,7 @@ fn show_inner(app: &mut LightcraftApp, ui: &mut egui::Ui) {
         }
     }
     if touch_multi(ui.ctx()) {
-        select_several_bar(ui);
+        select_several_bar(app, ui);
     }
     super::chips::show(app, ui, &chips);
     if app.ui.filter_bar {
@@ -1049,19 +1049,37 @@ pub(crate) fn touch_multi(ctx: &egui::Context) -> bool {
 }
 
 /// iPad: the strip under the grid's title while *Select Several* is on, so it's clear that taps
-/// now add or remove photos, with a Done button that turns it off (DECISIONS.md 59).
-fn select_several_bar(ui: &mut egui::Ui) {
+/// now add or remove photos, with Sync Settings (the active photo's settings to the other selected
+/// photos, as Edit › Sync Settings) and a Done button that turns it off (DECISIONS.md 59, 60).
+fn select_several_bar(app: &mut LightcraftApp, ui: &mut egui::Ui) {
     let t = Tokens::get(ui.ctx());
     let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 40.0), Sense::hover());
     ui.painter().rect_filled(r, 0.0, t.canvas);
     // the count of selected photos is in the title row above ("3 selected · 24 photos")
     let text = crate::i18n::tr("Tap photos to add or remove them");
     let done_w = 84.0;
-    let room = (r.width() - 40.0 - done_w).max(0.0);
+    let sync_w = 128.0;
+    let room = (r.width() - 52.0 - done_w - sync_w).max(0.0);
     let shown = crate::widgets::elide_head(text, room, |s| ui.painter().layout_no_wrap(s.to_string(), t.font(13.0), t.text).size().x);
     let label = ui.painter().text(pos2(r.left() + 20.0, r.center().y), Align2::LEFT_CENTER, &shown, t.font(13.0), t.text);
     crate::widgets::register(ui.ctx(), "grid:selectSeveralBar", label);
     let done_rect = Rect::from_min_size(pos2(r.right() - 20.0 - done_w, r.center().y - 16.0), vec2(done_w, 32.0));
+    let sync_rect = Rect::from_min_size(pos2(done_rect.left() - 12.0 - sync_w, r.center().y - 16.0), vec2(sync_w, 32.0));
+    // syncing needs a photo to copy from and at least one other to copy to
+    let can_sync = app.session.selection.ids.len() > 1 && app.session.selection.active.is_some();
+    let sync = ui.put(sync_rect, egui::Button::new(crate::i18n::tr("Sync Settings")).sense(if can_sync { Sense::click() } else { Sense::hover() }));
+    crate::widgets::register(ui.ctx(), "button:selectSeveralSync", sync.rect);
+    if can_sync && sync.clicked() {
+        match app.run("develop.sync", json!({})) {
+            Ok(v) => {
+                let n = v.get("changed").and_then(serde_json::Value::as_u64).unwrap_or(0);
+                // "Sync Settings: 2 photos" from messages every language already has
+                let photos = crate::i18n::tr_format!("{n} photo{}", if n == 1 { "" } else { "s" }, n = n);
+                app.toast(ui.ctx(), format!("{}: {photos}", crate::i18n::tr("Sync Settings")));
+            }
+            Err(e) => app.toast(ui.ctx(), e),
+        }
+    }
     let resp = ui.put(done_rect, egui::Button::new(crate::i18n::tr("Done")));
     crate::widgets::register(ui.ctx(), "button:selectSeveralDone", resp.rect);
     if resp.clicked() {

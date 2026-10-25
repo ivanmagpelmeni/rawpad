@@ -90,6 +90,11 @@
 {"clickVisible":"thumb:","count":2,"exclude":["thumb:1"],"top":160,"bottom":1100}
 {"waitUntil":"selected","equals":3,"method":"engine.execute","params":{"command":"library.select","params":{"ids":[],"mode":"add"}},"timeout":10}
 {"shot":"10-select-several"}
+# its Sync Settings copies the active photo's settings to the other selected photos (DECISIONS.md 60);
+# the toast says how many ("Sync Settings: 2 photos")
+{"method":"ui.clickWidget","params":{"id":"button:selectSeveralSync"},"expectOk":true}
+{"sleep":1}
+{"shot":"10-select-several-synced"}
 # the strip under the title says taps now add or remove photos; its Done turns Select Several off
 {"method":"ui.widgets","params":{"filter":"selectSeveral"}}
 {"method":"ui.clickWidget","params":{"id":"button:selectSeveralDone"},"expectOk":true}

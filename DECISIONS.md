@@ -359,3 +359,10 @@ morning session, which had taken 45 and 46.
     says *Done Selecting*. CI's tour taps two photos that are fully on screen (`clickVisible` in
     `ios/sim_test.py`), because which ids a grid shows depends on its sort and the screen size
     (run 49 tapped a photo above the screen).
+60. **2026-10-25: *Sync Settings* in the Select Several strip** (`button:selectSeveralSync`), left
+    of *Done*. It runs the existing `develop.sync` with its default groups (the same as Edit › Sync
+    Settings: the active photo's settings to the other selected photos), so the touch flow is
+    long-press › Select Several › taps › Sync Settings, with no group dialog (Lightroom's Sync
+    dialog can come later if Ivan asks). It is greyed out until two photos are selected; the toast
+    says "Sync Settings: N photos" from messages every language already has (no new `tr_format!`
+    message to translate 13 times).
