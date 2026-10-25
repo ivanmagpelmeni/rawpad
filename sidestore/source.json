@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.57",
+          "buildVersion": "57",
+          "date": "2026-10-25T22:08:55Z",
+          "localizedDescription": "RawPad 1.57 (build 57, f536a18): P4: handoff links main run 57 and branch run 56",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.57/RawPad.ipa",
+          "size": 19847837,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.53",
           "buildVersion": "53",
           "date": "2026-10-25T21:07:20Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.21/RawPad.ipa",
           "size": 19803555,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.16",
-          "buildVersion": "16",
-          "date": "2026-10-18T19:50:08Z",
-          "localizedDescription": "RawPad 1.16 (build 16, 1d11188): Merge branch 'p5-share'",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.16/RawPad.ipa",
-          "size": 19785629,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.53",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.53/RawPad.ipa",
-      "size": 19848310,
-      "versionDate": "2026-10-25T21:07:20Z",
-      "versionDescription": "RawPad 1.53 (build 53, 675afbd): P4: handoff links main run 53 and branch run 52"
+      "version": "1.57",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.57/RawPad.ipa",
+      "size": 19847837,
+      "versionDate": "2026-10-25T22:08:55Z",
+      "versionDescription": "RawPad 1.57 (build 57, f536a18): P4: handoff links main run 57 and branch run 56"
     }
   ],
   "news": []
