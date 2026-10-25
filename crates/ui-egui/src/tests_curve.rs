@@ -264,3 +264,29 @@ fn a_sliders_name_menu_resets_it() {
     h.step();
     assert!(develop(&h).light.exposure.abs() < 1e-9, "exposure back to 0");
 }
+
+/// iPad: *Select Several*'s strip in the grid has Sync Settings, which copies the active photo's
+/// settings to the other selected photos and says how many (DECISIONS.md 60). Run 54's tour
+/// screenshot showed no toast; this checks the button does the work, whatever the screenshot's timing.
+#[test]
+fn the_select_several_strips_sync_copies_settings_to_the_other_photos() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "grid"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    exec(&mut h, "library.select", json!({"ids": [1]}));
+    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 0.75}));
+    exec(&mut h, "library.select", json!({"ids": [1, 2], "active": 1}));
+    // the photo's long-press menu › Select Several turns this on
+    h.view.ctx.data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), true));
+    h.step();
+    h.step();
+    let other = |h: &Headless| h.app.session.develop_of(lightcraft_catalog::PhotoId(2)).map(|d| d.light.exposure).unwrap_or_default();
+    assert!(other(&h).abs() < 1e-9, "photo 2 starts at 0");
+    click_widget(&mut h, "button:selectSeveralSync", 1);
+    h.step();
+    assert!((other(&h) - 0.75).abs() < 1e-9, "photo 2 follows photo 1: {}", other(&h));
+    let toast = h.app.ui.toast.clone().map(|t| t.0).unwrap_or_default();
+    assert!(toast.starts_with("Sync Settings"), "the strip says what happened: {toast:?}");
+}
