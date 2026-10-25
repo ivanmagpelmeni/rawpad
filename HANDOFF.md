@@ -8,7 +8,7 @@ end. The next session reads it **first**.
 - **Main:** run 53 for `ca54af2` was green and **released 1.53**
   (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40231250240). Then this session merged
   **`p4-select-bar` + `p4-select-sync`** (merge commit `b31c5e9`, pushed about 22:38 with these
-  docs; `sidestore/source.json` kept at main's 1.53). Main's run for it was not finished at
+  docs; `sidestore/source.json` kept at main's 1.53). Main's run 57 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40236028354) was not finished at
   handoff; it should release about 1.57.
 - **Done this session:**
   - Branch run 52 on `p4-select-bar` green
@@ -29,7 +29,7 @@ end. The next session reads it **first**.
     that drove raw egui frames (it probably clicked the menu item at its first-frame "sizing pass"
     position); replaced by the app-level test `tests_curve::a_sliders_name_menu_resets_it`
     (right-click via `ui.clickWidget`, then click the item), commit after `e91f502`/`3341447`.
-    **Run 56 was dispatched at about 22:14 Berlin**, not finished at handoff.
+    **Run 56 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40234543833) dispatched at about 22:14 Berlin**, not finished at handoff.
 - **Very next step:**
   1. Check main's run for `b31c5e9` (and the docs commit after it) is green and released
      (`…/releases?per_page=2`). If red, fix or revert the merge first.
