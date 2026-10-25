@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.47",
+          "buildVersion": "47",
+          "date": "2026-10-25T19:10:37Z",
+          "localizedDescription": "RawPad 1.47 (build 47, 96b182e): P4: handoff links main run 47",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.47/RawPad.ipa",
+          "size": 19850097,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.44",
           "buildVersion": "44",
           "date": "2026-10-20T09:47:30Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.14/RawPad.ipa",
           "size": 19780972,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.12",
-          "buildVersion": "12",
-          "date": "2026-10-18T18:12:28Z",
-          "localizedDescription": "RawPad 1.12 (build 12, 63582bd): P7: hide the AI items (Object, Describe, Sky, Subject) in the mask Add/Subtract/Intersect menus on iPad",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.12/RawPad.ipa",
-          "size": 19789480,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.44",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.44/RawPad.ipa",
-      "size": 19836879,
-      "versionDate": "2026-10-20T09:47:30Z",
-      "versionDescription": "RawPad 1.44 (build 44, 8f782ac): Merge audit-2026-10-19 (editing audit: keyboard only for a tapped text box, Before/After menu, two-finger undo, slider scrolling, pins visible, AltStore setup; branch run 43 green)"
+      "version": "1.47",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.47/RawPad.ipa",
+      "size": 19850097,
+      "versionDate": "2026-10-25T19:10:37Z",
+      "versionDescription": "RawPad 1.47 (build 47, 96b182e): P4: handoff links main run 47"
     }
   ],
   "news": []
