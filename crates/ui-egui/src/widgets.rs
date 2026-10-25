@@ -744,6 +744,9 @@ pub fn icon_button(ui: &mut Ui, id: &str, icon: Icon, size: egui::Vec2, active: 
     if !tooltip.is_empty() { resp.on_hover_text(tooltip) } else { resp }
 }
 
+/// iPad: the height of a rating star's touch area (points).
+const STAR_TOUCH_H: f32 = 36.0;
+
 /// Star rating row (5 stars); returns a new rating when clicked (clicking the current rating clears).
 pub fn stars(ui: &mut Ui, id: &str, rating: u8, size: f32) -> Option<u8> {
     let t = Tokens::get(ui.ctx());
@@ -751,7 +754,12 @@ pub fn stars(ui: &mut Ui, id: &str, rating: u8, size: f32) -> Option<u8> {
     let mut hover_n = None;
     let mut rects = [Rect::NOTHING; 5];
     for (i, slot) in (0..5u8).zip(rects.iter_mut()) {
-        let (r, resp) = ui.allocate_exact_size(vec2(size, size), Sense::click());
+        let (r, mut resp) = ui.allocate_exact_size(vec2(size, size), if cfg!(target_os = "ios") { Sense::hover() } else { Sense::click() });
+        if cfg!(target_os = "ios") {
+            // a fingertip needs more than the drawn star: the gaps on both sides and 36 pt of height
+            let reach = vec2(ui.spacing().item_spacing.x / 2.0, ((STAR_TOUCH_H - size) / 2.0).max(0.0));
+            resp = ui.interact(r.expand2(reach), resp.id.with("touch"), Sense::click());
+        }
         crate::widgets::announce_selected(&resp, format!("{} ★", i + 1), i < rating);
         register(ui.ctx(), format!("star:{id}:{}", i + 1), r);
         if resp.hovered() {

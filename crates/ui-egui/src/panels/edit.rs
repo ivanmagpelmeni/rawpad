@@ -1631,10 +1631,12 @@ fn grading_wheel(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings
             t.text_label,
         );
     }
-    // the eye: on top of the wheel, shown while hovering or while the wheel is hidden
-    if hovering || hidden {
+    // the eye: on top of the wheel, shown while hovering or while the wheel is hidden (always on
+    // iPad, where nothing hovers; its touch area there is 28 pt)
+    if hovering || hidden || cfg!(target_os = "ios") {
         let eye = Rect::from_center_size(r.left_bottom() + vec2(2.0, -2.0), vec2(16.0, 16.0));
-        let er = ui.interact(eye, egui::Id::new(("wheelEye", key)), Sense::click());
+        let reach = if cfg!(target_os = "ios") { eye.expand(6.0) } else { eye };
+        let er = ui.interact(reach, egui::Id::new(("wheelEye", key)), Sense::click());
         crate::widgets::announce(&er, crate::i18n::tr("Show / hide"));
         register(ui.ctx(), format!("wheelEye:{key}"), eye);
         paint(ui.painter(), eye, if hidden { Icon::EyeOff } else { Icon::Eye }, if hidden { t.text_disabled } else { t.icon });

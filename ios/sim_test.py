@@ -143,6 +143,26 @@ def main():
                 if len(found) < step.get("min", 1):
                     failures.append(f"expected at least {step.get('min', 1)} file(s) in {step['checkFiles']}, found {found}")
                 continue
+            if "clickVisible" in step:
+                # {"clickVisible": "thumb:", "count": 2, "exclude": ["thumb:1"]}: tap the first `count`
+                # widgets whose id contains the text and whose rect lies fully on screen (top to bottom),
+                # because which photo ids a grid shows depends on its sort and the screen size
+                reply = request(sock, reader, "ui.widgets", {"filter": step["clickVisible"]})
+                top, bottom = step.get("top", 50), step.get("bottom", 1130)
+                seen = [
+                    w for w in (reply.get("result") or [])
+                    if w["id"] not in step.get("exclude", []) and w["rect"][1] >= top and w["rect"][1] + w["rect"][3] <= bottom
+                ]
+                seen.sort(key=lambda w: (w["rect"][1], w["rect"][0]))
+                picked = [w["id"] for w in seen[: step.get("count", 1)]]
+                print(f"{'ok ' if len(picked) == step.get('count', 1) else 'ERR'} clickVisible {step['clickVisible']!r} -> {picked}")
+                if len(picked) < step.get("count", 1):
+                    failures.append(f"clickVisible {step['clickVisible']!r}: only {picked} fully on screen: {json.dumps(reply)[:300]}")
+                for wid in picked:
+                    r = request(sock, reader, "ui.clickWidget", {"id": wid})
+                    log.write(json.dumps({"request": {"method": "ui.clickWidget", "params": {"id": wid}}, "reply": r}) + "\n")
+                    time.sleep(step.get("pause", 1))
+                continue
             if "shot" in step:
                 path = f"{out_dir}/{step['shot']}.png"
                 subprocess.run(["xcrun", "simctl", "io", "booted", "screenshot", path], check=True)

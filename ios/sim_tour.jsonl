@@ -74,6 +74,27 @@
 {"method":"ui.clickWidget","params":{"id":"button:cropDone"},"expectOk":true}
 {"sleep":6}
 {"shot":"09-crop-applied"}
+# Select Several (the photo's long-press menu; a right-click is the same menu): then each tap
+# adds a photo to the selection, for Sync (DECISIONS.md 58). Turned off again afterwards.
+{"method":"engine.execute","params":{"command":"view.photoGrid"},"expectOk":true}
+{"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
+{"sleep":4}
+{"method":"ui.clickWidget","params":{"id":"thumb:1","button":"right"},"expectOk":true}
+{"sleep":2}
+{"shot":"10-select-several-menu"}
+{"method":"ui.clickWidget","params":{"id":"gridMenu:selectSeveral"},"expectOk":true}
+{"sleep":1}
+# two photos fully on screen other than photo 1 (run 49: thumb:2 sat above the screen, thumb:3 wasn't laid out)
+{"clickVisible":"thumb:","count":2,"exclude":["thumb:1"]}
+{"waitUntil":"selected","equals":3,"method":"engine.execute","params":{"command":"library.select","params":{"ids":[],"mode":"add"}},"timeout":10}
+{"shot":"10-select-several"}
+{"method":"ui.clickWidget","params":{"id":"thumb:1","button":"right"},"expectOk":true}
+{"sleep":2}
+{"method":"ui.clickWidget","params":{"id":"gridMenu:selectSeveral"},"expectOk":true}
+{"sleep":1}
+{"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
+{"method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
+{"sleep":3}
 # phase 4: pinch-zoom and pan in the loupe. ui.zoom is egui's pinch event; real fingers reach the
 # same code (detail.rs navigate_gesture) through egui's multi-touch input (zoom_delta/translation_delta)
 {"method":"engine.execute","params":{"command":"panel.edit"}}
@@ -150,7 +171,9 @@
 {"checkFiles":"Documents/Logs","min":1}
 # Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome).
 # Soft: a timeout only warns, because the same code passed in runs 20, 21, 25 and hung in 22, 24, 26
-{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[3],"format":"jpeg","addToPhotos":true,"background":true}},"expectOk":true}
+# Not expectOk: with the share sheet over it the app sometimes draws no frame for 5 s and the control
+# server refuses the request (run 48, run 49); passed in runs 46 and 47
+{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[3],"format":"jpeg","addToPhotos":true,"background":true}}}
 {"waitUntil":"imports.imported","method":"engine.execute","params":{"command":"export.photosImports","params":{}},"timeout":180,"soft":true}
 {"method":"ui.inspect"}
 # (Help › Open Log Folder → share sheet was checked in runs 15/16; a second sheet can't open over this one)

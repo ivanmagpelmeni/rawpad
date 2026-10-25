@@ -38,6 +38,10 @@
 | `crates/ui-egui/src/panels/edit.rs` (`curve_editor`, `CURVE_POINT_HIT`) | On iOS a press within 22 pt (desktop 10) grabs a curve point; on iOS (and in unit tests) the curve's long-press menu starts with *Delete Point* for the inner point under the press (id `curveMenu:deletePoint`); the menu call moved below the points (and into the parametric branch) | Re-apply the constant, the `secondary_clicked` block and the two `context_menu` calls |
 | `crates/ui-egui/src/panels/detail.rs` (`CROP_GRAB`, `MASK_GRAB`, crop `drag_started`) | On iOS crop handles and mask pins/handles are grabbed within 22 pt (desktop 12 / 10), and a crop drag starts at `press_origin()` | Re-apply the two constants and the `press` line |
 | `crates/ui-egui/src/panels/right.rs` (`crop`, after *Reset*) | On iOS a *Done* button (`button:cropDone`) runs `tool.done` | Re-apply the `if cfg!(target_os = "ios")` button |
+| `crates/ui-egui/src/panels/detail.rs` (radial mask handles, `ROT_KNOB_GAP`; `targeted_drag`) | On iOS the radial rotate knob is drawn 44 pt out from the right-edge handle, 7 pt radius; the targeted adjustment starts at `press_origin()` | Re-apply the `rot_desk`/`rot_q` lines and the `press` line |
+| `crates/ui-egui/src/widgets.rs` (`stars`, `STAR_TOUCH_H`) | On iOS each star's click area is 36 pt tall and covers the gaps | Re-apply the `if cfg!(target_os = "ios")` interact block |
+| `crates/ui-egui/src/panels/edit.rs` (colour wheel eye) | On iOS the wheels' show/hide eye is always drawn (no hover) and its touch area is 28 pt | Re-apply the `|| cfg!(target_os = "ios")` and the `reach` rect |
+| `crates/ui-egui/src/panels/grid.rs` (`touch_multi`, `context_menu`, cell click) and `panels/detail.rs` (filmstrip click) | On iOS *Select Several* / *Done Selecting* at the top of the photo menu (`gridMenu:selectSeveral`); while on, a tap toggles the photo in the selection | Re-apply the function, the menu block and the two `|| touch_multi(…)` |
 
 ### Upstream files compiled into RawPad unchanged (`#[path]` in `apps/rawpad-ios/src/ios.rs`)
 

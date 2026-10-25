@@ -772,7 +772,7 @@ fn cell(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, r: Rect, square
         let m = ui.input(|i| i.modifiers);
         let mode = if m.shift {
             "range"
-        } else if m.command {
+        } else if m.command || touch_multi(ui.ctx()) {
             "toggle"
         } else {
             "replace"
@@ -1039,9 +1039,24 @@ pub fn stack_badge(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, sid:
     }
 }
 
+/// iPad: whether *Select Several* (the photo's long-press menu) is on, where a tap adds a photo to
+/// the selection or takes it out, as a ⌘-click does on the Mac (no modifier keys on a touch screen).
+pub(crate) fn touch_multi(ctx: &egui::Context) -> bool {
+    cfg!(target_os = "ios") && ctx.data(|d| d.get_temp::<bool>(egui::Id::new("rawpad.selectSeveral"))).unwrap_or(false)
+}
+
 pub fn context_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
-    if !app.session.selection.contains(id) {
+    if !app.session.selection.contains(id) && !touch_multi(ui.ctx()) {
         let _ = app.run("library.select", json!({"ids": [id.0]}));
+    }
+    if cfg!(target_os = "ios") {
+        let on = touch_multi(ui.ctx());
+        let resp = ui.button(crate::i18n::tr(if on { "Done Selecting" } else { "Select Several" }));
+        crate::widgets::register(ui.ctx(), "gridMenu:selectSeveral", resp.rect);
+        if resp.clicked() {
+            ui.ctx().data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), !on));
+        }
+        ui.separator();
     }
     if ui.button(crate::i18n::tr("Open in Detail")).clicked() {
         let _ = app.run("view.detail", json!({}));

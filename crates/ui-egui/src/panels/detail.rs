@@ -1315,8 +1315,10 @@ fn quick_name(q: lightcraft_engine::media::QuickSource) -> &'static str {
 /// the colour-mixer bands under the press point (`develop.targeted`, one call per whole step, all
 /// in one interaction = one undo step).
 fn targeted_drag(app: &mut LightcraftApp, resp: &egui::Response, map: &CanvasMap, target: &str) {
+    // on iPad the sample point is where the finger landed, not where it is once egui calls it a drag
+    let press = if cfg!(target_os = "ios") { resp.ctx.input(|i| i.pointer.press_origin()) } else { None };
     if resp.drag_started()
-        && let Some(q) = resp.interact_pointer_pos()
+        && let Some(q) = press.or(resp.interact_pointer_pos())
     {
         let _ = app.run("develop.beginInteraction", json!({"label": "Targeted Adjustment"}));
         app.gesture = Some(Gesture::Targeted { at: map.norm(q), acc: 0.0 });
@@ -1644,6 +1646,8 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
 /// fingertip on iPad is far less precise than a mouse pointer.
 const CROP_GRAB: f32 = if cfg!(target_os = "ios") { 22.0 } else { 12.0 };
 const MASK_GRAB: f32 = if cfg!(target_os = "ios") { 22.0 } else { 10.0 };
+/// iPad: how far (points) the radial mask's rotate knob sits out from its right-edge handle.
+const ROT_KNOB_GAP: f32 = 44.0;
 
 const CROP_HANDLE_NAMES: [&str; 9] = [
     "Crop top-left corner",
@@ -2045,10 +2049,16 @@ fn mask_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
 
                     let (s, co) = angle.to_radians().sin_cos();
                     let rot_r = rx + 0.08;
-                    let rot_q = map.screen(Point::new(center.x + (rot_r * co) * l.0, center.y + (rot_r * s) * l.1));
                     let h1_q = map.screen(Point::new(center.x + (rx * co) * l.0, center.y + (rx * s) * l.1));
+                    // on iPad the rotate knob sits a finger's width (44 pt) out from the right-edge
+                    // handle and is drawn larger, so the two can't be grabbed for each other
+                    let rot_desk = map.screen(Point::new(center.x + (rot_r * co) * l.0, center.y + (rot_r * s) * l.1));
+                    let rot_q = if cfg!(target_os = "ios") { h1_q + (rot_desk - h1_q).normalized() * ROT_KNOB_GAP } else { rot_desk };
                     p.line_segment([h1_q, rot_q], Stroke::new(1.0, Color32::from_white_alpha(200)));
-                    p.circle_stroke(rot_q, 4.0, Stroke::new(1.5, Color32::WHITE));
+                    if cfg!(target_os = "ios") {
+                        p.circle_filled(rot_q, 7.0, Color32::from_black_alpha(90));
+                    }
+                    p.circle_stroke(rot_q, if cfg!(target_os = "ios") { 7.0 } else { 4.0 }, Stroke::new(1.5, Color32::WHITE));
                     register(ui.ctx(), format!("maskHandle:{}:{ci}:5", m.id), Rect::from_center_size(rot_q, vec2(14.0, 14.0)));
                     grips.push((m.id, ci, 5, rot_q));
                 }
@@ -2669,7 +2679,7 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
                     // ⌘/Ctrl- and Shift-clicks change the selection; the pair on screen stays (#187)
                     super::compare::select_with_modifier(app, *id, !m.command)
                 } else {
-                    let mode = if m.command {
+                    let mode = if m.command || super::grid::touch_multi(ui.ctx()) {
                         "toggle"
                     } else if m.shift {
                         "range"
