@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-10-25 (evening, 18:55–19:40 Berlin, unattended)**
+1. Main was green (run 44, **released 1.44**: the editing audit). No new upstream release (still 0.9.1).
+2. Touch: curve points, crop handles and mask pins/handles are grabbed within 22 pt on iPad; a crop drag starts where the finger landed (DECISIONS.md 53).
+3. Long-press a tone-curve point → *Delete Point* (DECISIONS.md 54); a *Done* button in the Crop panel (56).
+4. CI now also runs the upstream curve unit tests (55). Branch runs 45 (curve only) and 46 (everything) — see HANDOFF.md for their result and whether it got merged.
+5. Next: rating stars and the radial rotate knob (still small), then picking several photos for Sync.
+
 **2026-10-20 (interactive, about 09:40 Berlin)**
 1. Uploaded the 2026-10-19 audit session's 8 commits (they couldn't be pushed that night) to branch
    `audit-2026-10-19`, unchanged (file hashes checked against the patch series).
@@ -207,17 +214,14 @@ check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Finish the audit branch** (HANDOFF.md has the exact steps): branch `audit-2026-10-19` (audit
-   fixes + this morning's keyboard avoidance). Check its CI run; fix compile, clippy or test
-   failures (none of the audit code had been compiled before); look at the new screenshots
-   (07-*, 08-*); then merge into main so a release goes out. Also check main run 40 (keyboard
-   avoidance, ~1.40). FEEDBACK.md's two items move to Done after Ivan confirms.
-2. **Touch targets and grab position:** a `cfg(ios)` touch hit radius (~22 pt) for tone-curve
-   points (`panels/edit.rs` ~1048), mask handles and pins (`panels/detail.rs` ~2160), crop handles
-   (~1587) and the radial rotate knob; and hit-test those grabs at `pointer.press_origin()`
-   instead of `interact_pointer_pos()` (crop ~1587, targeted adjustment ~1319).
-3. **Remove a curve point by touch** ("Delete Point" in the curve's long-press menu,
-   `panels/edit.rs` ~970) and a **Done button for crop** on iOS.
+1. **Finish the touch branch** if HANDOFF.md says it isn't merged yet: branch `p4-touch-all`
+   (curve/crop/mask grab radius, curve Delete Point, Crop Done). Check its run, look at
+   `09-crop-done-button` / `09-crop-applied`, merge into main.
+2. **Remaining small targets:** the radial mask's rotate knob (`panels/detail.rs`, mask handles
+   drawing ~2160) and the bottom-bar rating stars (19 pt, `panels/bottombar.rs`); the targeted
+   adjustment's sample point at `press_origin()` (`panels/edit.rs` ~1319, under `cfg!(ios)`).
+3. **Pick several photos by touch for Sync** (a "Select" toggle in the bottom bar, or "Add to
+   Selection" in the grid's long-press menu; `panels/grid.rs` ~771).
 
 Also queued:
 - Exercise the keyboard shrink in CI: focus a field low on the screen and expect `UI shrunk by`
@@ -248,6 +252,10 @@ and tell Claude what you see:**
    should not move.
 5. Things only the real iPad can show: Pencil strokes, pinch-zoom with fingers, press-and-hold
    menus.
+6. **New in the version after 1.44 (if HANDOFF.md says it was released):** in the Tone Curve,
+   drag a point with your finger (it should be easy to catch); press and hold a point for half a
+   second → **Delete Point**. In Crop, there is now a **Done** button next to Reset. Crop corners
+   and mask pins should be easier to grab.
 
 **Install:** you use **AltStore Classic** (your iPad blocks VPN apps, so SideStore can't work).
 Steps are in `SETUP.md` › *Install with AltStore Classic*. Updates and the weekly refresh: plug the

@@ -324,3 +324,18 @@ morning session, which had taken 45 and 46.
     were applied unchanged (blob hashes checked) in an interactive session on 2026-10-20, then
     merged with the morning session's keyboard avoidance on branch `audit-2026-10-19`. Scheduled
     tasks must attach the repo with push access (their prompts already say so).
+53. **2026-10-25: Touch grab radius 22 pt on iPad** (about a fingertip; Apple's minimum target is
+    44 pt across) for tone-curve points, crop handles and mask pins/handles; the desktop keeps
+    upstream's 10–12 pt. The nearest point or handle still wins when several are in reach. A crop
+    drag on iPad starts at the press (`press_origin()`), not where the finger is once egui's drag
+    threshold has passed (the curve already did this). All `cfg!(target_os = "ios")` constants in
+    upstream files (UPSTREAM.md).
+54. **2026-10-25: Delete a curve point by long-press** (the curve's context menu gets *Delete
+    Point* for the inner point under the press), not a bigger double-tap target: a double-tap on a
+    point that just moved a little would add a point instead. iOS only, plus `cfg!(test)` so the
+    upstream unit test (`tests_curve.rs`) can check it.
+55. **2026-10-25: CI runs upstream UI tests that cover our patches**
+    (`cargo test -p lightcraft-ui-egui --lib tests_curve`), so patched upstream code gets a
+    compiled test too. Add more test module names to that step as more patches get tests.
+56. **2026-10-25: A Done button in the Crop panel on iPad** (`button:cropDone`, runs `tool.done`),
+    next to Reset: the crop was applied only by a double-tap inside it or Return.
