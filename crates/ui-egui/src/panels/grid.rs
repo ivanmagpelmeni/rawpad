@@ -169,6 +169,9 @@ fn show_inner(app: &mut LightcraftApp, ui: &mut egui::Ui) {
             }
         }
     }
+    if touch_multi(ui.ctx()) {
+        select_several_bar(ui);
+    }
     super::chips::show(app, ui, &chips);
     if app.ui.filter_bar {
         super::filterbar::show(app, ui);
@@ -1043,6 +1046,27 @@ pub fn stack_badge(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, sid:
 /// the selection or takes it out, as a ⌘-click does on the Mac (no modifier keys on a touch screen).
 pub(crate) fn touch_multi(ctx: &egui::Context) -> bool {
     cfg!(target_os = "ios") && ctx.data(|d| d.get_temp::<bool>(egui::Id::new("rawpad.selectSeveral"))).unwrap_or(false)
+}
+
+/// iPad: the strip under the grid's title while *Select Several* is on, so it's clear that taps
+/// now add or remove photos, with a Done button that turns it off (DECISIONS.md 59).
+fn select_several_bar(ui: &mut egui::Ui) {
+    let t = Tokens::get(ui.ctx());
+    let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 40.0), Sense::hover());
+    ui.painter().rect_filled(r, 0.0, t.canvas);
+    // the count of selected photos is in the title row above ("3 selected · 24 photos")
+    let text = crate::i18n::tr("Tap photos to add or remove them");
+    let done_w = 84.0;
+    let room = (r.width() - 40.0 - done_w).max(0.0);
+    let shown = crate::widgets::elide_head(text, room, |s| ui.painter().layout_no_wrap(s.to_string(), t.font(13.0), t.text).size().x);
+    let label = ui.painter().text(pos2(r.left() + 20.0, r.center().y), Align2::LEFT_CENTER, &shown, t.font(13.0), t.text);
+    crate::widgets::register(ui.ctx(), "grid:selectSeveralBar", label);
+    let done_rect = Rect::from_min_size(pos2(r.right() - 20.0 - done_w, r.center().y - 16.0), vec2(done_w, 32.0));
+    let resp = ui.put(done_rect, egui::Button::new(crate::i18n::tr("Done")));
+    crate::widgets::register(ui.ctx(), "button:selectSeveralDone", resp.rect);
+    if resp.clicked() {
+        ui.ctx().data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), false));
+    }
 }
 
 pub fn context_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
