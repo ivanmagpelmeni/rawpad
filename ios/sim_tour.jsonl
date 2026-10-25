@@ -104,6 +104,47 @@
 {"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
 {"method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
 {"sleep":3}
+# long-press menus that stand in for hover on iPad (DECISIONS.md 61-63). A right-click opens the
+# same menu as a long-press. Soft for now: the first run of these steps (branch p4-snapshot-preview)
+# checks the ids and the screenshots
+{"method":"engine.execute","params":{"command":"panel.edit"}}
+{"method":"engine.execute","params":{"command":"develop.set","params":{"control":"light.exposure","value":0.75}},"expectOk":true}
+{"method":"engine.execute","params":{"command":"version.create","params":{"name":"Bright"}}}
+{"sleep":2}
+{"method":"ui.clickWidget","params":{"id":"sliderLabel:light.exposure","button":"right"}}
+{"sleep":1}
+{"shot":"11-slider-menu"}
+{"method":"ui.clickWidget","params":{"id":"sliderMenu:reset:light.exposure"}}
+{"sleep":2}
+# History: the newest step is where the photo is (no preview); the one below it is the +0.75 step
+{"method":"engine.execute","params":{"command":"panel.activity"}}
+{"sleep":2}
+{"clickVisible":"history:","skip":1,"button":"right","soft":true}
+{"sleep":2}
+{"shot":"11-history-preview"}
+{"method":"ui.key","params":{"key":"Escape"}}
+{"sleep":1}
+# Versions: "Bright" (+0.75) previews over the reset photo
+{"method":"engine.execute","params":{"command":"panel.versions"}}
+{"sleep":2}
+{"clickVisible":"version:","button":"right","soft":true}
+{"sleep":2}
+{"shot":"11-version-preview"}
+{"method":"ui.key","params":{"key":"Escape"}}
+{"sleep":1}
+# Presets: the preset's look in the loupe, Apply first
+{"method":"engine.execute","params":{"command":"panel.presets"}}
+{"sleep":3}
+{"clickVisible":"preset:","button":"right","soft":true}
+{"sleep":2}
+{"shot":"11-preset-preview"}
+{"method":"ui.key","params":{"key":"Escape"}}
+{"sleep":1}
+{"method":"engine.execute","params":{"command":"panel.presets"}}
+{"method":"engine.execute","params":{"command":"develop.set","params":{"control":"light.exposure","value":0}}}
+# in case an Escape above did more than close a menu
+{"method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
+{"sleep":2}
 # phase 4: pinch-zoom and pan in the loupe. ui.zoom is egui's pinch event; real fingers reach the
 # same code (detail.rs navigate_gesture) through egui's multi-touch input (zoom_delta/translation_delta)
 {"method":"engine.execute","params":{"command":"panel.edit"}}

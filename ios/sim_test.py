@@ -125,9 +125,15 @@ def main():
             if "checkLog" in step:
                 # {"checkLog": "text", "since": "mark", "absent": true}: the app logged (or, with
                 # absent, never logged) that text since the mark (e.g. the on-screen keyboard)
-                time.sleep(1)
-                text = log_text(out_dir, marks.get(step.get("since"), 0))
-                found = step["checkLog"] in text
+                # a present check polls for up to `wait` seconds: the app may not have flushed the
+                # line yet (run 60's first attempt saw an empty log right after the tap)
+                deadline = time.time() + step.get("wait", 5)
+                while True:
+                    time.sleep(1)
+                    text = log_text(out_dir, marks.get(step.get("since"), 0))
+                    found = step["checkLog"] in text
+                    if found or step.get("absent") or time.time() >= deadline:
+                        break
                 good = (not found) if step.get("absent") else found
                 what = f"checkLog {step['checkLog']!r} {'absent' if step.get('absent') else 'present'} since {step.get('since')}"
                 print(f"{'ok ' if good else ('WARN' if step.get('soft') else 'ERR')} {what}")
@@ -146,7 +152,9 @@ def main():
             if "clickVisible" in step:
                 # {"clickVisible": "thumb:", "count": 2, "exclude": ["thumb:1"]}: tap the first `count`
                 # widgets whose id contains the text and whose rect lies fully on screen (top to bottom),
-                # because which photo ids a grid shows depends on its sort and the screen size
+                # because which photo ids a grid shows depends on its sort and the screen size.
+                # "skip": n passes over the first n, "button": "right" long-presses (the context menu),
+                # "soft": true only warns when too few are on screen
                 reply = request(sock, reader, "ui.widgets", {"filter": step["clickVisible"]})
                 top, bottom = step.get("top", 50), step.get("bottom", 1130)
                 seen = [
@@ -154,13 +162,15 @@ def main():
                     if w["id"] not in step.get("exclude", []) and w["rect"][1] >= top and w["rect"][1] + w["rect"][3] <= bottom
                 ]
                 seen.sort(key=lambda w: (w["rect"][1], w["rect"][0]))
-                picked = [w["id"] for w in seen[: step.get("count", 1)]]
-                print(f"{'ok ' if len(picked) == step.get('count', 1) else 'ERR'} clickVisible {step['clickVisible']!r} -> {picked}")
+                skip = step.get("skip", 0)
+                picked = [w["id"] for w in seen[skip : skip + step.get("count", 1)]]
+                print(f"{'ok ' if len(picked) == step.get('count', 1) else ('WARN' if step.get('soft') else 'ERR')} clickVisible {step['clickVisible']!r} -> {picked}")
                 if len(picked) < step.get("count", 1):
-                    failures.append(f"clickVisible {step['clickVisible']!r}: only {picked} fully on screen: {json.dumps(reply)[:300]}")
+                    (warnings if step.get("soft") else failures).append(f"clickVisible {step['clickVisible']!r}: only {picked} fully on screen: {json.dumps(reply)[:300]}")
                 for wid in picked:
-                    r = request(sock, reader, "ui.clickWidget", {"id": wid})
-                    log.write(json.dumps({"request": {"method": "ui.clickWidget", "params": {"id": wid}}, "reply": r}) + "\n")
+                    params = {"id": wid, **({"button": step["button"]} if "button" in step else {})}
+                    r = request(sock, reader, "ui.clickWidget", params)
+                    log.write(json.dumps({"request": {"method": "ui.clickWidget", "params": params}, "reply": r}) + "\n")
                     time.sleep(step.get("pause", 1))
                 continue
             if "shot" in step:
