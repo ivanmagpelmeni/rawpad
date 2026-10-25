@@ -2679,7 +2679,7 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
                     // ⌘/Ctrl- and Shift-clicks change the selection; the pair on screen stays (#187)
                     super::compare::select_with_modifier(app, *id, !m.command)
                 } else {
-                    let mode = if m.command {
+                    let mode = if m.command || super::grid::touch_multi(ui.ctx()) {
                         "toggle"
                     } else if m.shift {
                         "range"
