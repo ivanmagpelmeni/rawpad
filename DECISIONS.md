@@ -388,3 +388,15 @@ morning session, which had taken 45 and 46.
     *Versions* (right strip), so "snapshot preview" in PROGRESS meant this panel. Checked by
     `tests_curve::a_versions_long_press_menu_previews_and_restores_it` and
     `tests_curve::a_history_steps_long_press_menu_previews_and_goes_back_to_it`.
+64. **2026-10-26: Select Several shows in the loupe too.** While *Select Several* is on, the loupe
+    has a pill floating just above the filmstrip's top-left with "N selected" and *Done*
+    (`filmSelectSeveral`, `button:filmSelectSeveralDone`); before, only the long-press menu's
+    *Done Selecting* told you taps in the filmstrip add or remove photos. A floating pill rather
+    than a strip like the grid's, so the filmstrip and loupe keep their size. No Sync button there:
+    Sync stays in the grid's strip and Edit › Sync Settings. The pill's text is a new
+    `tr_format!` message ("{n} selected"), English everywhere for now like the grid strip's text.
+    Checked by `tests_curve::the_loupe_shows_select_several_above_the_filmstrip_and_done_ends_it`
+    and the tour shot `10-select-several-loupe`.
+65. **2026-10-26: Tour opens panels with `ui.set`, not `panel.*`,** when it can't know whether the
+    panel is already open: `panel.edit` and friends toggle, so in run 63 it closed the Edit panel and
+    the slider long-press step found no slider. The long-press tour steps are hard checks now.
