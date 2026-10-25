@@ -42,6 +42,7 @@
 | `crates/ui-egui/src/widgets.rs` (`stars`, `STAR_TOUCH_H`) | On iOS each star's click area is 36 pt tall and covers the gaps | Re-apply the `if cfg!(target_os = "ios")` interact block |
 | `crates/ui-egui/src/panels/edit.rs` (colour wheel eye) | On iOS the wheels' show/hide eye is always drawn (no hover) and its touch area is 28 pt | Re-apply the `|| cfg!(target_os = "ios")` and the `reach` rect |
 | `crates/ui-egui/src/panels/grid.rs` (`touch_multi`, `context_menu`, cell click) and `panels/detail.rs` (filmstrip click) | On iOS *Select Several* / *Done Selecting* at the top of the photo menu (`gridMenu:selectSeveral`); while on, a tap toggles the photo in the selection | Re-apply the function, the menu block, the two `|| touch_multi(…)` and `select_several_bar` (the strip under the grid title with Sync Settings and Done, DECISIONS 59, 60) |
+| `crates/ui-egui/src/widgets.rs` (`slider`, `menu_reset`) and `widgets/tests_slider_reset.rs` | On iOS (and in unit tests) a long-press on a slider's name opens a menu with *Reset <name>* (`sliderMenu:reset:<control>`), DECISIONS 61 | Re-apply the `context_menu` block after `sliderLabel:` and `|| menu_reset` on the double-click reset; keep the test |
 
 ### Upstream files compiled into RawPad unchanged (`#[path]` in `apps/rawpad-ios/src/ios.rs`)
 

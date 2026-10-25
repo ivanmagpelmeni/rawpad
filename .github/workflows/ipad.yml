@@ -67,7 +67,7 @@ jobs:
 
       - name: Unit tests (patched upstream UI code, on the macOS host)
         # the upstream UI tests that cover RawPad's touch patches (cfg!(test) sees the iPad code)
-        run: set -o pipefail; cargo test -p lightcraft-ui-egui --lib tests_curve 2>&1 | tee ipad-test/ui-tests.log
+        run: set -o pipefail; cargo test -p lightcraft-ui-egui --lib -- tests_curve slider_reset_tests 2>&1 | tee ipad-test/ui-tests.log
 
       - name: Build for the simulator
         run: set -o pipefail; ios/build.sh sim 2>&1 | tee ipad-test/build-sim.log
