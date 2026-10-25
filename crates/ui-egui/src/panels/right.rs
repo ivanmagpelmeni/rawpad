@@ -257,6 +257,10 @@ fn crop(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
             if text_button(ui, "cropReset", crate::i18n::tr("Reset"), false).clicked() {
                 let _ = app.run("crop.reset", json!({}));
             }
+            // iPad: the crop is applied by double-tapping inside it or Return; a finger needs a button
+            if cfg!(target_os = "ios") && text_button(ui, "cropDone", crate::i18n::tr("Done"), true).clicked() {
+                let _ = app.run("tool.done", json!({}));
+            }
         });
     });
     let ang = lightcraft_develop::controls::find("crop.angle").copied();
