@@ -8,8 +8,8 @@ end. The next session reads it **first**.
 - **Main:** **`p4-select-several` merged** (merge commit `ca54af2`, pushed about 21:35 with these
   docs). Its branch run 50 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40228483392)
   was fully green; screenshot `runs/50/10-select-several.jpg` shows 3 highlighted photos,
-  "3 selected · 24 photos" and Quick Develop · 3 photos. **Main's run for the merge was still
-  going at handoff** and should release about 1.50 (radial knob, star touch area, targeted
+  "3 selected · 24 photos" and Quick Develop · 3 photos. **Main's run 53 for the merge
+  (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40231250240) was still going at handoff** and should release about 1.50 (radial knob, star touch area, targeted
   adjustment at the press, Select Several, colour-wheel eye always shown).
 - **Done this session:**
   - Run 49's failure was in the tour: `thumb:2` was laid out above the screen (y = −509) and
@@ -25,7 +25,7 @@ end. The next session reads it **first**.
     green, strip looks right in `runs/51/10-select-several.jpg`, but the tour picked `thumb:22`
     whose rect started at y = 79, under the strip; the tap hit the day header (which selects that
     day), so 2 selected instead of 3. Fixed by `"top":160,"bottom":1100` on that tour step
-    (commit after `9edf9cd`). **Run 52 dispatched at about 21:32 Berlin**, not finished.
+    (commit after `9edf9cd`). **Run 52 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40231165148) dispatched at about 21:31 Berlin**, not finished.
 - **Very next step:**
   1. Check main's run for `ca54af2` is green and released (`…/releases?per_page=2`). If red,
      fix or revert the merge first.
