@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-10-25 (evening 2, 19:54–20:35 Berlin, unattended)**
+1. Main run 47 green, **released 1.47** (touch grabs, curve Delete Point, Crop Done; screenshots checked). Upstream still 0.9.1.
+2. Branch `p4-touch-2`: radial rotate knob bigger and 44 pt out, targeted adjustment at the press, rating stars 36 pt tall to touch. Built fine; tour failed only at the last (Photos) step, re-run started.
+3. Branch `p4-select-several` (includes the above): *Select Several* in the photo long-press menu, so taps pick several photos for Sync, with a CI tour check; colour-wheel eye always shown on iPad.
+4. Nothing new merged into main this session: see HANDOFF.md for the run results to check and the merge step.
+5. Next: merge those branches, then hover-only leftovers (preset preview, reset hints).
+
 **2026-10-25 (evening, 18:55–19:40 Berlin, unattended)**
 1. Main was green (run 44, **released 1.44**: the editing audit). No new upstream release (still 0.9.1).
 2. Touch: curve points, crop handles and mask pins/handles are grabbed within 22 pt on iPad; a crop drag starts where the finger landed (DECISIONS.md 53).
@@ -204,9 +211,7 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 38 green, released **1.38** (on-screen keyboard). Branch `p4-keyboard-avoid` (keyboard
-avoidance, typing check; run 39 all green) was merged into main at the end of the morning session
-of 2026-10-20; the main run after that push should release it (about 1.40). CI checks build, fmt,
+Main run 47 green, released **1.47** (2026-10-25: touch grabs, curve Delete Point, Crop Done). Branches `p4-touch-2` and `p4-select-several` wait to be merged (HANDOFF.md). CI checks build, fmt,
 unit tests, clippy, the simulator tour (sliders, radial and brush masks, pinch/pan, hardware keys
 with rating 5 and ⌘Z undo as hard checks, search box with on-screen keyboard and typing, caption
 field with keyboard, background export, Share button and sheet, Add to Apple Photos as a soft
@@ -214,22 +219,15 @@ check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Finish the touch branch** if HANDOFF.md says it isn't merged yet: branch `p4-touch-all`
-   (curve/crop/mask grab radius, curve Delete Point, Crop Done). Check its run, look at
-   `09-crop-done-button` / `09-crop-applied`, merge into main.
-2. **Remaining small targets:** the radial mask's rotate knob (`panels/detail.rs`, mask handles
-   drawing ~2160) and the bottom-bar rating stars (19 pt, `panels/bottombar.rs`); the targeted
-   adjustment's sample point at `press_origin()` (`panels/edit.rs` ~1319, under `cfg!(ios)`).
-3. **Pick several photos by touch for Sync** (a "Select" toggle in the bottom bar, or "Add to
-   Selection" in the grid's long-press menu; `panels/grid.rs` ~771).
+1. **Merge `p4-select-several`** (contains `p4-touch-2`) once its run is green; see HANDOFF.md.
+2. **Hover-only leftovers on iPad:** a long-press "Preview" for presets; show reset hints
+   ("double-tap to reset") without hover; snapshot preview.
+3. **An on-screen hint while *Select Several* is on** (e.g. "Selecting: tap photos · Done" pill
+   in the grid's title bar), and a "Sync…" shortcut in that pill.
 
 Also queued:
 - Exercise the keyboard shrink in CI: focus a field low on the screen and expect `UI shrunk by`
   > 0 in `app-stderr.log`; check the measured keyboard height (257 pt logged vs. the screenshot).
-- Pick several photos by touch for Sync (a "Select" toggle in the bottom bar, or "Add to
-  Selection" in the long-press menu; `panels/grid.rs` ~771).
-- Hover-only things on iOS: show the colour wheels' eye always (`panels/edit.rs` ~1601); a
-  long-press "Preview" for presets; show reset hints without hover.
 - Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try the
   Simulator menu via osascript on the CI Mac).
 - A 24 MP raw memory test in the simulator (CC0 ARW/RW2 from `cargo xtask corpus`).
@@ -237,7 +235,7 @@ Also queued:
 
 ## Needs Ivan
 
-**Re-test after the next update (the first version after 1.40 that AltStore lists, about 1.44), in this order,
+**Re-test after the next update (1.47 is out now; AltStore should list it), in this order,
 and tell Claude what you see:**
 1. **Keyboard:** open a photo, move several sliders, paint a brush mask with the Pencil, tap the
    photo. The keyboard must **not** appear. Then tap **Search Photos**: it must appear. Tap a
@@ -252,7 +250,7 @@ and tell Claude what you see:**
    should not move.
 5. Things only the real iPad can show: Pencil strokes, pinch-zoom with fingers, press-and-hold
    menus.
-6. **New in the version after 1.44 (about 1.47; if AltStore lists it):** in the Tone Curve,
+6. **New in 1.47:** in the Tone Curve,
    drag a point with your finger (it should be easy to catch); press and hold a point for half a
    second → **Delete Point**. In Crop, there is now a **Done** button next to Reset. Crop corners
    and mask pins should be easier to grab.
