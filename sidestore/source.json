@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.64",
+          "buildVersion": "64",
+          "date": "2026-10-25T23:42:48Z",
+          "localizedDescription": "RawPad 1.64 (build 64, 1c48438): P4: handoff and progress after the night-1 session (1.60 released; p4-preset-preview merged; p4-snapshot-preview run 63 green)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.64/RawPad.ipa",
+          "size": 19848920,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.60",
           "buildVersion": "60",
           "date": "2026-10-25T23:05:01Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.32/RawPad.ipa",
           "size": 19810335,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.27",
-          "buildVersion": "27",
-          "date": "2026-10-18T23:21:29Z",
-          "localizedDescription": "RawPad 1.27 (build 27, bf77cb0): P5: log the Photos add-only permission status before each save",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.27/RawPad.ipa",
-          "size": 19803978,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.60",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.60/RawPad.ipa",
-      "size": 19859407,
-      "versionDate": "2026-10-25T23:05:01Z",
-      "versionDescription": "RawPad 1.60 (build 60, 4b6deef): P4: handoff: main run 60 tour flake re-run, run 61 status"
+      "version": "1.64",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.64/RawPad.ipa",
+      "size": 19848920,
+      "versionDate": "2026-10-25T23:42:48Z",
+      "versionDescription": "RawPad 1.64 (build 64, 1c48438): P4: handoff and progress after the night-1 session (1.60 released; p4-preset-preview merged; p4-snapshot-preview run 63 green)"
     }
   ],
   "news": []
