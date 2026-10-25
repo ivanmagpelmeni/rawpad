@@ -85,13 +85,21 @@
 {"method":"ui.clickWidget","params":{"id":"gridMenu:selectSeveral"},"expectOk":true}
 {"sleep":1}
 # two photos fully on screen other than photo 1 (run 49: thumb:2 sat above the screen, thumb:3 wasn't laid out)
-{"clickVisible":"thumb:","count":2,"exclude":["thumb:1"]}
+# top 160: below the toolbar (62), the title row (44) and the Select Several strip (40); run 51 tapped
+# a cell hidden under the strip (it hit the day header, which selects that day)
+{"clickVisible":"thumb:","count":2,"exclude":["thumb:1"],"top":160,"bottom":1100}
 {"waitUntil":"selected","equals":3,"method":"engine.execute","params":{"command":"library.select","params":{"ids":[],"mode":"add"}},"timeout":10}
 {"shot":"10-select-several"}
-{"method":"ui.clickWidget","params":{"id":"thumb:1","button":"right"},"expectOk":true}
-{"sleep":2}
-{"method":"ui.clickWidget","params":{"id":"gridMenu:selectSeveral"},"expectOk":true}
+# its Sync Settings copies the active photo's settings to the other selected photos (DECISIONS.md 60);
+# the toast says how many ("Sync Settings: 2 photos")
+{"method":"ui.clickWidget","params":{"id":"button:selectSeveralSync"},"expectOk":true}
 {"sleep":1}
+{"shot":"10-select-several-synced"}
+# the strip under the title says taps now add or remove photos; its Done turns Select Several off
+{"method":"ui.widgets","params":{"filter":"selectSeveral"}}
+{"method":"ui.clickWidget","params":{"id":"button:selectSeveralDone"},"expectOk":true}
+{"sleep":1}
+{"shot":"10-select-several-done"}
 {"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
 {"method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
 {"sleep":3}
