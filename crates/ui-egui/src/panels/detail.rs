@@ -1551,7 +1551,7 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
             Some(Gesture::CropHandle { handle, .. }) => Some(usize::from(handle)),
             _ => None,
         };
-        let near = held.or_else(|| handles.iter().position(|h| h.distance(hq) < 12.0)).filter(|_| !rotating);
+        let near = held.or_else(|| handles.iter().position(|h| h.distance(hq) < CROP_GRAB)).filter(|_| !rotating);
         let cursor = match near {
             Some(0 | 2) => egui::CursorIcon::ResizeNwSe,
             Some(1 | 3) => egui::CursorIcon::ResizeNeSw,
@@ -1575,13 +1575,15 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
     if resp.double_clicked()
         && let Some(q) = resp.interact_pointer_pos()
         && inside(q)
-        && !handles.iter().any(|h| h.distance(q) < 12.0)
+        && !handles.iter().any(|h| h.distance(q) < CROP_GRAB)
     {
         let _ = app.run("tool.done", json!({}));
         return;
     }
+    // on iPad the handle under the press, not where the finger is once the drag threshold passed
+    let press = if cfg!(target_os = "ios") { ui.input(|i| i.pointer.press_origin()) } else { None };
     if resp.drag_started()
-        && let Some(q) = resp.interact_pointer_pos()
+        && let Some(q) = press.or(resp.interact_pointer_pos())
     {
         if let Err(e) = app.run("develop.beginInteraction", json!({"label": "Crop"})).and_then(|_| app.begin_crop().map(|_| serde_json::Value::Null))
         {
@@ -1590,7 +1592,7 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
             return;
         }
         let d = app.session.develop_of(id).unwrap_or_default();
-        app.gesture = Some(match handles.iter().position(|h| h.distance(q) < 12.0) {
+        app.gesture = Some(match handles.iter().position(|h| h.distance(q) < CROP_GRAB) {
             Some(h) => Gesture::CropHandle { handle: h as u8, start: d.crop.geometry.rect, angle: d.crop.geometry.angle },
             None if inside(q) => Gesture::CropHandle { handle: 8, start: d.crop.geometry.rect, angle: d.crop.geometry.angle },
             None => {
@@ -1638,6 +1640,11 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
 
 /// The crop handles' names for screen readers, in `crop.drag`'s numbering: 0..3 corners, 4..7
 /// edges (top, right, bottom, left), 8 the whole box.
+/// How near (in points) a press must land to grab a crop handle, and a mask pin or handle: a
+/// fingertip on iPad is far less precise than a mouse pointer.
+const CROP_GRAB: f32 = if cfg!(target_os = "ios") { 22.0 } else { 12.0 };
+const MASK_GRAB: f32 = if cfg!(target_os = "ios") { 22.0 } else { 10.0 };
+
 const CROP_HANDLE_NAMES: [&str; 9] = [
     "Crop top-left corner",
     "Crop top-right corner",
@@ -2190,7 +2197,7 @@ fn mask_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
     let hit = |q: Pos2| {
         grips
             .iter()
-            .filter(|g| g.3.distance(q) < 10.0)
+            .filter(|g| g.3.distance(q) < MASK_GRAB)
             .min_by(|a, b| {
                 (Some(a.0) != active, a.3.distance(q)).partial_cmp(&(Some(b.0) != active, b.3.distance(q))).unwrap_or(std::cmp::Ordering::Equal)
             })
