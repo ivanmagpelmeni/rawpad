@@ -379,3 +379,12 @@ morning session, which had taken 45 and 46.
     toast). Closing the menu any other way leaves the photo unchanged. Chosen over "preview while
     the finger is down" because a long-press already opens this menu, and a tap must stay "apply".
     Checked by `tests_curve::a_presets_long_press_menu_previews_and_applies_it`.
+63. **2026-10-25: Version (snapshot) and History previews by long-press on iPad**, the same pattern
+    as presets (62). On iOS (and in unit tests) while a version's long-press menu is open the loupe
+    shows that version, and its first item, *Restore*, now has an id
+    (`versionMenu:restore:<i>`). A History step's long-press menu previews the photo as it was at
+    that step and starts with *Restore* (`historyMenu:restore:<i>`, same as a tap on the step). No
+    preview for the version or step the photo is already at. LightCraft's "snapshots" are
+    *Versions* (right strip), so "snapshot preview" in PROGRESS meant this panel. Checked by
+    `tests_curve::a_versions_long_press_menu_previews_and_restores_it` and
+    `tests_curve::a_history_steps_long_press_menu_previews_and_goes_back_to_it`.

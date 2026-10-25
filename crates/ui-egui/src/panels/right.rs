@@ -1325,7 +1325,15 @@ fn versions(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
             }
             resp.on_hover_text(crate::i18n::tr(if current { "The photo has these settings" } else { "Click to restore · double-click to rename" }))
                 .context_menu(|ui| {
-                    if ui.button(crate::i18n::tr("Restore")).clicked() {
+                    // iPad: no hover, so while a version's long-press menu is open the loupe shows
+                    // it, as resting the pointer on it does on the Mac (DECISIONS.md 63)
+                    if (cfg!(target_os = "ios") || cfg!(test)) && !current {
+                        app.hover_preview =
+                            Some(crate::HoverPreview { label: crate::i18n::tr_format!("Version: {}", v.name), settings: (*v.settings).clone() });
+                    }
+                    let restore = ui.button(crate::i18n::tr("Restore"));
+                    register(ui.ctx(), format!("versionMenu:restore:{i}"), restore.rect);
+                    if restore.clicked() {
                         let _ = app.run("version.restore", json!({"index": i}));
                     }
                     if ui.button(crate::i18n::tr("Update with Current Settings")).clicked() {
@@ -1414,6 +1422,21 @@ fn activity(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
                 let _ = app.run("history.restore", json!({"index": i}));
             }
             resp.context_menu(|ui| {
+                // iPad: while a step's long-press menu is open the loupe shows the photo as it was
+                // at that step, and the first item goes back to it (DECISIONS.md 63)
+                if (cfg!(target_os = "ios") || cfg!(test)) && row != HistoryRow::Current {
+                    app.hover_preview = Some(crate::HoverPreview {
+                        label: crate::i18n::history_label(&h.label, &app.session.presets),
+                        settings: (*h.settings).clone(),
+                    });
+                    let back = ui.button(crate::i18n::tr("Restore"));
+                    register(ui.ctx(), format!("historyMenu:restore:{i}"), back.rect);
+                    if back.clicked() {
+                        let _ = app.run("history.restore", json!({"index": i}));
+                        ui.close();
+                    }
+                    ui.separator();
+                }
                 if ui.button(crate::i18n::tr("Copy History Step Settings to Before")).clicked() {
                     let _ = app.run("beforeAfter.setBefore", json!({"source": "history", "index": i}));
                 }
