@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.53",
+          "buildVersion": "53",
+          "date": "2026-10-25T21:07:20Z",
+          "localizedDescription": "RawPad 1.53 (build 53, 675afbd): P4: handoff links main run 53 and branch run 52",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.53/RawPad.ipa",
+          "size": 19848310,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.47",
           "buildVersion": "47",
           "date": "2026-10-25T19:10:37Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.16/RawPad.ipa",
           "size": 19785629,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.14",
-          "buildVersion": "14",
-          "date": "2026-10-18T18:39:48Z",
-          "localizedDescription": "RawPad 1.14 (build 14, 533f7e6): P5: handoff: run 14 tour passed",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.14/RawPad.ipa",
-          "size": 19780972,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.47",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.47/RawPad.ipa",
-      "size": 19850097,
-      "versionDate": "2026-10-25T19:10:37Z",
-      "versionDescription": "RawPad 1.47 (build 47, 96b182e): P4: handoff links main run 47"
+      "version": "1.53",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.53/RawPad.ipa",
+      "size": 19848310,
+      "versionDate": "2026-10-25T21:07:20Z",
+      "versionDescription": "RawPad 1.53 (build 53, 675afbd): P4: handoff links main run 53 and branch run 52"
     }
   ],
   "news": []
