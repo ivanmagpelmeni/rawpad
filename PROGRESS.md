@@ -252,7 +252,7 @@ and tell Claude what you see:**
    should not move.
 5. Things only the real iPad can show: Pencil strokes, pinch-zoom with fingers, press-and-hold
    menus.
-6. **New in the version after 1.44 (if HANDOFF.md says it was released):** in the Tone Curve,
+6. **New in the version after 1.44 (about 1.47; if AltStore lists it):** in the Tone Curve,
    drag a point with your finger (it should be easy to catch); press and hold a point for half a
    second → **Delete Point**. In Crop, there is now a **Done** button next to Reset. Crop corners
    and mask pins should be easier to grab.

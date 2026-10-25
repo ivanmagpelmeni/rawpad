@@ -19,7 +19,7 @@ end. The next session reads it **first**.
     https://github.com/ivanmagpelmeni/rawpad/actions/runs/40219287994): compile, clippy, unit
     tests and **tour green** (the tour's `button:cropDone` click succeeded). Its screenshots were
     **not looked at yet** (the report is published after the .ipa build, after this session).
-  - Merged into main (about 19:35) → the main run after it should release about 1.48.
+  - Merged into main (about 19:35): main run 47 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40221839828) started; it should release about 1.47.
 - **Very next step:**
   1. Check that main run: green and released? If red, fix or `git revert -m 1 <merge>`.
   2. Look at `09-crop-done-button.jpg` (Done button visible next to Reset) and
