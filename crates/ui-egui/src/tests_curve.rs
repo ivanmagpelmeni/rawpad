@@ -221,3 +221,29 @@ fn curve_points_from_an_agent_are_stored_in_order() {
     let c = pts(&develop(&h).curve.green);
     assert!(c[1].0 < c[2].0, "dragged up to its neighbour, not past it: {c:?}");
 }
+
+/// A finger can't land the precise double-click that deletes a curve point, so the curve's menu
+/// (right-click, a long-press on iPad) offers Delete Point for the inner point under the press,
+/// and leaves it out for an end point or empty space.
+#[test]
+fn the_curve_menu_deletes_the_point_under_the_press() {
+    let mut h = curve_open("master");
+    exec(&mut h, "develop.curve", json!({"channel": "master", "points": [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]]}));
+    h.step();
+    let has = |h: &Headless, id: &str| h.app.widgets.iter().any(|(w, _)| w == id);
+    // the middle point
+    let r = h.request("ui.clickWidget", json!({"id": "curve", "fx": 0.5, "fy": 0.5, "button": "right"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    click_widget(&mut h, "curveMenu:deletePoint", 1);
+    h.step();
+    assert_eq!(pts(&develop(&h).curve.master), vec![(0.0, 0.0), (1.0, 1.0)], "the middle point is gone");
+    // empty space: the menu has only the reset items
+    let r = h.request("ui.clickWidget", json!({"id": "curve", "fx": 0.3, "fy": 0.2, "button": "right"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    assert!(has(&h, "curveMenu:resetAll"), "the menu opens");
+    assert!(!has(&h, "curveMenu:deletePoint"), "no point under the press");
+}

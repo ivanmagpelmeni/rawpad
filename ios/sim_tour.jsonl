@@ -67,6 +67,13 @@
 {"shot":"08-side-by-side"}
 {"method":"ui.clickWidget","params":{"id":"icon:beforeAfter"},"expectOk":true}
 {"sleep":2}
+# crop by touch: the Crop panel's Done button (iPad only) applies the crop and goes back to Edit
+{"method":"engine.execute","params":{"command":"panel.crop"},"expectOk":true}
+{"sleep":6}
+{"shot":"09-crop-done-button"}
+{"method":"ui.clickWidget","params":{"id":"button:cropDone"},"expectOk":true}
+{"sleep":6}
+{"shot":"09-crop-applied"}
 # phase 4: pinch-zoom and pan in the loupe. ui.zoom is egui's pinch event; real fingers reach the
 # same code (detail.rs navigate_gesture) through egui's multi-touch input (zoom_delta/translation_delta)
 {"method":"engine.execute","params":{"command":"panel.edit"}}

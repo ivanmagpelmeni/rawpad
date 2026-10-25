@@ -967,7 +967,6 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
     let resp = ui.interact(r, egui::Id::new(("curve", &ch)), Sense::click_and_drag());
     crate::widgets::announce(&resp, crate::i18n::tr("Tone Curve"));
     register(ui.ctx(), "curve", r);
-    resp.context_menu(|ui| curve_reset_menu(app, ui, &ch));
     let p = ui.painter();
     p.rect_filled(r, 2.0, t.canvas);
     if let Some(hist) = preview_histogram(app, id) {
@@ -1009,6 +1008,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
             })
             .collect();
         p.add(egui::Shape::line(pts, Stroke::new(2.0, Color32::from_gray(220))));
+        resp.context_menu(|ui| curve_reset_menu(app, ui, &ch));
         curve_footer(app, ui, d);
         for c in ["curve.highlights", "curve.lights", "curve.darks", "curve.shadows"] {
             control(app, ui, d, c, true);
@@ -1045,7 +1045,38 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
     // the point being dragged (stored as `Option<usize>` so a stale value can be cleared)
     let mut dragging: Option<usize> = ui.data(|dd| dd.get_temp::<Option<usize>>(drag_id)).flatten();
     let nearest = |q: Pos2| pts.iter().enumerate().map(|(i, p)| (i, to_screen(p.x, p.y).distance(q))).min_by(|a, b| a.1.total_cmp(&b.1));
-    let hovered = resp.hover_pos().and_then(nearest).filter(|(_, dist)| *dist < 10.0).map(|(i, _)| i);
+    let hovered = resp.hover_pos().and_then(nearest).filter(|(_, dist)| *dist < CURVE_POINT_HIT).map(|(i, _)| i);
+    // the curve's menu (a right-click, or a long-press on iPad) offers Delete Point for the inner
+    // point under the press: a finger can't hit the double-click a mouse uses
+    let menu_id = egui::Id::new(("curve-menu-point", &ch));
+    // (iPad only; desktop keeps upstream's menu, and the unit tests see the iPad one)
+    if (cfg!(target_os = "ios") || cfg!(test)) && resp.secondary_clicked() {
+        let under = resp
+            .interact_pointer_pos()
+            .and_then(nearest)
+            .filter(|&(i, dist)| dist < CURVE_POINT_HIT && i != 0 && i + 1 != pts.len())
+            .and_then(|(i, _)| pts.get(i))
+            .map(|q| [q.x, q.y]);
+        ui.data_mut(|dd| dd.insert_temp(menu_id, under));
+    }
+    let menu_point: Option<[f64; 2]> = ui.data(|dd| dd.get_temp::<Option<[f64; 2]>>(menu_id)).flatten();
+    resp.context_menu(|ui| {
+        if let Some(q) = menu_point
+            && let Some(i) = pts.iter().position(|p| (p.x - q[0]).abs() < 1e-12 && (p.y - q[1]).abs() < 1e-12)
+            && i != 0
+            && i + 1 != pts.len()
+        {
+            let b = ui.button(crate::i18n::tr("Delete Point"));
+            register(ui.ctx(), "curveMenu:deletePoint", b.rect);
+            if b.clicked() {
+                let arr: Vec<[f64; 2]> = pts.iter().enumerate().filter(|(j, _)| *j != i).map(|(_, p)| [p.x, p.y]).collect();
+                let _ = app.run("develop.curve", json!({"channel": ch, "points": arr}));
+                ui.close();
+            }
+            ui.separator();
+        }
+        curve_reset_menu(app, ui, &ch);
+    });
     if dragging.is_some() {
         ui.ctx().set_cursor_icon(egui::CursorIcon::Grabbing);
     } else if hovered.is_some() {
@@ -1074,7 +1105,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
     if resp.double_clicked()
         && let Some(q) = resp.interact_pointer_pos()
         && let Some((i, dist)) = nearest(q)
-        && dist < 10.0
+        && dist < CURVE_POINT_HIT
         && i != 0
         && i != pts.len() - 1
     {
@@ -1087,7 +1118,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
         // pick the point under the press, not where the pointer is once the drag threshold passed
         let _ = app.run("develop.beginInteraction", json!({"label": "Tone Curve"}));
         match nearest(q) {
-            Some((i, dist)) if dist < 10.0 => dragging = Some(i),
+            Some((i, dist)) if dist < CURVE_POINT_HIT => dragging = Some(i),
             _ => {
                 let (x, y) = from_screen(q);
                 let mut v = pts.clone();
@@ -1130,7 +1161,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
         }
     } else if resp.clicked()
         && let Some(q) = resp.interact_pointer_pos()
-        && nearest(q).is_none_or(|(_, dist)| dist >= 10.0)
+        && nearest(q).is_none_or(|(_, dist)| dist >= CURVE_POINT_HIT)
     {
         let (x, y) = from_screen(q);
         let mut v = pts.clone();
@@ -1221,6 +1252,10 @@ fn curve_footer(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings)
 }
 
 /// Right-click menu of the curve graph.
+/// How near (in points) a press must land to grab a curve point: a fingertip on iPad is far
+/// less precise than a mouse pointer.
+const CURVE_POINT_HIT: f32 = if cfg!(target_os = "ios") { 22.0 } else { 10.0 };
+
 fn curve_reset_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, ch: &str) {
     let label = if ch == "parametric" {
         crate::i18n::tr("Reset Parametric Curve").to_string()

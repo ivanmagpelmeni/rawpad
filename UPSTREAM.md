@@ -2,6 +2,8 @@
 
 - **Last merged upstream commit:** `4f0b110bcbd2e350c6d97b47f1d824c2222295c4`, Release 0.9.1
   (2026-10-17). This is the fork point.
+- **Last checked:** 2026-10-25 (newest upstream tag still `v0.9.1`; `git ls-remote --tags
+  https://github.com/storytold/lightcraft` works from the sandbox when the releases API doesn't).
 - **Merge policy:** merge each upstream release tag, at most once a week (decided 2026-10-18). To
   merge:
   1. `git remote add upstream https://github.com/storytold/lightcraft` (once).
@@ -33,6 +35,9 @@
 | `crates/ui-egui/src/panels/bottombar.rs` (`show`, before the Before/After button; `before_after_menu`) | On iOS a chevron button right of Before/After opens a menu with every Before/After view (Split, Top/Bottom, Split Top/Bottom, Show Original); ids `icon:beforeAfterModes`, `beforeAfterMode:<key>` (CI tour) | Re-apply the `if cfg!(target_os = "ios")` block and the function |
 | `crates/ui-egui/src/widgets.rs` (`slider`, `touch_scrolls`) | On iOS a drag on a slider's track that sets off mostly vertically scrolls the panel and leaves the value alone | Re-apply the `else if touch_scrolls(…)` branch before the drag code, and the function |
 | `crates/ui-egui/src/panels/detail.rs` (`pins_live`) | On iOS the Tool Overlay's Auto mode always shows mask and spot pins (no hover on a touch screen) | Re-apply the `cfg!(target_os = "ios") ||` at the start |
+| `crates/ui-egui/src/panels/edit.rs` (`curve_editor`, `CURVE_POINT_HIT`) | On iOS a press within 22 pt (desktop 10) grabs a curve point; on iOS (and in unit tests) the curve's long-press menu starts with *Delete Point* for the inner point under the press (id `curveMenu:deletePoint`); the menu call moved below the points (and into the parametric branch) | Re-apply the constant, the `secondary_clicked` block and the two `context_menu` calls |
+| `crates/ui-egui/src/panels/detail.rs` (`CROP_GRAB`, `MASK_GRAB`, crop `drag_started`) | On iOS crop handles and mask pins/handles are grabbed within 22 pt (desktop 12 / 10), and a crop drag starts at `press_origin()` | Re-apply the two constants and the `press` line |
+| `crates/ui-egui/src/panels/right.rs` (`crop`, after *Reset*) | On iOS a *Done* button (`button:cropDone`) runs `tool.done` | Re-apply the `if cfg!(target_os = "ios")` button |
 
 ### Upstream files compiled into RawPad unchanged (`#[path]` in `apps/rawpad-ios/src/ios.rs`)
 
