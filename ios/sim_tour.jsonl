@@ -84,9 +84,8 @@
 {"shot":"10-select-several-menu"}
 {"method":"ui.clickWidget","params":{"id":"gridMenu:selectSeveral"},"expectOk":true}
 {"sleep":1}
-{"method":"ui.clickWidget","params":{"id":"thumb:2"},"expectOk":true}
-{"sleep":1}
-{"method":"ui.clickWidget","params":{"id":"thumb:3"},"expectOk":true}
+# two photos fully on screen other than photo 1 (run 49: thumb:2 sat above the screen, thumb:3 wasn't laid out)
+{"clickVisible":"thumb:","count":2,"exclude":["thumb:1"]}
 {"waitUntil":"selected","equals":3,"method":"engine.execute","params":{"command":"library.select","params":{"ids":[],"mode":"add"}},"timeout":10}
 {"shot":"10-select-several"}
 {"method":"ui.clickWidget","params":{"id":"thumb:1","button":"right"},"expectOk":true}
@@ -172,7 +171,9 @@
 {"checkFiles":"Documents/Logs","min":1}
 # Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome).
 # Soft: a timeout only warns, because the same code passed in runs 20, 21, 25 and hung in 22, 24, 26
-{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[3],"format":"jpeg","addToPhotos":true,"background":true}},"expectOk":true}
+# Not expectOk: with the share sheet over it the app sometimes draws no frame for 5 s and the control
+# server refuses the request (run 48, run 49); passed in runs 46 and 47
+{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[3],"format":"jpeg","addToPhotos":true,"background":true}}}
 {"waitUntil":"imports.imported","method":"engine.execute","params":{"command":"export.photosImports","params":{}},"timeout":180,"soft":true}
 {"method":"ui.inspect"}
 # (Help › Open Log Folder → share sheet was checked in runs 15/16; a second sheet can't open over this one)
