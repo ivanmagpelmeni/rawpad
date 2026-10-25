@@ -339,3 +339,16 @@ morning session, which had taken 45 and 46.
     compiled test too. Add more test module names to that step as more patches get tests.
 56. **2026-10-25: A Done button in the Crop panel on iPad** (`button:cropDone`, runs `tool.done`),
     next to Reset: the crop was applied only by a double-tap inside it or Return.
+57. **2026-10-25: The last small touch targets on iPad.** The radial mask's rotate knob sits 44 pt
+    (a fingertip) out from the right-edge handle on screen, along the mask's axis, and is drawn
+    with a 7 pt radius on a dark fill (desktop: 0.08 of the long side, 4 pt); the drag sets the
+    angle from the centre to the finger, so the distance doesn't change what it does. Rating stars
+    keep their drawn size (19–20 pt) but take a touch area of 36 pt tall plus the gaps between them
+    (`widgets::stars`). The targeted adjustment samples where the finger landed (`press_origin`).
+58. **2026-10-25: Picking several photos by touch = *Select Several* in the photo's long-press
+    menu** (grid, filmstrip, loupe), not a new bottom-bar button: it needs no space in an already
+    full bar and stays out of the way for one-photo work. While it is on, a tap adds a photo to the
+    selection or takes it out (as ⌘-click), and a long-press no longer replaces the selection; the
+    same menu says *Done Selecting* to turn it off. The flag is egui temp data
+    (`rawpad.selectSeveral`), so it resets at each launch. CI's tour turns it on and checks that two
+    taps make 3 selected. No on-screen indicator yet besides the highlighted cells.
