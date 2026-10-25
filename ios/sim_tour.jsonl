@@ -74,6 +74,28 @@
 {"method":"ui.clickWidget","params":{"id":"button:cropDone"},"expectOk":true}
 {"sleep":6}
 {"shot":"09-crop-applied"}
+# Select Several (the photo's long-press menu; a right-click is the same menu): then each tap
+# adds a photo to the selection, for Sync (DECISIONS.md 58). Turned off again afterwards.
+{"method":"engine.execute","params":{"command":"view.photoGrid"},"expectOk":true}
+{"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
+{"sleep":4}
+{"method":"ui.clickWidget","params":{"id":"thumb:1","button":"right"},"expectOk":true}
+{"sleep":2}
+{"shot":"10-select-several-menu"}
+{"method":"ui.clickWidget","params":{"id":"gridMenu:selectSeveral"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"thumb:2"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"thumb:3"},"expectOk":true}
+{"waitUntil":"selected","equals":3,"method":"engine.execute","params":{"command":"library.select","params":{"ids":[],"mode":"add"}},"timeout":10}
+{"shot":"10-select-several"}
+{"method":"ui.clickWidget","params":{"id":"thumb:1","button":"right"},"expectOk":true}
+{"sleep":2}
+{"method":"ui.clickWidget","params":{"id":"gridMenu:selectSeveral"},"expectOk":true}
+{"sleep":1}
+{"method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
+{"method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
+{"sleep":3}
 # phase 4: pinch-zoom and pan in the loupe. ui.zoom is egui's pinch event; real fingers reach the
 # same code (detail.rs navigate_gesture) through egui's multi-touch input (zoom_delta/translation_delta)
 {"method":"engine.execute","params":{"command":"panel.edit"}}
