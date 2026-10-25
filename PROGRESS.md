@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-10-25 (evening 5, 22:55–23:20 Berlin, unattended)**
+1. Main run 57 green, **released 1.57** (Select Several strip with Sync Settings and Done).
+2. Branch run 56 green; **merged `p4-reset-menu`** (long-press a slider's name → Reset); main's run 60 releases about 1.60.
+3. Sync Settings checked by a new app-level test (photo 2's exposure follows photo 1, toast says so); the missing toast in run 54's screenshot was timing (1.4 s toast), tour shot now 0.3 s after the tap.
+4. New: long-press a preset → the photo previews it while the menu is open, *Apply* at the top (DECISIONS 62); its test passed in run 59. Branch `p4-preset-preview`, run 61 going.
+5. Next: merge `p4-preset-preview` when run 61 is green, then snapshot preview by long-press.
+
 **2026-10-25 (evening 4, 21:55–22:40 Berlin, unattended)**
 1. Main run 53 green, **released 1.53** (radial knob, star touch area, Select Several, colour-wheel eye).
 2. Branch `p4-select-bar` run 52 green (strip + 3 selected, then strip gone; screenshots checked).
@@ -225,7 +232,7 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 47 green, released **1.47** (2026-10-25: touch grabs, curve Delete Point, Crop Done). Branches `p4-touch-2` and `p4-select-several` wait to be merged (HANDOFF.md). CI checks build, fmt,
+Main run 57 green, released **1.57** (2026-10-25: Select Several strip with Sync Settings); main's run 60 (slider name → Reset) releases about 1.60. Branch `p4-preset-preview` waits for run 61 (HANDOFF.md). CI checks build, fmt,
 unit tests, clippy, the simulator tour (sliders, radial and brush masks, pinch/pan, hardware keys
 with rating 5 and ⌘Z undo as hard checks, search box with on-screen keyboard and typing, caption
 field with keyboard, background export, Share button and sheet, Add to Apple Photos as a soft
@@ -233,11 +240,12 @@ check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p4-reset-menu`** (slider name long-press → Reset) once its branch run is green; see
-   HANDOFF.md.
-2. **Hover-only leftovers on iPad:** a long-press "Preview" for presets; snapshot preview.
-3. **Check the Sync Settings toast** (not visible in run 54's screenshot 1 s after the tap) and
-   add a tour check that a synced photo really changed (set exposure on photo 1 first).
+1. **Merge `p4-preset-preview`** (preset long-press preview + Apply, and the Sync Settings test)
+   once branch run 61 is green; see HANDOFF.md.
+2. **Snapshot preview by long-press** (same pattern as presets: the snapshot's menu previews it
+   in the loupe), then the History panel's hover preview.
+3. **Tour steps for the new long-press menus** (slider Reset, preset preview) so the screenshots
+   show them.
 
 Also queued:
 - Exercise the keyboard shrink in CI: focus a field low on the screen and expect `UI shrunk by`
@@ -272,6 +280,10 @@ and tell Claude what you see:**
 8. **New in the version after 1.53 (about 1.57, once AltStore lists it):** while Select Several is
    on, a strip under the grid title says "Tap photos to add or remove them" with **Sync Settings**
    (copies the edits of the photo you long-pressed first to the other picked photos) and **Done**.
+9. **New in the version after 1.57 (about 1.60):** in Develop, press and hold a slider's
+   **name** (e.g. "Exposure") → **Reset Exposure** puts that one slider back to zero.
+10. **Coming next (not out yet):** press and hold a preset in the Presets list: the photo shows
+   how the preset looks while the menu is open; **Apply** at the top of the menu applies it.
 6. **New in 1.47:** in the Tone Curve,
    drag a point with your finger (it should be easy to catch); press and hold a point for half a
    second → **Delete Point**. In Crop, there is now a **Done** button next to Reset. Crop corners
