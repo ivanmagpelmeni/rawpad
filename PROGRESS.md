@@ -65,9 +65,9 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
-**2026-10-25 (evening 5, 22:55–23:20 Berlin, unattended)**
+**2026-10-25 (evening 5, 22:55–23:40 Berlin, unattended)**
 1. Main run 57 green, **released 1.57** (Select Several strip with Sync Settings and Done).
-2. Branch run 56 green; **merged `p4-reset-menu`** (long-press a slider's name → Reset); main's run 60 releases about 1.60.
+2. Branch run 56 green; **merged `p4-reset-menu`** (long-press a slider's name → Reset); main's run 60 failed on a search-keyboard log check that passed on the same code before (flake?), re-run once.
 3. Sync Settings checked by a new app-level test (photo 2's exposure follows photo 1, toast says so); the missing toast in run 54's screenshot was timing (1.4 s toast), tour shot now 0.3 s after the tap.
 4. New: long-press a preset → the photo previews it while the menu is open, *Apply* at the top (DECISIONS 62); its test passed in run 59. Branch `p4-preset-preview`, run 61 going.
 5. Next: merge `p4-preset-preview` when run 61 is green, then snapshot preview by long-press.

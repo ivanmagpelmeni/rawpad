@@ -3,13 +3,19 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-10-25, about 23:20 Berlin, by the scheduled session (22:55–23:20 Berlin).
+- **Written:** 2026-10-25, about 23:38 Berlin, by the scheduled session (22:55–23:40 Berlin).
 - **Upstream:** not re-checked (not the first run of the night; the newest tag was `v0.9.1` at 20:35).
 - **Main:** run 57 green and **released 1.57** (Select Several strip + Sync Settings)
   (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40236028354). Then this session merged
   **`p4-reset-menu`** (branch run 56 green, `a_sliders_name_menu_resets_it ... ok`); main's
-  **run 60** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40238860698) was going at
-  handoff and should release about 1.60.
+  **run 60** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40238860698) **failed in the
+  tour** at `checkLog 'first responder for text field' present since search` (log since the mark
+  was empty). The code is identical to branch run 56's tree, which passed that step, and run 57
+  passed it too, so it looks like a flake (the log not yet written when checked): **its failed
+  job was re-run once at about 23:35 Berlin** (attempt 2). If attempt 2 fails the same way, it is
+  real or a flaky check: make the `checkLog` step wait/retry for the line (e.g. a few seconds of
+  polling in `ios/sim_test.py`) rather than reverting, since the reset-menu code doesn't touch
+  text fields.
 - **Done this session:**
   - Sync Settings toast (open problem from run 54): the toast lasts only 1.4 s (`TOAST_SECONDS`)
     and the tour waited 1 s plus the screenshot's own delay, so it was probably just gone. The
@@ -28,8 +34,8 @@ end. The next session reads it **first**.
     (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40239152026): its UI unit tests step
     **passed** (both new tests); the simulator tour was still going at handoff.
 - **Very next step:**
-  1. Check main's run 60 is green and released (`…/releases?per_page=2`). If red, fix or revert
-     `f0121c0` (the reset-menu merge) first.
+  1. Check main's run 60 **attempt 2** is green and released (`…/releases?per_page=2`). If red,
+     see the note under *Main* above; main must not stay red.
   2. Run 61: `runs/61/ui-tests.log` must show both new tests `ok` (13 passed); look at
      `runs/61/10-select-several-synced.jpg` for the "Sync Settings: 2 photos" toast at the bottom
      of the grid. If green, merge `origin/p4-preset-preview` into main with a merge commit (it
