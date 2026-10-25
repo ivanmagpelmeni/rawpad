@@ -290,3 +290,34 @@ fn the_select_several_strips_sync_copies_settings_to_the_other_photos() {
     let toast = h.app.ui.toast.clone().map(|t| t.0).unwrap_or_default();
     assert!(toast.starts_with("Sync Settings"), "the strip says what happened: {toast:?}");
 }
+
+/// iPad: a preset's long-press menu shows the preset's look in the loupe while it is open (there is
+/// no hover to rest on a preset) and its first item, Apply, applies it (DECISIONS.md 62).
+#[test]
+fn a_presets_long_press_menu_previews_and_applies_it() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.app.run("panel.presets", json!({})).expect("open the presets column");
+    h.step();
+    h.step();
+    let row = h.app.widgets.iter().map(|(id, _)| id.clone()).find(|id| id.starts_with("preset:")).expect("a preset row on screen");
+    let pid = row.trim_start_matches("preset:").to_string();
+    let undo = h.app.session.undo.len();
+    let r = h.request("ui.clickWidget", json!({"id": row, "button": "right"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    // the finger is gone (no hover left), the menu stays open
+    h.app.synthetic.push(egui::Event::PointerMoved(egui::pos2(5.0, 5.0)));
+    h.step();
+    h.step();
+    let preview = h.app.hover_preview.as_ref().map(|p| p.label.clone()).unwrap_or_default();
+    assert!(preview.starts_with("Preset"), "the loupe previews the preset while its menu is open: {preview:?}");
+    assert_eq!(h.app.session.undo.len(), undo, "previewing changes nothing");
+    click_widget(&mut h, &format!("presetMenu:apply:{pid}"), 1);
+    h.step();
+    let toast = h.app.ui.toast.clone().map(|t| t.0).unwrap_or_default();
+    assert!(toast.starts_with("Preset"), "Apply applied it: {toast:?}");
+}
