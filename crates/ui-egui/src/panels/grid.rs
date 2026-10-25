@@ -1044,8 +1044,9 @@ pub fn stack_badge(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, sid:
 
 /// iPad: whether *Select Several* (the photo's long-press menu) is on, where a tap adds a photo to
 /// the selection or takes it out, as a ⌘-click does on the Mac (no modifier keys on a touch screen).
+/// Also in this crate's tests, where only a test that sets the flag turns it on.
 pub(crate) fn touch_multi(ctx: &egui::Context) -> bool {
-    cfg!(target_os = "ios") && ctx.data(|d| d.get_temp::<bool>(egui::Id::new("rawpad.selectSeveral"))).unwrap_or(false)
+    (cfg!(target_os = "ios") || cfg!(test)) && ctx.data(|d| d.get_temp::<bool>(egui::Id::new("rawpad.selectSeveral"))).unwrap_or(false)
 }
 
 /// iPad: the strip under the grid's title while *Select Several* is on, so it's clear that taps

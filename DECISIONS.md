@@ -372,3 +372,10 @@ morning session, which had taken 45 and 46.
     a long-press menu is how iPad apps offer such actions. iOS only plus `cfg!(test)`, so the
     upstream unit test `tests_curve::a_sliders_name_menu_resets_it` checks it (in
     the `tests_curve` module, which CI already runs).
+62. **2026-10-25: Preset preview by long-press on iPad.** Resting the pointer on a preset previews
+    it in the loupe on the Mac; a finger can't hover. On iOS (and in unit tests) a preset's
+    long-press menu now shows the preset's look in the loupe for as long as the menu is open, and
+    its first item is *Apply* (`presetMenu:apply:<id>`, same as a tap: applies at 100 % with a
+    toast). Closing the menu any other way leaves the photo unchanged. Chosen over "preview while
+    the finger is down" because a long-press already opens this menu, and a tap must stay "apply".
+    Checked by `tests_curve::a_presets_long_press_menu_previews_and_applies_it`.
