@@ -25,7 +25,8 @@ end. The next session reads it **first**.
     `tests_curve::a_presets_long_press_menu_previews_and_applies_it` **passed** in run 59.
   - Runs 58/59 failed only because the sync test asked for view `"grid"` (the name is
     `"photoGrid"`); fixed in `cbfbac2`. **Run 61 on `p4-preset-preview`**
-    (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40239152026) was going at handoff.
+    (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40239152026): its UI unit tests step
+    **passed** (both new tests); the simulator tour was still going at handoff.
 - **Very next step:**
   1. Check main's run 60 is green and released (`…/releases?per_page=2`). If red, fix or revert
      `f0121c0` (the reset-menu merge) first.
