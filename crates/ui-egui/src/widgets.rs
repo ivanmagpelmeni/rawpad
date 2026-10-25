@@ -292,6 +292,19 @@ pub fn slider(ui: &mut Ui, spec: &ControlSpec, value: f64, enabled: bool, label_
     let label_resp = if enabled { label_resp.on_hover_text(reset_hint.as_str()) } else { label_resp };
     crate::widgets::announce(&label_resp, crate::i18n::tr_format!("Reset {name}", name = label_text.clone()));
     register(ui.ctx(), format!("sliderLabel:{}", spec.id), label_rect);
+    // RawPad (iPad): a finger can't hover for the hint, so a long-press on the name (a secondary
+    // click) opens a menu with "Reset <name>" (DECISIONS.md 61); the unit tests see it too
+    let mut menu_reset = false;
+    if (cfg!(target_os = "ios") || cfg!(test)) && enabled {
+        label_resp.context_menu(|ui| {
+            let b = ui.button(crate::i18n::tr_format!("Reset {name}", name = label_text.clone()));
+            register(ui.ctx(), format!("sliderMenu:reset:{}", spec.id), b.rect);
+            if b.clicked() {
+                menu_reset = true;
+                ui.close();
+            }
+        });
+    }
     register(ui.ctx(), format!("slider:{}", spec.id), track_rect);
     // the value: click it to type an exact one, drag it sideways to scrub (over the label, so it
     // takes the click)
@@ -410,7 +423,7 @@ pub fn slider(ui: &mut Ui, spec: &ControlSpec, value: f64, enabled: bool, label_
             typing = Some((text.clone(), frames, pressed));
             ui.data_mut(|m| m.insert_temp(typing_id, (text, frames, pressed)));
         }
-    } else if resp.double_clicked() || label_resp.double_clicked() {
+    } else if resp.double_clicked() || label_resp.double_clicked() || menu_reset {
         out.reset = true;
         out.value = Some(spec.default);
         v = spec.default;

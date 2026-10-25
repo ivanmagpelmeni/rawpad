@@ -366,3 +366,9 @@ morning session, which had taken 45 and 46.
     dialog can come later if Ivan asks). It is greyed out until two photos are selected; the toast
     says "Sync Settings: N photos" from messages every language already has (no new `tr_format!`
     message to translate 13 times).
+61. **2026-10-25: Reset a slider by long-press on its name** on iPad: the menu has one item,
+    *Reset <name>* (`sliderMenu:reset:<control>`), which does what a double-tap on the name or knob
+    does. The desktop's "double-click to reset it" tooltip needs hover, which a finger can't do, and
+    a long-press menu is how iPad apps offer such actions. iOS only plus `cfg!(test)`, so the
+    upstream unit test `tests_curve::a_sliders_name_menu_resets_it` checks it (in
+    the `tests_curve` module, which CI already runs).

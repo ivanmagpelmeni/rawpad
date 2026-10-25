@@ -247,3 +247,20 @@ fn the_curve_menu_deletes_the_point_under_the_press() {
     assert!(has(&h, "curveMenu:resetAll"), "the menu opens");
     assert!(!has(&h, "curveMenu:deletePoint"), "no point under the press");
 }
+
+/// RawPad (iPad): a long-press on a slider's name (a right-click here) opens a menu whose
+/// "Reset Exposure" resets that slider (DECISIONS.md 61). Lives here so CI's `tests_curve` step runs it.
+#[test]
+fn a_sliders_name_menu_resets_it() {
+    let mut h = curve_open("master");
+    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 1.25}));
+    h.step();
+    assert!((develop(&h).light.exposure - 1.25).abs() < 1e-9, "exposure set");
+    let r = h.request("ui.clickWidget", json!({"id": "sliderLabel:light.exposure", "button": "right"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    click_widget(&mut h, "sliderMenu:reset:light.exposure", 1);
+    h.step();
+    assert!(develop(&h).light.exposure.abs() < 1e-9, "exposure back to 0");
+}
