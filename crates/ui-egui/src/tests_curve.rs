@@ -273,7 +273,7 @@ fn the_select_several_strips_sync_copies_settings_to_the_other_photos() {
     let services = Services { png: None, ..Default::default() };
     let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
     let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
-    let r = h.request("ui.set", json!({"view": "grid"}), T);
+    let r = h.request("ui.set", json!({"view": "photoGrid"}), T);
     assert_eq!(r["ok"], true, "{r}");
     exec(&mut h, "library.select", json!({"ids": [1]}));
     exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 0.75}));
