@@ -395,3 +395,29 @@ fn a_history_steps_long_press_menu_previews_and_goes_back_to_it() {
     h.step();
     assert!((develop(&h).light.exposure - 0.5).abs() < 1e-9, "Restore went back to the step: {}", develop(&h).light.exposure);
 }
+
+/// iPad: with *Select Several* on, the loupe shows a pill above the filmstrip saying how many photos
+/// are picked, and its Done turns Select Several off (DECISIONS.md 64). Lives here so CI runs it.
+#[test]
+fn the_loupe_shows_select_several_above_the_filmstrip_and_done_ends_it() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    exec(&mut h, "library.select", json!({"ids": [1, 2], "active": 1}));
+    let r = h.request("ui.set", json!({"view": "detail"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    let has = |h: &Headless, id: &str| h.app.widgets.iter().any(|(w, _)| w == id);
+    assert!(has(&h, "filmstrip"), "the loupe has its filmstrip");
+    assert!(!has(&h, "filmSelectSeveral"), "no pill while Select Several is off");
+    h.view.ctx.data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), true));
+    h.step();
+    h.step();
+    assert!(has(&h, "filmSelectSeveral"), "the pill shows while Select Several is on");
+    click_widget(&mut h, "button:filmSelectSeveralDone", 1);
+    h.step();
+    h.step();
+    assert!(!crate::panels::grid::touch_multi(&h.view.ctx), "Done turned Select Several off");
+    assert!(!has(&h, "filmSelectSeveral"), "and the pill is gone");
+}
