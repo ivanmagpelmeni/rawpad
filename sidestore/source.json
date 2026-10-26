@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.70",
+          "buildVersion": "70",
+          "date": "2026-10-26T01:47:42Z",
+          "localizedDescription": "RawPad 1.70 (build 70, c5e24db): P4: handoff: run 69 found a keyboard flicker for low text fields (not merged)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.70/RawPad.ipa",
+          "size": 19860757,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.68",
           "buildVersion": "68",
           "date": "2026-10-26T01:14:31Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.38/RawPad.ipa",
           "size": 19827118,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.35",
-          "buildVersion": "35",
-          "date": "2026-10-19T00:59:08Z",
-          "localizedDescription": "RawPad 1.35 (build 35, 4e59383): P4: handoff: p4-uikit-keys merged, main run 35 running",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.35/RawPad.ipa",
-          "size": 19822623,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.68",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.68/RawPad.ipa",
-      "size": 19843017,
-      "versionDate": "2026-10-26T01:14:31Z",
-      "versionDescription": "RawPad 1.68 (build 68, d867e83): P4: handoff: p4-snapshot-preview merged after run 65"
+      "version": "1.70",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.70/RawPad.ipa",
+      "size": 19860757,
+      "versionDate": "2026-10-26T01:47:42Z",
+      "versionDescription": "RawPad 1.70 (build 70, c5e24db): P4: handoff: run 69 found a keyboard flicker for low text fields (not merged)"
     }
   ],
   "news": []
