@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.72",
+          "buildVersion": "72",
+          "date": "2026-10-26T03:10:25Z",
+          "localizedDescription": "RawPad 1.72 (build 72, d07fb2a): P4: low-field keyboard tour steps are hard checks (run 71: shot and log right)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.72/RawPad.ipa",
+          "size": 19859891,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.70",
           "buildVersion": "70",
           "date": "2026-10-26T01:47:42Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.40/RawPad.ipa",
           "size": 19827576,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.38",
-          "buildVersion": "38",
-          "date": "2026-10-19T01:45:09Z",
-          "localizedDescription": "RawPad 1.38 (build 38, 0e80da0): P4: handoff: main run 38 tour green",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.38/RawPad.ipa",
-          "size": 19827118,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.70",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.70/RawPad.ipa",
-      "size": 19860757,
-      "versionDate": "2026-10-26T01:47:42Z",
-      "versionDescription": "RawPad 1.70 (build 70, c5e24db): P4: handoff: run 69 found a keyboard flicker for low text fields (not merged)"
+      "version": "1.72",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.72/RawPad.ipa",
+      "size": 19859891,
+      "versionDate": "2026-10-26T03:10:25Z",
+      "versionDescription": "RawPad 1.72 (build 72, d07fb2a): P4: low-field keyboard tour steps are hard checks (run 71: shot and log right)"
     }
   ],
   "news": []
