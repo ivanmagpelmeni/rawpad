@@ -321,3 +321,77 @@ fn a_presets_long_press_menu_previews_and_applies_it() {
     let toast = h.app.ui.toast.clone().map(|t| t.0).unwrap_or_default();
     assert!(toast.starts_with("Preset"), "Apply applied it: {toast:?}");
 }
+
+/// Opens the long-press (right-click) menu of the first on-screen widget whose id starts with
+/// `prefix`, then lifts the finger off it (no hover left) and returns the widget's id.
+fn long_press_first(h: &mut Headless, prefix: &str) -> String {
+    let row = h.app.widgets.iter().map(|(id, _)| id.clone()).find(|id| id.starts_with(prefix)).unwrap_or_else(|| panic!("a {prefix} row on screen"));
+    let r = h.request("ui.clickWidget", json!({"id": row, "button": "right"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.app.synthetic.push(egui::Event::PointerMoved(egui::pos2(5.0, 5.0)));
+    h.step();
+    h.step();
+    row
+}
+
+/// iPad: a version's (snapshot's) long-press menu shows it in the loupe while it is open, and its
+/// first item restores it (DECISIONS.md 63).
+#[test]
+fn a_versions_long_press_menu_previews_and_restores_it() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 0.5}));
+    exec(&mut h, "version.create", json!({"name": "Half"}));
+    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 1.0}));
+    h.app.ui.right = crate::state::RightPanel::Versions;
+    h.step();
+    h.step();
+    let row = long_press_first(&mut h, "version:");
+    let i = row.trim_start_matches("version:").to_string();
+    let preview = h.app.hover_preview.clone().map(|p| (p.label, p.settings.light.exposure));
+    let (label, exposure) = preview.unwrap_or_default();
+    assert!(label.starts_with("Version"), "the loupe previews the version while its menu is open: {label:?}");
+    assert!((exposure - 0.5).abs() < 1e-9, "with the version's settings: {exposure}");
+    assert!((develop(&h).light.exposure - 1.0).abs() < 1e-9, "previewing changes nothing");
+    click_widget(&mut h, &format!("versionMenu:restore:{i}"), 1);
+    h.step();
+    assert!((develop(&h).light.exposure - 0.5).abs() < 1e-9, "Restore restored it: {}", develop(&h).light.exposure);
+}
+
+/// iPad: a History step's long-press menu shows the photo as it was at that step, and its first
+/// item goes back to it (DECISIONS.md 63).
+#[test]
+fn a_history_steps_long_press_menu_previews_and_goes_back_to_it() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 0.5}));
+    // another control in between, so the two exposure steps can't merge into one
+    exec(&mut h, "develop.set", json!({"control": "light.contrast", "value": 10.0}));
+    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 1.0}));
+    h.app.ui.right = crate::state::RightPanel::Activity;
+    h.step();
+    h.step();
+    let id = h.app.session.active().expect("active photo");
+    let steps: Vec<f64> = h.app.session.catalog.photo(id).map(|p| p.history.iter().map(|s| s.settings.light.exposure).collect()).unwrap_or_default();
+    let i = steps.iter().position(|e| (e - 0.5).abs() < 1e-9).unwrap_or_else(|| panic!("a step at exposure 0.5: {steps:?}"));
+    let row = format!("history:{i}");
+    let r = h.request("ui.clickWidget", json!({"id": row, "button": "right"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.app.synthetic.push(egui::Event::PointerMoved(egui::pos2(5.0, 5.0)));
+    h.step();
+    h.step();
+    let exposure = h.app.hover_preview.as_ref().map(|p| p.settings.light.exposure);
+    assert_eq!(exposure, Some(0.5), "the loupe previews the step while its menu is open");
+    assert!((develop(&h).light.exposure - 1.0).abs() < 1e-9, "previewing changes nothing");
+    click_widget(&mut h, &format!("historyMenu:restore:{i}"), 1);
+    h.step();
+    assert!((develop(&h).light.exposure - 0.5).abs() < 1e-9, "Restore went back to the step: {}", develop(&h).light.exposure);
+}
