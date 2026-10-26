@@ -1,0 +1,49 @@
+[1m[92m   Compiling[0m lightcraft-geom v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/geom)
+[1m[92m   Compiling[0m lightcraft-tiff v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/tiff)
+[1m[92m   Compiling[0m lightcraft-inpaint v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/inpaint)
+[1m[92m   Compiling[0m lightcraft-color v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/color)
+[1m[92m   Compiling[0m lightcraft-raster v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/raster)
+[1m[92m   Compiling[0m lightcraft-meta v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/meta)
+[1m[92m   Compiling[0m lightcraft-develop v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/develop)
+[1m[92m   Compiling[0m lightcraft-codecs v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/codecs)
+[1m[92m   Compiling[0m lightcraft-raw v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/raw)
+[1m[92m   Compiling[0m lightcraft-denoise-core v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/denoise-core)
+[1m[92m   Compiling[0m lightcraft-pipeline v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/pipeline)
+[1m[92m   Compiling[0m lightcraft-scenes v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/scenes)
+[1m[92m   Compiling[0m lightcraft-faces v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/faces)
+[1m[92m   Compiling[0m lightcraft-engine v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/engine)
+[1m[33mwarning[0m: lightcraft-engine@0.9.1: no craft-fonts embedded: Chinese and Japanese text will render as empty boxes. Clone https://github.com/storytold/craft-fonts next to this repo and rebuild with CRAFT_FONTS_DIR=../craft-fonts
+[1m[92m   Compiling[0m lightcraft-preview v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/preview)
+[1m[92m   Compiling[0m lightcraft-fetch v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/fetch)
+[1m[92m   Compiling[0m lightcraft-gpu v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/gpu)
+[1m[92m   Compiling[0m lightcraft-merge v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/merge)
+[1m[92m   Compiling[0m lightcraft-catalog v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/catalog)
+[1m[92m   Compiling[0m lightcraft-ui-egui v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/ui-egui)
+[1m[92m   Compiling[0m lightcraft-lensdb v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/lensdb)
+[1m[92m   Compiling[0m lightcraft-slideshow v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/slideshow)
+[1m[92m   Compiling[0m lightcraft-geocode v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/geocode)
+[1m[92m   Compiling[0m lightcraft-denoise v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/denoise)
+[1m[92m   Compiling[0m lightcraft-testkit v0.9.1 (/Users/runner/work/rawpad/rawpad/crates/testkit)
+[1m[92m    Finished[0m `test` profile [optimized + debuginfo] target(s) in 5m 06s
+[1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/lightcraft_ui_egui-3bda27fd7da6767b)
+
+running 16 tests
+test tests_curve::a_history_steps_long_press_menu_previews_and_goes_back_to_it ... ok
+test tests_curve::a_presets_long_press_menu_previews_and_applies_it ... ok
+test tests_curve::a_sliders_name_menu_resets_it ... ok
+test tests_curve::a_versions_long_press_menu_previews_and_restores_it ... ok
+test tests_curve::double_clicking_a_channel_resets_only_that_channel ... ok
+test tests_curve::alt_dragging_a_point_moves_it_a_tenth_as_far ... ok
+test tests_curve::curve_points_from_an_agent_are_stored_in_order ... ok
+test tests_curve::dragging_a_point_moves_it_in_both_axes_with_one_undo_step ... ok
+test tests_curve::point_curve_preset_dropdown_applies_and_saves ... ok
+test tests_curve::dragging_a_point_between_close_neighbours_does_not_panic ... ok
+test tests_curve::reset_button_resets_every_curve ... ok
+test tests_curve::targeted_adjustment_announces_itself_and_esc_turns_it_off ... ok
+test tests_curve::the_loupe_shows_select_several_above_the_filmstrip_and_done_ends_it ... ok
+test tests_curve::the_select_several_strips_sync_copies_settings_to_the_other_photos ... ok
+test tests_curve::the_curve_menu_deletes_the_point_under_the_press ... ok
+test tests_curve::dragging_a_point_past_its_neighbour_is_clamped ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 1100 filtered out; finished in 6.16s
+

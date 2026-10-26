@@ -1,0 +1,415 @@
+2026-10-26T01:13:50.244Z INFO  [main] rawpad::ios: log file /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/7D222292-BBA9-4708-B47B-52D01FB1E849/Documents/Logs/lightcraft.log
+2026-10-26T01:13:50.246Z INFO  [main] rawpad::ios: RawPad 0.9.1 starting
+2026-10-26T01:13:50.766Z WARN  [main] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-10-26T01:13:50.768Z WARN  [main] wgpu_core::instance: DownlevelCapabilities {
+    flags: DownlevelFlags(
+        COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+    ),
+    limits: DownlevelLimits,
+    shader_model: Sm5,
+}
+2026-10-26T01:13:54.223Z INFO  [main] rawpad::ios: library /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/7D222292-BBA9-4708-B47B-52D01FB1E849/Library/Application Support/RawPad Library: 24 photos (0 log records replayed)
+2026-10-26T01:13:54.226Z INFO  [main] rawpad::ios::control_server: control server listening on 127.0.0.1:7980
+2026-10-26T01:13:54.247Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T01:13:54.252Z INFO  [main] rawpad::ios: safe area (points): top 0 left 0 bottom 25 right 0
+2026-10-26T01:13:54.278Z WARN  [main] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-10-26T01:13:54.278Z WARN  [main] wgpu_core::instance: DownlevelCapabilities {
+    flags: DownlevelFlags(
+        COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+    ),
+    limits: DownlevelLimits,
+    shader_model: Sm5,
+}
+2026-10-26T01:13:55.570Z INFO  [main] lightcraft_gpu::ctx: gpu: Apple iOS simulator GPU (Metal), buffers ≤ 256 MiB
+2026-10-26T01:18:23.770Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x5D flags 0x200000 "5" down
+2026-10-26T01:18:23.775Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x5D flags 0x200000 "5" up
+2026-10-26T01:18:27.115Z INFO  [main] rawpad::native: keyboard (UIKit): key 0xE3 flags 0x100000 "" down
+2026-10-26T01:18:27.255Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x1D flags 0x100000 "z" down
+2026-10-26T01:18:27.263Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x1D flags 0x100000 "z" up
+2026-10-26T01:18:27.264Z INFO  [main] rawpad::native: keyboard (UIKit): key 0xE3 flags 0x100000 "" up
+2026-10-26T01:18:41.010Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-10-26T01:18:41.572Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 0 pt
+2026-10-26T01:18:48.669Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T01:18:48.730Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 0 pt, UI shrunk by 0 pt
+2026-10-26T01:18:52.148Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-10-26T01:18:52.409Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 0 pt
+2026-10-26T01:19:05.675Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T01:19:05.819Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 0 pt, UI shrunk by 0 pt
+2026-10-26T01:19:07.843Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-10-26T01:19:07.930Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:08.007Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 257 pt
+2026-10-26T01:19:08.043Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T01:19:08.210Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:08.267Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-10-26T01:19:08.314Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T01:19:08.496Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:08.583Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-10-26T01:19:08.637Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T01:19:08.829Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:08.830Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((986.084625ms, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:08.968Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:08.968Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((1.124216917s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:09.074Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:09.074Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((1.230164s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:09.202Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:09.202Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((1.358859208s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:09.334Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:09.334Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((1.490966917s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:09.496Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:09.496Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((1.652915833s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:09.646Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:09.646Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((1.802998708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:09.796Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:09.796Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((1.95291975s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:09.963Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:09.963Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((2.119575125s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:10.113Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:10.113Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((2.269437167s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:10.258Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:10.258Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((2.414179125s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:10.401Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:10.401Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((2.557667542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:10.537Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:10.537Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((2.693456625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:10.663Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:10.663Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((2.819522583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:10.818Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:10.818Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((2.974877625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:10.963Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:10.963Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((3.119345083s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:11.096Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:11.097Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((3.253209417s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:11.246Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:11.246Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((3.402764292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:11.381Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:11.381Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((3.537916333s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:11.530Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:11.530Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((3.686334917s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:11.713Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:11.713Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((3.869366542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:11.847Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:11.847Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((4.003500375s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:12.013Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:12.013Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((4.169362333s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:12.179Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:12.180Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((4.336125708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:12.307Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:12.307Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((4.463804917s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:12.452Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:12.452Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((4.608522792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:12.596Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:12.596Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((4.752835292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:12.698Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:12.698Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((4.854201875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:12.881Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:12.881Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((5.03714225s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:13.046Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:13.046Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((5.202975917s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:13.147Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:13.147Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((5.303784958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:13.314Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:13.314Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((5.47022775s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:13.466Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:13.466Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((5.622627208s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:13.631Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:13.631Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((5.787177292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:13.786Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:13.786Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((5.942101792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:13.941Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:13.941Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((6.097390542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:14.163Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:14.163Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((6.3197615s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:14.313Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:14.313Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((6.469461s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:14.516Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:14.516Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((6.672439833s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:14.681Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:14.681Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((6.837338542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:14.847Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:14.847Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((7.003204292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:14.954Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:14.954Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((7.110277083s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:15.113Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:15.113Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((7.269895792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:15.263Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:15.263Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((7.419617625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:15.396Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:15.396Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((7.552949708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:15.496Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:15.496Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((7.652981833s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:15.647Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:15.647Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((7.803098208s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:15.796Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:15.796Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((7.952649167s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:15.871Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:15.871Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((8.027254708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.013Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.013Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((8.169440625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.123Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.123Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((8.279930667s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.246Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.246Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((8.402996625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.380Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.380Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((8.536406875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.502Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.502Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((8.658822292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.647Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.647Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((8.803391542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.763Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.763Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((8.919316208s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.847Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.847Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((9.003668583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:16.965Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:16.965Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((9.121157625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:17.117Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:17.117Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((9.2734955s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:17.242Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:17.243Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((9.399110333s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:17.363Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:17.363Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((9.519729167s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:17.496Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:17.497Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((9.653096125s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:17.647Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:17.647Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((9.803134625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:17.763Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:17.763Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((9.919468375s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:17.863Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:17.863Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((10.019619375s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:17.997Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:17.997Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((10.153467s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:18.124Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:18.124Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((10.2810135s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:18.251Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:18.251Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((10.407858583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:18.380Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:18.380Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((10.536651958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:18.530Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:18.530Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((10.686135083s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:18.646Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:18.647Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((10.803125625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:18.763Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:18.763Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((10.919648583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:18.897Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:18.897Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((11.053157708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:19.029Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:19.029Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((11.186006542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:19.163Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:19.163Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((11.319360667s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:19.297Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:19.297Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((11.453578458s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:19.413Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:19.413Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((11.569560125s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:19.546Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:19.546Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((11.702825292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:19.622Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:19.622Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((11.778971292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:19.735Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:19.735Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((11.891816792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:19.880Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:19.880Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((12.036237708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:20.018Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:20.018Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((12.174708708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:20.107Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:20.107Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((12.263113042s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:20.254Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:20.254Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((12.410979417s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:20.396Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:20.396Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((12.552668458s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:20.513Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:20.513Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((12.669989667s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:20.634Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:20.634Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((12.790990792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:20.766Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:20.767Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((12.923077167s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:20.913Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:20.913Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((13.06941025s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.001Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.001Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((13.157683583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.110Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.110Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((13.266794333s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.255Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.255Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((13.411564167s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.382Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.382Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((13.538732875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.529Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.530Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((13.686054083s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.663Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.663Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((13.819881417s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.764Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.764Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((13.920149875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.896Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.897Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.05322875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:21.980Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:21.980Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.136285417s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:22.079Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:22.080Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.23603475s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:22.167Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:22.167Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.323507667s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:22.313Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:22.313Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.469777583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:22.446Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:22.446Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.602912958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:22.567Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:22.567Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.723302625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:22.713Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:22.714Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.87010575s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:22.830Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:22.830Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((14.986273875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:22.922Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:22.922Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.07834425s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.013Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.013Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.169575292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.129Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.130Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.286021s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.213Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.213Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.3699785s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.346Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.346Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.502782833s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.430Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.430Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.586232s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.529Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.529Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.685998583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.646Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.646Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.802811375s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.746Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.746Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((15.902818042s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.846Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.846Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.002736792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:23.929Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:23.929Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.086012958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:24.046Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:24.046Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.202898542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:24.180Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:24.180Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.336854458s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:24.315Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:24.316Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.4721085s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:24.446Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:24.446Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.602765042s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:24.566Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:24.566Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.722330542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:24.702Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:24.702Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.858124542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:24.813Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:24.813Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((16.969306542s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:24.906Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:24.906Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((17.062726958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:25.033Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:25.033Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((17.189766625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:25.152Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:25.152Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((17.30836525s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:25.279Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:25.279Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((17.436012917s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:25.387Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:25.387Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((17.543147917s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:25.497Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:25.497Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((17.653821417s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:25.618Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:25.618Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((17.774609917s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:25.746Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:25.746Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((17.902913292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:25.881Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:25.881Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.037633583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.013Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.013Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.169475625s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.130Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.130Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.286334875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.210Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.210Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.366884167s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.335Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.335Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.491699375s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.480Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.480Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.636146667s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.590Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.590Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.746246292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.696Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.697Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.85313275s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.813Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.813Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((18.969543125s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.906Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.906Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((19.062893375s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:26.996Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:26.996Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((19.15264475s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:27.130Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:27.130Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((19.286345333s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:27.268Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:27.269Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((19.425020458s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:27.414Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:27.417Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((19.570325792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:27.552Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:27.552Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((19.708783833s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:27.663Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:27.663Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((19.819400125s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:27.796Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:27.796Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((19.95283225s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:27.916Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:27.916Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((20.072536s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:28.039Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:28.039Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((20.195974792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:28.196Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:28.196Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((20.352719958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:28.330Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:28.330Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((20.486531292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:28.446Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:28.446Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((20.602650125s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:28.546Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:28.546Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((20.702704292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:28.666Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:28.666Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((20.822881833s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:28.788Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:28.788Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((20.944730375s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:29.047Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:29.048Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((21.2040425s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:29.156Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:29.156Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((21.312627583s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:29.275Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:29.275Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((21.431862458s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:29.403Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:29.403Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((21.559227708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:29.529Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:29.530Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((21.686065792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:29.663Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:29.663Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((21.81933275s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:29.796Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:29.797Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((21.953342958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:29.930Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:29.930Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((22.086297292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:30.080Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:30.080Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((22.236547208s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:30.230Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:30.230Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((22.386315167s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:30.380Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:30.380Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((22.536349708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:30.516Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:30.516Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((22.672531958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:30.667Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:30.667Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((22.823328125s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:30.824Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:30.824Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((22.980231958s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:30.946Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:30.946Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((23.102665667s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:31.063Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:31.063Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((23.219568875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:31.213Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:31.214Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((23.370023708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:31.330Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:31.330Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((23.486469708s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:31.463Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:31.463Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((23.619845792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:31.607Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:31.607Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((23.763788875s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:31.746Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:31.746Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((23.90288825s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:31.880Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:31.880Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((24.036694042s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:32.022Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(986.0625), keyboard top 898)
+2026-10-26T01:19:32.022Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((24.178359792s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:32.105Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 0 pt, UI shrunk by 0 pt
+2026-10-26T01:19:32.105Z INFO  [main] rawpad::ios: keyboard: text field Some([[528.5 966.3] - [750.5 986.1]]) focused without a tap on it (last tap Some((24.261077292s, [639.5 976.2]))): on-screen keyboard stays down
+2026-10-26T01:19:40.786Z WARN  [main] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-26T01:20:16.157Z WARN  [export] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-26T01:20:28.478Z INFO  [main] rawpad::native: share sheet for /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/7D222292-BBA9-4708-B47B-52D01FB1E849/Documents/Exports/LC01214.jpg
+2026-10-26T01:20:51.165Z WARN  [export] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-26T01:21:10.299Z INFO  [export] rawpad::native: photos: saving /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/7D222292-BBA9-4708-B47B-52D01FB1E849/Documents/Exports/LC01221.jpg (permission status 3)
+2026-10-26T01:31:15.311Z WARN  [export] rawpad::native: photos: no answer for /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/7D222292-BBA9-4708-B47B-52D01FB1E849/Documents/Exports/LC01221.jpg after 604.999999416s

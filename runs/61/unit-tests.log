@@ -1,0 +1,65 @@
+[1m[92m    Updating[0m crates.io index
+[1m[92m     Locking[0m 28 packages to highest Rust 1.95 compatible versions
+[1m[92m      Adding[0m displaydoc v0.2.7
+[1m[92m      Adding[0m form_urlencoded v1.2.2
+[1m[92m      Adding[0m icu_collections v2.3.0 [1m[33m(available: v2.4.0)[0m
+[1m[92m      Adding[0m icu_locale_core v2.3.0 [1m[33m(available: v2.4.0)[0m
+[1m[92m      Adding[0m icu_normalizer v2.3.0 [1m[33m(available: v2.4.0)[0m
+[1m[92m      Adding[0m icu_normalizer_data v2.3.0 [1m[33m(available: v2.4.0)[0m
+[1m[92m      Adding[0m icu_properties v2.3.0 [1m[33m(available: v2.4.0)[0m
+[1m[92m      Adding[0m icu_properties_data v2.3.0 [1m[33m(available: v2.4.0)[0m
+[1m[92m      Adding[0m icu_provider v2.3.1 [1m[33m(available: v2.4.0)[0m
+[1m[92m      Adding[0m idna v1.1.0
+[1m[92m      Adding[0m idna_adapter v1.2.2
+[1m[92m      Adding[0m litemap v0.8.3
+[1m[92m      Adding[0m objc2-cloud-kit v0.3.2
+[1m[92m      Adding[0m objc2-core-data v0.3.2
+[1m[92m      Adding[0m objc2-core-image v0.3.2
+[1m[92m      Adding[0m objc2-core-location v0.3.2
+[1m[92m      Adding[0m objc2-core-text v0.3.2
+[1m[92m      Adding[0m objc2-uniform-type-identifiers v0.3.2
+[1m[92m      Adding[0m objc2-user-notifications v0.3.2
+[1m[92m      Adding[0m potential_utf v0.1.6
+[1m[92m      Adding[0m tinystr v0.8.4 [1m[33m(available: v0.8.5)[0m
+[1m[92m      Adding[0m url v2.5.8
+[1m[92m      Adding[0m utf8_iter v1.0.4
+[1m[92m      Adding[0m webbrowser v1.2.5
+[1m[92m      Adding[0m writeable v0.6.4
+[1m[92m      Adding[0m zerotrie v0.2.5
+[1m[92m      Adding[0m zerovec v0.11.8 [1m[33m(available: v0.11.9)[0m
+[1m[92m      Adding[0m zerovec-derive v0.11.7
+[1m[92m   Compiling[0m rawpad-ios v0.9.1 (/Users/runner/work/rawpad/rawpad/apps/rawpad-ios)
+[1m[92m    Finished[0m `test` profile [optimized + debuginfo] target(s) in 10.27s
+[1m[92m     Running[0m unittests src/main.rs (target/debug/deps/rawpad-f0bd46d8d2098410)
+
+running 27 tests
+test keyboard::tests::covered_field_shrinks_and_stays_shrunk_after_it_moves_up ... ok
+test keyboard::tests::another_field_is_decided_afresh ... ok
+test keyboard::tests::field_above_the_keyboard_keeps_the_layout ... ok
+test keyboard::tests::keyboard_growing_during_its_animation_is_caught ... ok
+test keyboard::tests::no_keyboard_or_no_focus_means_no_inset ... ok
+test keyboard::tests::unknown_position_or_bad_numbers_are_safe ... ok
+test keys::tests::a_tap_a_few_slow_frames_back_still_counts ... ok
+test keys::tests::ctrl_alone_is_not_command ... ok
+test keys::tests::logo_key_is_command ... ok
+test keys::tests::released_command_does_not_stick ... ok
+test keys::tests::soft_keyboard_only_for_a_tapped_text_field ... ok
+test keys::tests::soft_keyboard_text_and_return ... ok
+test keys::tests::taps_are_presses_and_touch_starts_or_ends ... ok
+test keys::tests::uikit_command_z_is_undo_shortcut ... ok
+test keys::tests::uikit_hid_table ... ok
+test keys::tests::uikit_plain_letter_types_text ... ok
+test share_offer::tests::a_new_result_offers_its_files_for_a_while ... ok
+test share_offer::tests::labels_follow_the_language_and_count ... ok
+test share_offer::tests::written_files_only ... ok
+test touch::tests::drag_releases_the_press_before_the_move ... ok
+test touch::tests::mouse_presses_are_not_held ... ok
+test touch::tests::pencil_press_goes_through_at_once_and_never_long_presses ... ok
+test touch::tests::second_finger_cancels_the_long_press ... ok
+test touch::tests::still_finger_becomes_secondary_click_and_release_is_dropped ... ok
+test touch::tests::tap_passes_through_as_press_and_release ... ok
+test touch::tests::two_finger_tap_is_undo_and_three_is_redo ... ok
+test share_offer::tests::tapping_share_hands_over_the_files_once ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

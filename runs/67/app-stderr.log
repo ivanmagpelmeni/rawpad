@@ -1,0 +1,45 @@
+2026-10-26T00:23:35.103Z INFO  [main] rawpad::ios: log file /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/E81BF92A-0758-4F3D-B571-01DC7E4FC88C/Documents/Logs/lightcraft.log
+2026-10-26T00:23:35.106Z INFO  [main] rawpad::ios: RawPad 0.9.1 starting
+2026-10-26T00:23:35.797Z WARN  [main] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-10-26T00:23:35.800Z WARN  [main] wgpu_core::instance: DownlevelCapabilities {
+    flags: DownlevelFlags(
+        COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+    ),
+    limits: DownlevelLimits,
+    shader_model: Sm5,
+}
+2026-10-26T00:23:38.122Z INFO  [main] rawpad::ios: library /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/E81BF92A-0758-4F3D-B571-01DC7E4FC88C/Library/Application Support/RawPad Library: 24 photos (0 log records replayed)
+2026-10-26T00:23:38.125Z INFO  [main] rawpad::ios::control_server: control server listening on 127.0.0.1:7980
+2026-10-26T00:23:38.151Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T00:23:38.159Z INFO  [main] rawpad::ios: safe area (points): top 0 left 0 bottom 25 right 0
+2026-10-26T00:23:38.192Z WARN  [main] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-10-26T00:23:38.192Z WARN  [main] wgpu_core::instance: DownlevelCapabilities {
+    flags: DownlevelFlags(
+        COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+    ),
+    limits: DownlevelLimits,
+    shader_model: Sm5,
+}
+2026-10-26T00:23:39.514Z INFO  [main] lightcraft_gpu::ctx: gpu: Apple iOS simulator GPU (Metal), buffers ≤ 256 MiB
+2026-10-26T00:28:05.297Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x5D flags 0x200000 "5" down
+2026-10-26T00:28:05.307Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x5D flags 0x200000 "5" up
+2026-10-26T00:28:08.188Z INFO  [main] rawpad::native: keyboard (UIKit): key 0xE3 flags 0x100000 "" down
+2026-10-26T00:28:08.509Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x1D flags 0x100000 "z" down
+2026-10-26T00:28:08.518Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x1D flags 0x100000 "z" up
+2026-10-26T00:28:08.520Z INFO  [main] rawpad::native: keyboard (UIKit): key 0xE3 flags 0x100000 "" up
+2026-10-26T00:28:28.732Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-10-26T00:28:28.783Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 0 pt
+2026-10-26T00:29:00.291Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T00:29:00.419Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 0 pt, UI shrunk by 0 pt
+2026-10-26T00:29:03.467Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-10-26T00:29:03.683Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 0 pt
+2026-10-26T00:29:12.093Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-10-26T00:29:12.117Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 0 pt, UI shrunk by 0 pt
+2026-10-26T00:29:14.162Z WARN  [main] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-26T00:29:40.494Z WARN  [export] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-26T00:29:51.105Z INFO  [main] rawpad::native: share sheet for /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/E81BF92A-0758-4F3D-B571-01DC7E4FC88C/Documents/Exports/LC01214.jpg
+2026-10-26T00:30:12.323Z WARN  [export] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-10-26T00:30:38.506Z INFO  [export] rawpad::native: photos: saving /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/E81BF92A-0758-4F3D-B571-01DC7E4FC88C/Documents/Exports/LC01221.jpg (permission status 3)
+2026-10-26T00:40:43.522Z WARN  [export] rawpad::native: photos: no answer for /Users/runner/Library/Developer/CoreSimulator/Devices/7222C0FB-7BCD-457A-AD32-76C948D2602F/data/Containers/Data/Application/E81BF92A-0758-4F3D-B571-01DC7E4FC88C/Documents/Exports/LC01221.jpg after 604.999999791s
