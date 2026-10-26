@@ -69,8 +69,8 @@ Classic setup steps and source fix.
 1. Main run 64 green: **released 1.64** (long-press a preset → preview + Apply).
 2. Tour fix on `p4-snapshot-preview`: `panel.edit` toggled the Edit panel shut, so the slider long-press found no slider; the tour now opens it with `ui.set` and the long-press steps are hard checks (DECISIONS 65). Branch run 65's tour passed.
 3. New branch `p4-film-select`: while Select Several is on, the loupe shows a pill above the filmstrip ("Select Several: 2 photos" + Done), with a unit test and tour shot `10-select-several-loupe` (DECISIONS 64). Run 66 failed to compile (new translation message); fixed, run 67 going.
-4. Not merged yet: `p4-snapshot-preview` (run 65) and `p4-film-select` (run 67) wait for their screenshots (HANDOFF.md).
-5. Next: check both runs' screenshots, merge them one at a time, then the keyboard-shrink CI check.
+4. Run 65 green and its screenshots right: **merged `p4-snapshot-preview`** (version / History preview by long-press); main's run releases about 1.68. `p4-film-select` (run 67) still waits.
+5. Next: check main's run, merge `p4-film-select` after its screenshot, then the keyboard-shrink CI check.
 
 **2026-10-25/26 (night 1, 23:55–00:40 Berlin, unattended)**
 1. Main run 60's re-run was green: **released 1.60** (long-press a slider's name → Reset). The first attempt's log-check failure was a flake; the tour's `checkLog` now waits up to 5 s.
@@ -256,8 +256,7 @@ check, the long-press menus), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p4-snapshot-preview`** (run 65) once its `11-*` screenshots look right: the slider
-   menu shows *Reset Exposure*, the version shot shows *Bright* over the reset photo.
+1. **Check main's run** for the `p4-snapshot-preview` merge is green and released (about 1.68).
 2. **Merge `p4-film-select`** (run 67, or a re-run) once green and `10-select-several-loupe`
    shows the pill above the filmstrip. Then find out why the Sync Settings toast isn't in the
    tour's `10-select-several-synced` shot.
@@ -302,7 +301,7 @@ and tell Claude what you see:**
    preset in the Presets list: the photo shows how the preset looks while the menu is open;
    **Apply** at the top of the menu applies it. Tapping anywhere else closes the menu and leaves
    the photo as it was.
-11. **Coming next (not out yet):** in the **Versions** panel (right-hand strip) and the
+11. **New in the version after 1.64 (about 1.68, once AltStore lists it):** in the **Versions** panel (right-hand strip) and the
    **History** panel, press and hold a row: the photo shows that version or step while the menu
    is open; **Restore** at the top goes back to it. Also: with Select Several on, the Develop
    view shows "Select Several: N photos" with a **Done** button just above the filmstrip.

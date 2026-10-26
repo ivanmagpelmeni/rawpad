@@ -6,8 +6,8 @@ end. The next session reads it **first**.
 - **Written:** 2026-10-26, about 01:35 Berlin, by the scheduled session (00:55–01:40 Berlin).
 - **Upstream:** not re-checked (not the first run of the night).
 - **Main:** `99ba506`, **green, released 1.64** (run 64,
-  https://github.com/ivanmagpelmeni/rawpad/actions/runs/40243221933). Nothing merged into main
-  this session (only these docs).
+  https://github.com/ivanmagpelmeni/rawpad/actions/runs/40243221933). At the very end of this
+  session `p4-snapshot-preview` was merged (step 1 below).
 - **Done this session:**
   - Branch **`p4-snapshot-preview`** (`8a0e78f` + merge of main `565b1de`): the tour's slider
     long-press step opened nothing because `panel.edit` **toggles** and the Edit panel was already
@@ -28,11 +28,10 @@ end. The next session reads it **first**.
     messages`. **Branch run 67** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40247973429)
     was going at handoff.
 - **Very next step:**
-  1. Run 65: open `runs/65/11-slider-menu.jpg` (menu with *Reset Exposure* next to the Exposure
-     slider), `11-version-preview.jpg` (*Bright* previewed over the reset photo),
-     `11-history-preview.jpg`, `11-preset-preview.jpg`. If good, merge `origin/p4-snapshot-preview`
-     into main with a merge commit and push (fetch first: CI pushes `SideStore source` commits).
-     If the tour failed, read `runs/65/tour.log`.
+  1. **Done at 01:40:** run 65 green; its `11-slider-menu` (Reset Exposure menu) and
+     `11-version-preview` ("Version: Bright" over the reset photo) shots look right, so
+     `p4-snapshot-preview` was **merged into main**; main's run for that merge releases about
+     1.68. Check it is green (if red, fix or revert the merge).
   2. Run 67: if green and `10-select-several-loupe.jpg` shows the pill above the filmstrip, merge
      `origin/p4-film-select` into main **after main's run for step 1 is done** (pushing code to main
      while a main run goes cancels its release). If the pill's unit test failed, read
