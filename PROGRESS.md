@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-10-26 (night 3, 01:55–02:40 Berlin, unattended)**
+1. Main run 68 green: **released 1.68** (long-press a version or History step → preview + Restore).
+2. Run 67 green and its shot shows the loupe's "Select Several: 3 photos | Done" pill: **merged `p4-film-select`**; main's run releases about 1.70.
+3. New branch `p4-keyboard-check` (DECISIONS 66): the tour taps a field low enough for the keyboard to cover it and expects the new log line "lifting the UI above the on-screen keyboard" (soft until seen); the Sync toast lasts 3 s so the tour shot can catch it.
+4. Branch run 69 was in the tour at handoff.
+5. Next: check main's run and run 69's `04-low-field-keyboard` shot, make the steps hard, merge.
+
 **2026-10-26 (night 2, 00:55–01:40 Berlin, unattended)**
 1. Main run 64 green: **released 1.64** (long-press a preset → preview + Apply).
 2. Tour fix on `p4-snapshot-preview`: `panel.edit` toggled the Edit panel shut, so the slider long-press found no slider; the tour now opens it with `ui.set` and the long-press steps are hard checks (DECISIONS 65). Branch run 65's tour passed.
@@ -246,27 +253,24 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 64 green, released **1.64** (2026-10-25: long-press a preset → preview + Apply). Branch
-`p4-snapshot-preview` (version and History preview by long-press, tour fix) is in run 65; branch
-`p4-film-select` (Select Several pill in the loupe) is in run 67 (HANDOFF.md). CI checks build, fmt,
-unit tests, clippy, the simulator tour (sliders, radial and brush masks, pinch/pan, hardware keys
-with rating 5 and ⌘Z undo as hard checks, search box with on-screen keyboard and typing, caption
-field with keyboard, background export, Share button and sheet, Add to Apple Photos as a soft
-check, the long-press menus), the export file and the log file.
+Main run 68 green, released **1.68** (2026-10-26: version and History preview by long-press).
+`p4-film-select` (Select Several pill in the loupe) merged into main at about 02:20 Berlin; its run
+releases about 1.70. Branch `p4-keyboard-check` (keyboard-shrink check, 3 s Sync toast) is in run
+69 (HANDOFF.md). CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and
+brush masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
+on-screen keyboard and typing, caption field with keyboard, background export, Share button and
+sheet, Add to Apple Photos as a soft check, the long-press menus), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check main's run** for the `p4-snapshot-preview` merge is green and released (about 1.68).
-2. **Merge `p4-film-select`** (run 67, or a re-run) once green and `10-select-several-loupe`
-   shows the pill above the filmstrip. Then find out why the Sync Settings toast isn't in the
-   tour's `10-select-several-synced` shot.
-3. **Exercise the keyboard shrink in CI** (below), then rotation / Split View in the tour.
+1. **Check main's run** for the `p4-film-select` merge is green and released (about 1.70).
+2. **Finish `p4-keyboard-check`:** run 69's `04-low-field-keyboard` shot shows the UI above the
+   keyboard and `10-select-several-synced` shows the toast → make the two steps hard, merge.
+3. **Rotation and Split View / Stage Manager resizing in the tour** (`simctl` can't rotate: try
+   the Simulator menu via osascript on the CI Mac).
 
 Also queued:
-- Exercise the keyboard shrink in CI: focus a field low on the screen and expect `UI shrunk by`
-  > 0 in `app-stderr.log`; check the measured keyboard height (257 pt logged vs. the screenshot).
-- Rotation and Split View / Stage Manager resizing in the tour (`simctl` can't rotate: try the
-  Simulator menu via osascript on the CI Mac).
+- Check the measured keyboard height (257 pt logged vs. the screenshot).
 - A 24 MP raw memory test in the simulator (CC0 ARW/RW2 from `cargo xtask corpus`).
 - Delete merged branches (no tool for it from the sandbox).
 
@@ -301,10 +305,11 @@ and tell Claude what you see:**
    preset in the Presets list: the photo shows how the preset looks while the menu is open;
    **Apply** at the top of the menu applies it. Tapping anywhere else closes the menu and leaves
    the photo as it was.
-11. **New in the version after 1.64 (about 1.68, once AltStore lists it):** in the **Versions** panel (right-hand strip) and the
+11. **New in 1.68 (AltStore should list it now):** in the **Versions** panel (right-hand strip) and the
    **History** panel, press and hold a row: the photo shows that version or step while the menu
    is open; **Restore** at the top goes back to it. Also: with Select Several on, the Develop
-   view shows "Select Several: N photos" with a **Done** button just above the filmstrip.
+   view shows "Select Several: N photos" with a **Done** button just above the filmstrip
+   (that part arrives in the version after 1.68, about 1.70).
 6. **New in 1.47:** in the Tone Curve,
    drag a point with your finger (it should be easy to catch); press and hold a point for half a
    second → **Delete Point**. In Crop, there is now a **Done** button next to Reset. Crop corners
