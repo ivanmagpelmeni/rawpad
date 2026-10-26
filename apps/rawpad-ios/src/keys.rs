@@ -200,6 +200,26 @@ pub fn soft_keyboard(was_up: bool, field: Option<egui::Rect>, tap: Option<(std::
     })
 }
 
+/// The text box the on-screen keyboard is up for, as `(egui id, rect)`.
+///
+/// egui reports the box being edited (`ime`) only while it is drawn. Right after the UI lifts
+/// above the keyboard, the focused box can lie below its shrunk panel's view for a few frames:
+/// no `ime`, so the keyboard dropped, the UI grew back, the box was drawn and the keyboard came
+/// back, every 150 ms (CI run 69, DECISIONS 67). So while the keyboard is up (`was_up`) and egui
+/// still focuses the same box, the last known box is kept.
+pub fn hold_field(
+    ime: Option<egui::Rect>,
+    focused: Option<egui::Id>,
+    was_up: bool,
+    last: Option<(egui::Id, egui::Rect)>,
+) -> Option<(egui::Id, egui::Rect)> {
+    match (ime, focused) {
+        (Some(rect), Some(id)) => Some((id, rect)),
+        (None, Some(id)) if was_up => last.filter(|(held, _)| *held == id),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -217,6 +237,24 @@ mod tests {
         let bs = soft_backspace();
         assert!(matches!(&bs[0], Event::Key { key: Key::Backspace, pressed: true, .. }));
         assert_eq!(bs.len(), 2);
+    }
+
+    #[test]
+    fn a_focused_field_out_of_view_keeps_the_keyboard() {
+        let id = egui::Id::new("location");
+        let rect = egui::Rect::from_min_size(egui::pos2(900.0, 960.0), egui::vec2(200.0, 26.0));
+        // drawn: held as it is
+        let held = hold_field(Some(rect), Some(id), false, None);
+        assert_eq!(held, Some((id, rect)));
+        // scrolled out of view after the UI lifted (CI run 69): still focused, keyboard up → kept
+        let kept = hold_field(None, Some(id), true, held);
+        assert_eq!(kept, held);
+        assert!(soft_keyboard(true, kept.map(|(_, r)| r), None), "the keyboard stays up");
+        // the keyboard was down: nothing to hold (a slider's focus never raises it)
+        assert_eq!(hold_field(None, Some(id), false, held), None);
+        // the focus moved on or ended: the keyboard goes down
+        assert_eq!(hold_field(None, Some(egui::Id::new("slider")), true, held), None);
+        assert_eq!(hold_field(None, None, true, held), None);
     }
 
     #[test]

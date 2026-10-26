@@ -68,6 +68,20 @@ pub fn id(widget: &str) -> egui::Id {
     egui::Id::new("lc-text-field").with(widget)
 }
 
+/// Temp-data key (a `bool` under `egui::Id::new(KEEP_IN_VIEW)`) the RawPad iPad host sets for a
+/// moment after it lifts the UI above the on-screen keyboard: the focused field then scrolls
+/// itself back into its panel's view, since the shrunk panel may end above it (CI run 69,
+/// DECISIONS 67). Never set on the desktop.
+pub const KEEP_IN_VIEW: &str = "rawpad-keep-focused-field-in-view";
+
+/// Scrolls a focused text box into view while the host asks for it ([`KEEP_IN_VIEW`]).
+pub fn keep_in_view(ui: &Ui, response: &Response) {
+    let wanted = ui.ctx().data(|d| d.get_temp::<bool>(egui::Id::new(KEEP_IN_VIEW))).unwrap_or(false);
+    if wanted && ui.memory(|m| m.has_focus(response.id)) && !ui.clip_rect().contains_rect(response.rect) {
+        response.scroll_to_me(None);
+    }
+}
+
 /// Whether the field had an unfinished edit on the immediately preceding egui pass.
 pub(crate) fn was_editing(ctx: &egui::Context, widget: &str) -> bool {
     let pass = ctx.cumulative_pass_nr();
@@ -224,6 +238,7 @@ impl<'a> TextField<'a> {
         let right = ui.input(|i| i.pointer.button_down(egui::PointerButton::Secondary) || i.pointer.button_released(egui::PointerButton::Secondary));
         let selection = egui::text_edit::TextEditState::load(ui.ctx(), id).and_then(|s| s.cursor.char_range());
         let mut response = ui.add(edit);
+        keep_in_view(ui, &response);
         // screen readers: the field by its caption, even once it holds text (egui names it by
         // nothing but its contents)
         if let Some(name) = name.filter(|n| !n.trim().is_empty()) {

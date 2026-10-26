@@ -400,3 +400,23 @@ morning session, which had taken 45 and 46.
 65. **2026-10-26: Tour opens panels with `ui.set`, not `panel.*`,** when it can't know whether the
     panel is already open: `panel.edit` and friends toggle, so in run 63 it closed the Edit panel and
     the slider long-press step found no slider. The long-press tour steps are hard checks now.
+66. **2026-10-26: The tour checks that the keyboard lifts the UI; the Sync toast lasts 3 s.**
+    Run 67 only ever focused fields above the keyboard (search, caption), so the shrink was never
+    exercised in CI ("UI shrunk by 0 pt"). The tour now taps a field fully on screen below the
+    keyboard's top (Info panel, top 905 to bottom 1150 pt) and expects the new log line "keyboard:
+    lifting the UI above the on-screen keyboard"; the keyboard line is logged again whenever the
+    shrink changes, not only the height. Both steps are soft until the screenshot
+    `04-low-field-keyboard` is checked. The grid strip's "Sync Settings: N photos" toast stays 3 s
+    instead of 1.4 s: it reports on photos that may be off screen, and no tour shot (runs 54-67)
+    ever caught the shorter one.
+67. **2026-10-26: A focused field out of view keeps the keyboard, and scrolls back into view.**
+    Run 69: tapping Location in the Info panel lifted the UI, the field then lay below its shrunk
+    panel, egui (which reports the box being edited only while it is drawn) reported none, so the
+    keyboard dropped, the UI grew back and the keyboard came back, every 150 ms. Two fixes, both
+    small: (1) the host keeps the keyboard up while egui still focuses the same text box
+    (`keys::hold_field`, unit test `a_focused_field_out_of_view_keeps_the_keyboard`), logging
+    "keyboard: focused text field out of view, on-screen keyboard kept up" once; (2) for 30 frames
+    after the lift the host sets `text_field::KEEP_IN_VIEW` and a focused `TextField` (and the
+    Info panel's GPS box) not fully inside its view calls `scroll_to_me` (upstream patch; the flag
+    is never set on the desktop, so only the iPad scrolls). Only for a moment after the lift, so it
+    never fights the user scrolling the panel while typing.

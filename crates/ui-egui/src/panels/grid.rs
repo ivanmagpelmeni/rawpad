@@ -1076,7 +1076,8 @@ fn select_several_bar(app: &mut LightcraftApp, ui: &mut egui::Ui) {
                 let n = v.get("changed").and_then(serde_json::Value::as_u64).unwrap_or(0);
                 // "Sync Settings: 2 photos" from messages every language already has
                 let photos = crate::i18n::tr_format!("{n} photo{}", if n == 1 { "" } else { "s" }, n = n);
-                app.toast(ui.ctx(), format!("{}: {photos}", crate::i18n::tr("Sync Settings")));
+                // 3 s: it reports on photos that may be off screen (DECISIONS.md 66)
+                app.toast_for(ui.ctx(), format!("{}: {photos}", crate::i18n::tr("Sync Settings")), 3.0);
             }
             Err(e) => app.toast(ui.ctx(), e),
         }

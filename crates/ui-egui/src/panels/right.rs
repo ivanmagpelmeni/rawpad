@@ -748,6 +748,7 @@ fn info(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
         let mut text: String = ui.data(|d| d.get_temp(gid)).unwrap_or_else(|| gps.clone());
         let r = ui.add(egui::TextEdit::singleline(&mut text).hint_text(crate::i18n::tr("latitude, longitude")).desired_width(f32::INFINITY));
         crate::widgets::screen_reader_name(ui.ctx(), r.id, "GPS");
+        crate::text_field::keep_in_view(ui, &r);
         register(ui.ctx(), "field:gps", r.rect);
         if r.has_focus() {
             ui.data_mut(|d| d.insert_temp(gid, text.clone()));
