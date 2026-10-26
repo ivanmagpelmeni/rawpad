@@ -2707,7 +2707,10 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
 fn select_several_pill(app: &LightcraftApp, ctx: &egui::Context, strip: Rect) {
     let t = Tokens::get(ctx);
     let n = app.session.selection.ids.len();
-    let text = crate::i18n::tr_format!("{n} selected", n = n);
+    // "Select Several: 2 photos" from messages every language already has (tr_format! takes only
+    // messages listed in the translations)
+    let photos = crate::i18n::tr_format!("{n} photo{}", if n == 1 { "" } else { "s" }, n = n);
+    let text = format!("{}: {photos}", crate::i18n::tr("Select Several"));
     egui::Area::new(egui::Id::new("film-select-several"))
         .order(egui::Order::Foreground)
         .fixed_pos(pos2(strip.left() + 12.0, strip.top() - 52.0))
