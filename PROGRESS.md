@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-10-26 (night 4, 02:54–03:40 Berlin, unattended, last run of the night)**
+1. Main run 70 green: **released 1.70** (the loupe shows "Select Several: N photos | Done" above the filmstrip).
+2. Fixed run 69's keyboard flicker: a text box low on the screen (Info panel › Location) kept making the keyboard drop and come back. The keyboard now stays up while the box is being edited, and the box scrolls back into view (DECISIONS 67).
+3. Branch run 71 green (build, unit tests incl. a new one, clippy, whole simulator tour); **merged `p4-keyboard-check`** into main; main's run releases about 1.72.
+4. Not checked yet: run 71's screenshot of the low box with the keyboard (the report wasn't published in time). Next session looks at it first.
+5. Next: check main's run and that screenshot, make the low-field tour steps hard, then rotation / Split View in the tour.
+
 **2026-10-26 (night 3, 01:55–02:40 Berlin, unattended)**
 1. Main run 68 green: **released 1.68** (long-press a version or History step → preview + Restore).
 2. Run 67 green and its shot shows the loupe's "Select Several: 3 photos | Done" pill: **merged `p4-film-select`**; main's run releases about 1.70.
@@ -253,29 +260,58 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 68 green, released **1.68** (2026-10-26: version and History preview by long-press).
-`p4-film-select` (Select Several pill in the loupe) merged into main at about 02:20 Berlin; its run
-releases about 1.70. Branch `p4-keyboard-check` (keyboard-shrink check, 3 s Sync toast) is in run
-69 (HANDOFF.md). CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and
-brush masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
-on-screen keyboard and typing, caption field with keyboard, background export, Share button and
-sheet, Add to Apple Photos as a soft check, the long-press menus), the export file and the log file.
+Main run 70 green, released **1.70** (2026-10-26: Select Several pill in the loupe). Main's run for
+the `p4-keyboard-check` merge (low text box: no keyboard flicker, DECISIONS 67) releases about
+**1.72**. CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
+masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
+on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
+Sync, the long-press menus, background export, Share button and sheet, Add to Apple Photos as a
+soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check main's run** for the `p4-film-select` merge is green and released (about 1.70).
-2. **Fix the keyboard flicker for low fields** on `p4-keyboard-check` (HANDOFF.md: run 69 shows the
-   UI shrinking and the keyboard dropping in a loop for the Info panel's Location field), then make
-   the tour steps hard and merge.
-3. **Rotation and Split View / Stage Manager resizing in the tour** (`simctl` can't rotate: try
+1. **Check run 71's / main's `04-low-field-keyboard` shot** (keyboard up, Location box visible
+   above it, "lifting the UI" logged once), then make those tour steps hard (HANDOFF.md).
+2. **Rotation and Split View / Stage Manager resizing in the tour** (`simctl` can't rotate: try
    the Simulator menu via osascript on the CI Mac).
+3. **A 24 MP raw memory test in the simulator** (CC0 ARW/RW2 from `cargo xtask corpus`).
 
 Also queued:
 - Check the measured keyboard height (257 pt logged vs. the screenshot).
-- A 24 MP raw memory test in the simulator (CC0 ARW/RW2 from `cargo xtask corpus`).
 - Delete merged branches (no tool for it from the sandbox).
 
 ## Needs Ivan
+
+### This week: what to test on the iPad (start here)
+
+First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
+**My Apps** › **Update** next to RawPad (pick the newest: 1.70, or 1.72 once it shows up). Then try
+these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
+
+1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several
+   sliders, tap the photo. The keyboard must **not** appear. Then tap **Search Photos** at the
+   top: now it should appear. Tap the photo: it should go away.
+2. **Before/After split** (your other note): in Develop, tap the small **⌄** right of the
+   Before/After button (bottom right). Try **Split**, **Top/Bottom**, **Split Top/Bottom**,
+   **Show Original**. Does each one show before and after? If not, say what you see.
+3. **A box low on the screen (new in 1.72):** open a photo, tap the **ⓘ** (Info) button, tap
+   **Location**. The keyboard should come up **once and stay**, with the Location box visible
+   above it (in 1.70 it may flicker). Type a word, then tap the photo.
+4. **Pick several photos:** in the grid, press and hold a photo › **Select Several**, tap two
+   more photos, then **Sync Settings** in the strip under the title: do the other photos get the
+   first photo's edits? Open a photo while it's on: the strip above the filmstrip should say
+   "Select Several: 3 photos" with **Done**.
+5. **Press and hold** (half a second): a slider's **name** → *Reset*; a **preset** → the photo
+   previews it, *Apply*; a row in **Versions** or **History** → the photo previews it, *Restore*.
+6. **Undo with fingers:** after a slider change, tap the photo with **two fingers** at once:
+   undone. **Three fingers**: redone.
+7. **Pencil and fingers:** paint a brush mask with the Pencil; pinch to zoom; scroll the Edit
+   panel with a finger starting on a slider (the slider should not move).
+
+If anything crashes or freezes: Files › On My iPad › RawPad › Logs › press and hold
+**lightcraft.log** › Share, and send it to Claude in chat.
+
+### Older notes
 
 **Re-test after the next update (1.47 is out now; AltStore should list it), in this order,
 and tell Claude what you see:**
