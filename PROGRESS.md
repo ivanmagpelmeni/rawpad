@@ -69,8 +69,8 @@ Classic setup steps and source fix.
 1. Main run 68 green: **released 1.68** (long-press a version or History step → preview + Restore).
 2. Run 67 green and its shot shows the loupe's "Select Several: 3 photos | Done" pill: **merged `p4-film-select`**; main's run releases about 1.70.
 3. New branch `p4-keyboard-check` (DECISIONS 66): the tour taps a field low enough for the keyboard to cover it and expects the new log line "lifting the UI above the on-screen keyboard" (soft until seen); the Sync toast lasts 3 s so the tour shot can catch it.
-4. Branch run 69 was in the tour at handoff.
-5. Next: check main's run and run 69's `04-low-field-keyboard` shot, make the steps hard, merge.
+4. Branch run 69 failed and **found a real bug**: a text field low on the screen makes the keyboard flicker (the UI lifts, the keyboard drops, again every 150 ms). Not merged; cause and fix ideas in HANDOFF.md.
+5. Next: check main's run 70, fix the flicker on `p4-keyboard-check`, then merge.
 
 **2026-10-26 (night 2, 00:55–01:40 Berlin, unattended)**
 1. Main run 64 green: **released 1.64** (long-press a preset → preview + Apply).
@@ -264,8 +264,9 @@ sheet, Add to Apple Photos as a soft check, the long-press menus), the export fi
 ## Next 3 tasks
 
 1. **Check main's run** for the `p4-film-select` merge is green and released (about 1.70).
-2. **Finish `p4-keyboard-check`:** run 69's `04-low-field-keyboard` shot shows the UI above the
-   keyboard and `10-select-several-synced` shows the toast → make the two steps hard, merge.
+2. **Fix the keyboard flicker for low fields** on `p4-keyboard-check` (HANDOFF.md: run 69 shows the
+   UI shrinking and the keyboard dropping in a loop for the Info panel's Location field), then make
+   the tour steps hard and merge.
 3. **Rotation and Split View / Stage Manager resizing in the tour** (`simctl` can't rotate: try
    the Simulator menu via osascript on the CI Mac).
 

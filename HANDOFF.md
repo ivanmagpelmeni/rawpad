@@ -3,7 +3,7 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-10-26, about 02:25 Berlin, by the scheduled session (01:55–02:40 Berlin).
+- **Written:** 2026-10-26, about 02:38 Berlin, by the scheduled session (01:55–02:40 Berlin).
 - **Upstream:** not re-checked (not the first run of the night).
 - **Main:** run 68 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40250402919) green,
   **released 1.68** (version / History preview by long-press). Then this session **merged
@@ -21,17 +21,31 @@ end. The next session reads it **first**.
       1150 pt (below the keyboard's top, about 903 pt; likely Location / City in the Info panel),
       shot `04-low-field-keyboard`, soft `checkLog` for the new line.
     - `panels/grid.rs`: the strip's "Sync Settings: N photos" toast lasts 3 s; tour sleeps 0.5 s.
-    - **Branch run 69** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40251879852) was in
-      the tour at handoff; report in `ci-artifacts` `runs/69/` about 10 minutes after.
+    - **Branch run 69** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40251879852)
+      **failed** (do not merge the branch yet). Report in `ci-artifacts` `runs/69/`.
+- **Run 69 found a real keyboard-avoidance bug (likely on the iPad too):** tapping
+  `field:location` (bottom 986 pt, keyboard top 898 pt) makes the UI shrink, then the keyboard
+  goes down, comes back, shrinks again, about every 150 ms (`app-stderr.log` lines 40–90+: 182
+  "lifting the UI" lines, "first responder for text field taken" / "for keys taken" alternating).
+  The shot `04-low-field-keyboard.jpg` caught a "down" frame: Location focused, no keyboard.
+  Likely cause: after the shrink the field lies below the new screen bottom, the Info panel's
+  scroll area doesn't bring it into view, so egui sends no IME output → `self.text_field` is None
+  (`ios.rs` line ~359) → `keys::soft_keyboard` drops the keyboard → the UI grows back → the field
+  is drawn again and the recent tap brings the keyboard back. Fix ideas (pick one, in our crate):
+  (a) keep the keyboard while egui still has a text field focused and `egui_wants_keyboard_input`
+  (`was_up`), even with no IME rect for a frame; and/or (b) after shrinking, scroll the focused
+  field into view (egui `Context::frame_state`/`scroll_to_rect` on the focused response next
+  frame). Then the run should show the keyboard and Location above it, and "lifting" logged once.
+- **Run 69's other failure:** `checkLog 'first responder for text field' present since search`
+  saw an empty log since the mark, though the app did log it (01:18:41). Passed in run 67: look at
+  how `log_text` / `logMark` offsets work in `ios/sim_test.py` if it repeats.
 - **Very next step:**
-  1. Check main's run for the `p4-film-select` merge is green (fix or revert if red).
-  2. Run 69: look at `04-low-field-keyboard.jpg` (the UI should sit above the keyboard with the
-     tapped field visible), `tour.log` (`clickVisible 'field:' -> [...]` says which field was
-     tapped; the `ui.widgets field:` reply in `replies.jsonl` lists the rects) and `app-stderr.log`
-     ("lifting the UI"). `10-select-several-synced.jpg` should now show the toast at the bottom of
-     the grid. If both are right: make the two steps hard (drop `"soft"`) and merge
-     `p4-keyboard-check` into main **after** main's run from step 1 is done. If no field was in
-     905–1150, read the rects and adjust `top`/`bottom`, or scroll the Info panel.
+  1. Check main's run 70 (`p4-film-select` merge, https://github.com/ivanmagpelmeni/rawpad/actions/runs/40253633287) is green (fix or revert if red).
+  2. On `p4-keyboard-check`: fix the keyboard flicker above (add a unit test in `keys.rs` or
+     `keyboard.rs` for the chosen rule), push, trigger a branch run. When
+     `04-low-field-keyboard.jpg` shows the keyboard with Location above it and "lifting" is logged
+     once: make the two steps hard (drop `"soft"`), check `10-select-several-synced.jpg` for the
+     toast, and merge into main **after** main's current run is done.
   3. Then PROGRESS.md › Next 3 tasks (rotation / Split View in the tour).
 - **Open problems:**
   - `ui.inspect` › `canvasRect` in the grid includes the title row, so the tour hard-codes `top`.
