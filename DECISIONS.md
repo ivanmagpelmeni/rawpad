@@ -409,3 +409,14 @@ morning session, which had taken 45 and 46.
     `04-low-field-keyboard` is checked. The grid strip's "Sync Settings: N photos" toast stays 3 s
     instead of 1.4 s: it reports on photos that may be off screen, and no tour shot (runs 54-67)
     ever caught the shorter one.
+67. **2026-10-26: A focused field out of view keeps the keyboard, and scrolls back into view.**
+    Run 69: tapping Location in the Info panel lifted the UI, the field then lay below its shrunk
+    panel, egui (which reports the box being edited only while it is drawn) reported none, so the
+    keyboard dropped, the UI grew back and the keyboard came back, every 150 ms. Two fixes, both
+    small: (1) the host keeps the keyboard up while egui still focuses the same text box
+    (`keys::hold_field`, unit test `a_focused_field_out_of_view_keeps_the_keyboard`), logging
+    "keyboard: focused text field out of view, on-screen keyboard kept up" once; (2) for 30 frames
+    after the lift the host sets `text_field::KEEP_IN_VIEW` and a focused `TextField` (and the
+    Info panel's GPS box) not fully inside its view calls `scroll_to_me` (upstream patch; the flag
+    is never set on the desktop, so only the iPad scrolls). Only for a moment after the lift, so it
+    never fights the user scrolling the panel while typing.

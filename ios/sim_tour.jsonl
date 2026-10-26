@@ -217,6 +217,9 @@
 {"sleep":3}
 {"shot":"04-low-field-keyboard"}
 {"checkLog":"lifting the UI above the on-screen keyboard","since":"lowfield","soft":true}
+# run 69: the keyboard flickered (field out of view after the lift, DECISIONS 67): now the field
+# scrolls into view and the keyboard is kept up; "lifting" must be logged once, not every 150 ms
+{"checkLog":"keyboard: focused text field out of view","since":"lowfield","soft":true}
 {"method":"ui.key","params":{"key":"Escape"}}
 {"method":"engine.execute","params":{"command":"panel.edit"}}
 {"sleep":2}

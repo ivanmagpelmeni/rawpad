@@ -56,6 +56,9 @@ pub fn run() {
         keys_logged: 0,
         keys: None,
         text_field: None,
+        field_held: None,
+        keep_in_view: 0,
+        holding: false,
         last_tap: None,
         frames: 0,
         last_logged_field: None,
@@ -93,6 +96,14 @@ struct Host {
     keys: Option<crate::native::Keys>,
     /// The egui text box being edited last frame (`PlatformOutput::ime`), if any.
     text_field: Option<egui::Rect>,
+    /// The text box the keyboard is up for, kept while it is focused but out of view
+    /// (`keys::hold_field`, DECISIONS 67).
+    field_held: Option<(egui::Id, egui::Rect)>,
+    /// Frames left in which the focused field scrolls itself into view after the UI lifted
+    /// (`text_field::KEEP_IN_VIEW`, DECISIONS 67).
+    keep_in_view: u8,
+    /// `field_held` is standing in for a box out of view (logged once per stretch).
+    holding: bool,
     /// When and where the last tap or press was (a finger, the Pencil or the CI's pointer).
     last_tap: Option<(Instant, u64, egui::Pos2)>,
     /// Frames drawn so far (for the tap window, `keys::tap_age`).
@@ -143,6 +154,10 @@ fn open_session() -> Session {
 /// Room kept at the top for iPadOS's multitasking "•••" button. The status bar is hidden, so
 /// UIKit reports a top inset of 0 and the button sat over the search box (CI run 21).
 const MIN_TOP_INSET: f32 = 20.0;
+
+/// Frames (about half a second) in which a focused field scrolls itself into view after the UI
+/// lifted above the on-screen keyboard (DECISIONS 67).
+const KEEP_IN_VIEW_FRAMES: u8 = 30;
 
 impl Host {
     fn start(&mut self, event_loop: &ActiveEventLoop) -> Result<(), String> {
@@ -261,6 +276,8 @@ impl Host {
                 let was_shrunk = self.avoid.active();
                 let kb = self.avoid.inset(cover, focused, field_bottom, rect.max.y - b);
                 if self.avoid.active() && !was_shrunk {
+                    // the field may now lie below its shrunk panel: scroll it into view
+                    self.keep_in_view = KEEP_IN_VIEW_FRAMES;
                     // the CI tour checks for this line (a field low on the screen, DECISIONS.md 66)
                     log::info!(
                         "keyboard: lifting the UI above the on-screen keyboard (field bottom {field_bottom:?}, keyboard top {:.0})",
@@ -339,6 +356,9 @@ impl Host {
         if let Some(at) = crate::keys::tap_pos(&raw.events) {
             self.last_tap = Some((Instant::now(), self.frames, at));
         }
+        let keep_in_view = self.keep_in_view > 0;
+        self.keep_in_view = self.keep_in_view.saturating_sub(1);
+        self.ctx.data_mut(|d| d.insert_temp(egui::Id::new(lightcraft_ui_egui::text_field::KEEP_IN_VIEW), keep_in_view));
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
         let mut out = self.ctx.run_ui(raw, |ui| {
@@ -365,7 +385,18 @@ impl Host {
         // only the text cursor's (zero wide in an empty box, CI run 42), so the box is the focused
         // widget's whole rectangle, with the cursor's for good measure
         let focused_rect = self.ctx.memory(|m| m.focused()).and_then(|id| self.ctx.read_response(id)).map(|r| r.rect);
-        self.text_field = out.platform_output.ime.as_ref().map(|ime| focused_rect.map_or(ime.rect, |r| r.union(ime.rect)));
+        let ime_field = out.platform_output.ime.as_ref().map(|ime| focused_rect.map_or(ime.rect, |r| r.union(ime.rect)));
+        // a focused box out of view (just after the UI lifted) keeps the keyboard (CI run 69)
+        let focused_id = self.ctx.memory(|m| m.focused());
+        let held = crate::keys::hold_field(ime_field, focused_id, self.soft_keyboard, self.field_held);
+        let holding = ime_field.is_none() && held.is_some();
+        if holding && !self.holding {
+            // the CI tour checks for this line (DECISIONS 67)
+            log::info!("keyboard: focused text field out of view, on-screen keyboard kept up");
+        }
+        self.holding = holding;
+        self.field_held = held;
+        self.text_field = ime_field.or(held.map(|(_, r)| r));
         gfx.input.handle_platform_output(&gfx.window, std::mem::take(&mut out.platform_output));
         let clipped = self.ctx.tessellate(std::mem::take(&mut out.shapes), out.pixels_per_point);
         gfx.painter.paint_and_update_textures(
