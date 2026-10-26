@@ -190,7 +190,8 @@
 {"method":"ui.clickWidget","params":{"id":"field:search"}}
 {"sleep":2}
 {"shot":"04-text-field"}
-{"checkLog":"first responder for text field","since":"search"}
+# (wait 10 s: run 69 saw nothing within 5 s though the app had logged it on time)
+{"checkLog":"first responder for text field","since":"search","wait":10}
 # typing reaches the field once (hardware presses through the text view, never twice): type,
 # select all, copy, read ui.inspect → copied. Soft: osascript on the CI Mac decides delivery.
 {"hostKeys":"rq"}
