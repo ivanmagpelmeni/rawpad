@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.68",
+          "buildVersion": "68",
+          "date": "2026-10-26T01:14:31Z",
+          "localizedDescription": "RawPad 1.68 (build 68, d867e83): P4: handoff: p4-snapshot-preview merged after run 65",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.68/RawPad.ipa",
+          "size": 19843017,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.64",
           "buildVersion": "64",
           "date": "2026-10-25T23:42:48Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.35/RawPad.ipa",
           "size": 19822623,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.32",
-          "buildVersion": "32",
-          "date": "2026-10-18T23:58:47Z",
-          "localizedDescription": "RawPad 1.32 (build 32, 4047a07): Merge branch 'p4-keys' (\u2318 = command on a hardware keyboard, keyboard probe; run 30 tour green)",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.32/RawPad.ipa",
-          "size": 19810335,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.64",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.64/RawPad.ipa",
-      "size": 19848920,
-      "versionDate": "2026-10-25T23:42:48Z",
-      "versionDescription": "RawPad 1.64 (build 64, 1c48438): P4: handoff and progress after the night-1 session (1.60 released; p4-preset-preview merged; p4-snapshot-preview run 63 green)"
+      "version": "1.68",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.68/RawPad.ipa",
+      "size": 19843017,
+      "versionDate": "2026-10-26T01:14:31Z",
+      "versionDescription": "RawPad 1.68 (build 68, d867e83): P4: handoff: p4-snapshot-preview merged after run 65"
     }
   ],
   "news": []
