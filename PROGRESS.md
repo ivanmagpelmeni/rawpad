@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-10-26 (night 2, 00:55–01:40 Berlin, unattended)**
+1. Main run 64 green: **released 1.64** (long-press a preset → preview + Apply).
+2. Tour fix on `p4-snapshot-preview`: `panel.edit` toggled the Edit panel shut, so the slider long-press found no slider; the tour now opens it with `ui.set` and the long-press steps are hard checks (DECISIONS 65). Branch run 65's tour passed.
+3. New branch `p4-film-select`: while Select Several is on, the loupe shows a pill above the filmstrip ("Select Several: 2 photos" + Done), with a unit test and tour shot `10-select-several-loupe` (DECISIONS 64). Run 66 failed to compile (new translation message); fixed, run 67 going.
+4. Not merged yet: `p4-snapshot-preview` (run 65) and `p4-film-select` (run 67) wait for their screenshots (HANDOFF.md).
+5. Next: check both runs' screenshots, merge them one at a time, then the keyboard-shrink CI check.
+
 **2026-10-25/26 (night 1, 23:55–00:40 Berlin, unattended)**
 1. Main run 60's re-run was green: **released 1.60** (long-press a slider's name → Reset). The first attempt's log-check failure was a flake; the tour's `checkLog` now waits up to 5 s.
 2. **Merged `p4-preset-preview`** into main (long-press a preset → preview + Apply); main's run 64 releases about 1.64.
@@ -239,18 +246,21 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 60 green, released **1.60** (2026-10-25: long-press a slider's name → Reset). Main's run 64 (preset preview by long-press) releases about 1.64. Branch `p4-snapshot-preview` (version and History preview by long-press) is in run 63 (HANDOFF.md). CI checks build, fmt,
+Main run 64 green, released **1.64** (2026-10-25: long-press a preset → preview + Apply). Branch
+`p4-snapshot-preview` (version and History preview by long-press, tour fix) is in run 65; branch
+`p4-film-select` (Select Several pill in the loupe) is in run 67 (HANDOFF.md). CI checks build, fmt,
 unit tests, clippy, the simulator tour (sliders, radial and brush masks, pinch/pan, hardware keys
 with rating 5 and ⌘Z undo as hard checks, search box with on-screen keyboard and typing, caption
 field with keyboard, background export, Share button and sheet, Add to Apple Photos as a soft
-check, the long-press menus as soft steps), the export file and the log file.
+check, the long-press menus), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p4-snapshot-preview`** once branch run 63 is green and its `11-*` screenshots look
-   right (HANDOFF.md), then make those tour steps hard checks.
-2. **Select Several indicator in the loupe's filmstrip** (today only the long-press menu says
-   *Done Selecting*), and find out why the Sync Settings toast isn't in the tour's screenshot.
+1. **Merge `p4-snapshot-preview`** (run 65) once its `11-*` screenshots look right: the slider
+   menu shows *Reset Exposure*, the version shot shows *Bright* over the reset photo.
+2. **Merge `p4-film-select`** (run 67, or a re-run) once green and `10-select-several-loupe`
+   shows the pill above the filmstrip. Then find out why the Sync Settings toast isn't in the
+   tour's `10-select-several-synced` shot.
 3. **Exercise the keyboard shrink in CI** (below), then rotation / Split View in the tour.
 
 Also queued:
@@ -288,13 +298,14 @@ and tell Claude what you see:**
    (copies the edits of the photo you long-pressed first to the other picked photos) and **Done**.
 9. **New in the version after 1.57 (about 1.60):** in Develop, press and hold a slider's
    **name** (e.g. "Exposure") → **Reset Exposure** puts that one slider back to zero.
-10. **New in the version after 1.60 (about 1.64, once AltStore lists it):** press and hold a
+10. **New in 1.64 (AltStore should list it now):** press and hold a
    preset in the Presets list: the photo shows how the preset looks while the menu is open;
    **Apply** at the top of the menu applies it. Tapping anywhere else closes the menu and leaves
    the photo as it was.
 11. **Coming next (not out yet):** in the **Versions** panel (right-hand strip) and the
    **History** panel, press and hold a row: the photo shows that version or step while the menu
-   is open; **Restore** at the top goes back to it.
+   is open; **Restore** at the top goes back to it. Also: with Select Several on, the Develop
+   view shows "Select Several: N photos" with a **Done** button just above the filmstrip.
 6. **New in 1.47:** in the Tone Curve,
    drag a point with your finger (it should be easy to catch); press and hold a point for half a
    second → **Delete Point**. In Crop, there is now a **Done** button next to Reset. Crop corners
