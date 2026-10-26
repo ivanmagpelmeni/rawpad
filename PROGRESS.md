@@ -69,8 +69,8 @@ Classic setup steps and source fix.
 1. Main run 70 green: **released 1.70** (the loupe shows "Select Several: N photos | Done" above the filmstrip).
 2. Fixed run 69's keyboard flicker: a text box low on the screen (Info panel › Location) kept making the keyboard drop and come back. The keyboard now stays up while the box is being edited, and the box scrolls back into view (DECISIONS 67).
 3. Branch run 71 green (build, unit tests incl. a new one, clippy, whole simulator tour); **merged `p4-keyboard-check`** into main; main's run releases about 1.72.
-4. Not checked yet: run 71's screenshot of the low box with the keyboard (the report wasn't published in time). Next session looks at it first.
-5. Next: check main's run and that screenshot, make the low-field tour steps hard, then rotation / Split View in the tour.
+4. Checked run 71's screenshot: keyboard up, the Location box visible right above it, "lifting" logged once (run 69: 182 times). Those tour steps are hard checks now.
+5. Next: check main's run (releases about 1.72), the Sync toast shot, then rotation / Split View in the tour.
 
 **2026-10-26 (night 3, 01:55–02:40 Berlin, unattended)**
 1. Main run 68 green: **released 1.68** (long-press a version or History step → preview + Restore).
@@ -270,8 +270,8 @@ soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check run 71's / main's `04-low-field-keyboard` shot** (keyboard up, Location box visible
-   above it, "lifting the UI" logged once), then make those tour steps hard (HANDOFF.md).
+1. **Check main's run for the merge** (releases about 1.72) and its `10-select-several-synced`
+   shot for the Sync toast (HANDOFF.md).
 2. **Rotation and Split View / Stage Manager resizing in the tour** (`simctl` can't rotate: try
    the Simulator menu via osascript on the CI Mac).
 3. **A 24 MP raw memory test in the simulator** (CC0 ARW/RW2 from `cargo xtask corpus`).

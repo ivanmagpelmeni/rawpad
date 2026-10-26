@@ -24,17 +24,14 @@ end. The next session reads it **first**.
       (run 69 saw an empty log after 5 s although the app had logged it).
   - **Branch run 71** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/40256706796):
     format, unit tests, clippy, build and the whole tour **green** (the tour-wait commit `550bb7d`
-    came after it; JSON only). The report (`ci-artifacts` `runs/71/`) was not published yet when
-    this was written, so `04-low-field-keyboard.jpg` and the log lines are **not checked yet**.
+    came after it; JSON only). **Checked its report** (`ci-artifacts` `runs/71/`):
+    `04-low-field-keyboard.jpg` shows the keyboard up and the focused Location box ("Dolomites")
+    just above it; `app-stderr.log` has "lifting the UI" **once**, then "kept up" once, "UI shrunk
+    by 257 pt", steady for 11 s until Escape (run 69: 182 lifts). So the three low-field tour
+    steps are **hard checks** now (in the merge, not yet run on main).
 - **Very next step:**
   1. Check main's run for `c11c712` (or the HANDOFF commit after it) is green; fix or revert if red.
-  2. Look at `runs/71/` (or main's run): `04-low-field-keyboard.jpg` should show the keyboard with
-     the Location box above it; `app-stderr.log` should have "lifting the UI" **once** after the
-     Location tap (run 69 had 182) and no "first responder" ping-pong. If so, drop `"soft"` from
-     the two low-field steps in `ios/sim_tour.jsonl` (`clickVisible` and both `checkLog`s), and
-     check `10-select-several-synced.jpg` for the 3 s Sync toast. If the box is still hidden
-     (scroll didn't happen), the keyboard should at least stay up: try calling `scroll_to_me`
-     with `Some(egui::Align::Center)` or over more frames.
+  2. Check `10-select-several-synced.jpg` (main's run) for the 3 s Sync toast.
   3. Then PROGRESS.md › Next 3 tasks (rotation / Split View in the tour).
 - **Open problems:**
   - `ui.inspect` › `canvasRect` in the grid includes the title row, so the tour hard-codes `top`.

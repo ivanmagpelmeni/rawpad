@@ -211,16 +211,16 @@
 {"sleep":2}
 # the caption sits above the keyboard, so nothing shrank (run 67: "UI shrunk by 0 pt"). A field
 # that the keyboard would cover (fully on screen below its top, about 903 pt) must lift the UI:
-# app-stderr.log "lifting the UI above the on-screen keyboard" (DECISIONS.md 66). Soft until seen.
+# app-stderr.log "lifting the UI above the on-screen keyboard" (DECISIONS.md 66). Hard since run 71.
 {"method":"ui.widgets","params":{"filter":"field:"}}
 {"logMark":"lowfield"}
-{"clickVisible":"field:","count":1,"top":905,"bottom":1150,"soft":true}
+{"clickVisible":"field:","count":1,"top":905,"bottom":1150}
 {"sleep":3}
 {"shot":"04-low-field-keyboard"}
-{"checkLog":"lifting the UI above the on-screen keyboard","since":"lowfield","soft":true}
+{"checkLog":"lifting the UI above the on-screen keyboard","since":"lowfield"}
 # run 69: the keyboard flickered (field out of view after the lift, DECISIONS 67): now the field
 # scrolls into view and the keyboard is kept up; "lifting" must be logged once, not every 150 ms
-{"checkLog":"keyboard: focused text field out of view","since":"lowfield","soft":true}
+{"checkLog":"keyboard: focused text field out of view","since":"lowfield"}
 {"method":"ui.key","params":{"key":"Escape"}}
 {"method":"engine.execute","params":{"command":"panel.edit"}}
 {"sleep":2}
