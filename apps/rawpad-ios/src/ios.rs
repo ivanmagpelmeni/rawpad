@@ -62,7 +62,7 @@ pub fn run() {
         soft_keyboard: false,
         logged_insets: None,
         avoid: Default::default(),
-        logged_cover: 0,
+        logged_cover: (0, 0),
         last_cover: 0,
         prefs: None,
         share_offer: Default::default(),
@@ -104,8 +104,8 @@ struct Host {
     logged_insets: Option<crate::native::EdgeInsets>,
     /// Keyboard avoidance: shrinks the UI while the on-screen keyboard covers a focused field.
     avoid: crate::keyboard::Avoid,
-    /// The last keyboard height logged (whole points), so the log shows changes only.
-    logged_cover: i32,
+    /// The last keyboard height and UI shrink logged (whole points), so the log shows changes only.
+    logged_cover: (i32, i32),
     /// The keyboard height of the last frame (whole points).
     last_cover: i32,
     prefs: Option<crate::prefs::Writer>,
@@ -258,11 +258,20 @@ impl Host {
                 let cover = crate::native::keyboard_cover(&gfx.window).map_or(0.0, |c| (c - i.bottom).max(0.0) as f32 / zoom);
                 let focused = self.ctx.memory(|m| m.focused()).filter(|_| self.ctx.egui_wants_keyboard_input());
                 let field_bottom = focused.and_then(|id| self.ctx.read_response(id)).map(|r| r.rect.bottom());
+                let was_shrunk = self.avoid.active();
                 let kb = self.avoid.inset(cover, focused, field_bottom, rect.max.y - b);
-                // log the keyboard once it has settled (same height two frames running)
+                if self.avoid.active() && !was_shrunk {
+                    // the CI tour checks for this line (a field low on the screen, DECISIONS.md 66)
+                    log::info!(
+                        "keyboard: lifting the UI above the on-screen keyboard (field bottom {field_bottom:?}, keyboard top {:.0})",
+                        rect.max.y - b - cover
+                    );
+                }
+                // log the keyboard once it has settled (same height two frames running); a new
+                // shrink at the same height is logged too (run 67 logged 257 pt only once)
                 let whole = cover.round() as i32;
-                if whole == self.last_cover && whole != self.logged_cover {
-                    self.logged_cover = whole;
+                if whole == self.last_cover && (whole, kb.round() as i32) != self.logged_cover {
+                    self.logged_cover = (whole, kb.round() as i32);
                     log::info!("keyboard (UIKit): on-screen keyboard covers {cover:.0} pt, UI shrunk by {kb:.0} pt");
                 }
                 // the keyboard slides in and out over a few frames: keep drawing until it settles

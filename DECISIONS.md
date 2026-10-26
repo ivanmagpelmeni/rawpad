@@ -400,3 +400,12 @@ morning session, which had taken 45 and 46.
 65. **2026-10-26: Tour opens panels with `ui.set`, not `panel.*`,** when it can't know whether the
     panel is already open: `panel.edit` and friends toggle, so in run 63 it closed the Edit panel and
     the slider long-press step found no slider. The long-press tour steps are hard checks now.
+66. **2026-10-26: The tour checks that the keyboard lifts the UI; the Sync toast lasts 3 s.**
+    Run 67 only ever focused fields above the keyboard (search, caption), so the shrink was never
+    exercised in CI ("UI shrunk by 0 pt"). The tour now taps a field fully on screen below the
+    keyboard's top (Info panel, top 905 to bottom 1150 pt) and expects the new log line "keyboard:
+    lifting the UI above the on-screen keyboard"; the keyboard line is logged again whenever the
+    shrink changes, not only the height. Both steps are soft until the screenshot
+    `04-low-field-keyboard` is checked. The grid strip's "Sync Settings: N photos" toast stays 3 s
+    instead of 1.4 s: it reports on photos that may be off screen, and no tour shot (runs 54-67)
+    ever caught the shorter one.
