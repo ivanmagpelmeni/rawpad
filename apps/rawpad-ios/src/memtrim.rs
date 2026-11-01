@@ -4,7 +4,8 @@
 //! recycled buffers and hands freed pages back to the system. Caches refill on demand.
 //! Plain engine calls, so the test runs on the CI's macOS host too.
 //!
-//! [`set_ipad_limits`] also keeps fewer loupe-sized decodes than the desktop (DECISIONS 74).
+//! [`set_ipad_limits`] also keeps fewer loupe-sized decodes than the desktop (DECISIONS 74) and a
+//! smaller pool of recycled GPU buffers (DECISIONS 76).
 
 use lightcraft_engine::Session;
 
@@ -16,9 +17,19 @@ const SQUEEZE_BYTES: usize = 16 << 20;
 /// keeps 4; 3 still holds both sides of Compare plus the next photo, like the web build.
 pub const PREVIEW_CAPACITY: usize = 3;
 
+/// Recycled GPU buffers kept for the next render. The engine keeps an eighth of its memory budget
+/// (192 MB on the CI simulator; run 85 held 177 MB of them while zoomed into a 24 MP raw); on the
+/// iPad, where Metal buffers are the app's own memory, a smaller pool lowers the zoomed peak.
+/// Leaving the zoomed view still frees the whole pool (upstream's idle trim).
+pub const GPU_POOL_BYTES: u64 = 64 << 20;
+
 /// iPad cache limits, set once when the session opens (they survive opening another library).
 pub fn set_ipad_limits(session: &mut Session) {
     session.media.preview_capacity = PREVIEW_CAPACITY;
+    // The process budget is set lazily and sets the GPU pool limit when it is: settle it first so
+    // the iPad limit stays (only a budget change in the settings resets it to an eighth).
+    let _ = lightcraft_engine::memory::budget();
+    lightcraft_engine::gpu::set_pool_limit(GPU_POOL_BYTES);
 }
 
 /// Bytes the engine's in-memory caches held before and after a trim.
@@ -75,6 +86,19 @@ mod tests {
         assert!(previews.count <= PREVIEW_CAPACITY, "kept {} previews", previews.count);
         // and renders keep working with the lower cap
         s.render_now(ids[0], 1600, 1200).unwrap();
+    }
+
+    #[test]
+    fn the_ipad_pools_at_most_64_mb_of_gpu_buffers() {
+        let mut s = Session::with_demo();
+        set_ipad_limits(&mut s);
+        let ids: Vec<_> = s.catalog.photos().map(|p| p.id).take(3).collect();
+        for id in &ids {
+            s.render_now(*id, 1600, 1200).unwrap();
+        }
+        // without a GPU (CI hosts often have none) nothing is pooled and this holds trivially
+        let pooled = lightcraft_engine::gpu::memory().pooled;
+        assert!(pooled <= GPU_POOL_BYTES, "pooled {pooled} bytes");
     }
 
     #[test]

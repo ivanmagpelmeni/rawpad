@@ -490,3 +490,23 @@ morning session, which had taken 45 and 46.
     grid draws from the rendered disk cache: `grid-after-relaunch` (run 83) held 0 thumbnail
     sources (vs 50 MB / 24 at `before-raw`). Revisit if Ivan's real library (hundreds of photos)
     shows memory warnings or ends while scrolling the grid.
+76. **2026-11-01: The iPad keeps at most 64 MB of recycled GPU buffers.** Run 85's `memory.jsonl`:
+    zooming into the 24 MP raw took GPU allocations from 117 to 512 MB, 177 MB of it the free
+    pool (the engine keeps an eighth of its budget, 192 MB on the CI simulator). Leaving the
+    zoomed view already gives it all back (`after-raw`: 115 MB, 0 pooled; upstream's idle trim
+    frees the pool once no zoom window is shown), so the pool only matters for the zoomed peak.
+    `memtrim::set_ipad_limits` settles the process budget, then calls `gpu::set_pool_limit(64 MB)`
+    (public API, no upstream patch). Only a budget change from the settings puts it back to an
+    eighth. The tour's `raw-zoomed` and `after-raw` steps get `maxGpuPooledMB` = 64, a warning
+    until a run shows it working. Open: the resident size rose from 450 MB (zoomed) to 541 MB
+    after zooming out in run 85, while the engine's own numbers fell; the memory warning brings
+    it back to 265 MB.
+77. **2026-11-01: RawPad returns the allocator's free pages to iPadOS itself.** Upstream's
+    `lightcraft_sysmem::release_free_memory` calls `malloc_zone_pressure_relief` only on macOS
+    (`cfg(target_os = "macos")`), and the iOS host never set the engine's release hook, so
+    `memory::release` (after idle GPU trims and memory warnings) did nothing on the iPad. iOS has
+    the same libmalloc, so `native::release_free_memory` makes the same one FFI call (in
+    `native.rs`, the one module allowed `unsafe`, with a `// SAFETY:` note) and `ios.rs` installs
+    it with `memory::set_release_hook` before the session opens. The memory warning logs
+    "memory warning: returned X MB of free pages" (tour: soft check). No upstream patch.
+    Expected effect: the resident size falls after zooming out of a raw (run 85: 450 → 541 MB).
