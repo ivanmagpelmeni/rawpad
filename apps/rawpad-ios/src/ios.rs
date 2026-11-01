@@ -528,7 +528,11 @@ impl ApplicationHandler<UserEvent> for Host {
     }
 
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
+        // iPadOS may end a suspended app without another callback (the CI tour checks this line,
+        // then kills and relaunches the app)
         self.save();
+        let unsaved = self.app.as_ref().and_then(|a| a.session.unsaved().map(|(n, _)| n)).unwrap_or(0);
+        log::info!("suspended: library and view saved ({unsaved} changes unsaved)");
     }
 
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
@@ -541,8 +545,13 @@ impl ApplicationHandler<UserEvent> for Host {
     }
 
     fn memory_warning(&mut self, _event_loop: &ActiveEventLoop) {
-        log::warn!("memory warning: saving and returning freed memory");
+        log::warn!("memory warning: saving, dropping cached photos and returning freed memory");
         self.save();
+        if let Some(app) = self.app.as_mut() {
+            let t = crate::memtrim::trim_caches(&mut app.session);
+            log::warn!("memory warning: caches held {:.1} MB, now {:.1} MB", t.before as f64 / 1_048_576.0, t.after as f64 / 1_048_576.0);
+            self.ctx.request_repaint();
+        }
         lightcraft_sysmem::release_free_memory();
     }
 }

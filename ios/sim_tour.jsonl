@@ -267,6 +267,13 @@
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":5}
 {"memory":"after-raw","ifFile":"tmp/rawpad-24mp.arw"}
+# memory warning: the Simulator's Debug menu sends one; the app drops cached photos and logs what
+# it freed (rawpad-ios src/memtrim.rs). Hard since run 78 (587 MB held, 325 MB after)
+{"logMark":"memwarn"}
+{"hostMenu":["Debug","Simulate Memory Warning"]}
+{"checkLog":"memory warning: caches held","since":"memwarn","wait":10}
+{"sleep":2}
+{"memory":"after-memwarn"}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}
@@ -292,3 +299,22 @@
 {"waitUntil":"imports.imported","method":"engine.execute","params":{"command":"export.photosImports","params":{}},"timeout":180,"soft":true}
 {"method":"ui.inspect"}
 # (Help › Open Log Folder → share sheet was checked in runs 15/16; a second sheet can't open over this one)
+# crash safety (P6, DECISIONS 72): rate photo 2, open it, send RawPad to the background (it saves
+# on `suspended`), kill it with simctl terminate (no callback, like iPadOS ending a suspended app)
+# and launch it again: the library, the rating and the open photo must come back
+{"method":"engine.execute","params":{"command":"photo.rate","params":{"rating":4,"ids":[2]}},"expectOk":true}
+{"method":"engine.execute","params":{"command":"library.select","params":{"ids":[2]}},"expectOk":true}
+{"method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
+{"sleep":3}
+{"logMark":"bg"}
+{"background":"com.apple.Preferences"}
+{"checkLog":"suspended: library and view saved","since":"bg","wait":15,"soft":true}
+{"sleep":3}
+{"relaunch":true}
+{"sleep":15}
+{"checkLog":"RawPad Library: ","wait":20}
+{"checkLog":"(0 log records replayed)","absent":true,"soft":true}
+{"method":"engine.execute","params":{"command":"library.info"},"expectPhotosAtLeast":24}
+{"waitUntil":"rating","equals":4,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":2}},"timeout":20}
+{"waitUntil":"selection","equals":[2],"method":"ui.inspect","timeout":20,"soft":true}
+{"shot":"14-relaunched"}

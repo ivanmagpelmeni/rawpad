@@ -13,6 +13,8 @@ import sys
 import time
 
 BUNDLE = "io.github.ivanmagpelmeni.rawpad"
+# the app's log, written by simctl launch: app-stderr.log, then app-stderr-2.log after a relaunch
+LOG = {"name": "app-stderr.log"}
 
 
 def connect(port, timeout=120):
@@ -44,14 +46,14 @@ def app_running():
 
 def log_size(out_dir):
     try:
-        return os.path.getsize(os.path.join(out_dir, "app-stderr.log"))
+        return os.path.getsize(os.path.join(out_dir, LOG["name"]))
     except OSError:
         return 0
 
 
 def log_text(out_dir, since):
     try:
-        with open(os.path.join(out_dir, "app-stderr.log"), "rb") as f:
+        with open(os.path.join(out_dir, LOG["name"]), "rb") as f:
             f.seek(since)
             return f.read().decode("utf-8", "replace")
     except OSError:
@@ -72,6 +74,25 @@ def app_rss_mb():
         return round(int(rss) / 1024, 1)
     except (OSError, ValueError):
         return None
+
+
+def relaunch(out_dir, port, n):
+    """End the app the hard way (simctl terminate: no callback, like iPadOS ending a suspended
+    app) and launch it again with the CI's environment. Returns (gone_after_terminate, log name)."""
+    subprocess.run(["xcrun", "simctl", "terminate", "booted", BUNDLE], capture_output=True, text=True)
+    deadline = time.time() + 20
+    while app_running() and time.time() < deadline:
+        time.sleep(1)
+    gone = not app_running()
+    name = f"app-stderr-{n}.log"
+    env = dict(os.environ, SIMCTL_CHILD_RAWPAD_DEMO="1", SIMCTL_CHILD_RAWPAD_CONTROL=str(port))
+    out = os.path.abspath(out_dir)
+    r = subprocess.run(
+        ["xcrun", "simctl", "launch", f"--stdout={out}/app-stdout-{n}.log", f"--stderr={out}/{name}", "booted", BUNDLE],
+        capture_output=True, text=True, env=env,
+    )
+    print(f"relaunch: terminate left the app {'gone' if gone else 'RUNNING'}; launch rc={r.returncode} {r.stdout.strip()[:120]} {r.stderr.strip()[:200]}")
+    return gone, name
 
 
 def substitute(value, names):
@@ -108,6 +129,7 @@ def main():
     failures = []
     warnings = []
     marks = {}
+    launches = 1
     names = {"APPDATA": app_data()}
     with open(f"{out_dir}/replies.jsonl", "w") as log:
         for raw in open(tour):
@@ -144,6 +166,28 @@ def main():
                 continue
             if "sleep" in step:
                 time.sleep(step["sleep"])
+                continue
+            if "background" in step:
+                # {"background": "com.apple.Preferences"}: open another app, which sends RawPad to
+                # the background (winit `suspended`: the app saves everything)
+                r = subprocess.run(["xcrun", "simctl", "launch", "booted", step["background"]], capture_output=True, text=True)
+                print(f"{'ok ' if r.returncode == 0 else 'WARN'} background: launched {step['background']} {r.stderr.strip()[:200]}")
+                continue
+            if "relaunch" in step:
+                # {"relaunch": true}: kill the app and start it again (crash safety: the library,
+                # edits and view must come back). Reconnects; checkLog then reads the new log
+                try:
+                    sock.close()
+                except OSError:
+                    pass
+                launches += 1
+                gone, LOG["name"] = relaunch(out_dir, port, launches)
+                if not gone:
+                    failures.append("relaunch: simctl terminate did not end the app")
+                marks.clear()
+                sock = connect(port)
+                reader = sock.makefile("r", encoding="utf-8")
+                print(f"ok relaunch: control channel back, log now {LOG['name']}")
                 continue
             if "waitUntil" in step:
                 # repeat a request until a dotted path in its result is truthy, e.g.
