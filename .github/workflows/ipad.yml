@@ -97,10 +97,26 @@ jobs:
           echo "Photos warm-up took $(( $(date +%s) - start )) s"
           echo "udid=$udid" >> "$GITHUB_OUTPUT"
 
+      # a real 24 MP raw for the tour's memory test (CC0, raw.pixls.us; the same file and sha256 as
+      # `cargo xtask corpus`). Never fails the run: without it the tour skips those steps.
+      - name: Fetch a 24 MP raw (memory test)
+        continue-on-error: true
+        run: |
+          f="$RUNNER_TEMP/rawpad-24mp.arw"
+          curl -fsSL --retry 3 --max-time 180 -o "$f" \
+            "https://raw.pixls.us/getfile.php/2414/nice/Sony%20-%20ILCE-7M3%20-%2014bit%2014bit%20compressed%20%283:2%29.ARW"
+          echo "250784580ea527442c09004417bb0eead484f2bf3ee8f9121a776ac65bb50d0f  $f" | shasum -a 256 -c - || { rm -f "$f"; exit 1; }
+          ls -la "$f"
+
       - name: Install, launch and drive RawPad
         run: |
           mkdir -p ipad-test
           xcrun simctl install booted target/ipad/sim/RawPad.app
+          # the memory test's raw goes in the app's own tmp folder (the tour imports it from there)
+          if [ -f "$RUNNER_TEMP/rawpad-24mp.arw" ]; then
+            data=$(xcrun simctl get_app_container booted io.github.ivanmagpelmeni.rawpad data)
+            mkdir -p "$data/tmp" && cp "$RUNNER_TEMP/rawpad-24mp.arw" "$data/tmp/"
+          fi
           # the tour's "Add to Apple Photos" export must not wait on the permission prompt
           xcrun simctl privacy booted grant photos-add io.github.ivanmagpelmeni.rawpad || true
           SIMCTL_CHILD_RAWPAD_DEMO=1 SIMCTL_CHILD_RAWPAD_CONTROL=7980 \

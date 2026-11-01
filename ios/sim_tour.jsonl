@@ -239,6 +239,34 @@
 {"sleep":2}
 {"shot":"12-portrait-again"}
 {"method":"ui.inspect"}
+# 24 MP raw memory test: CI downloads a CC0 Sony A7 III raw (24 MP, compressed ARW) into the app's
+# tmp folder; without it these steps are skipped with a warning. Opens it, edits, zooms in, and logs
+# memory (ui.inspect › memory and the process's resident size) to memory.jsonl. maxRssMB is soft
+# until a few runs show the normal range (an iPad with 6 GB lets an app use about 3 GB)
+{"memory":"before-raw","ifFile":"tmp/rawpad-24mp.arw"}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.import","params":{"paths":["$APPDATA/tmp/rawpad-24mp.arw"]}},"expectOk":true,"capture":{"rawId":"result.imported.0"}}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.select","params":{"ids":["$rawId"]}},"expectOk":true}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"ui.set","params":{"zoom":"fit","pan":[0.5,0.5]},"expectOk":true}
+{"ifFile":"tmp/rawpad-24mp.arw","sleep":10}
+{"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.pending","equals":false,"method":"ui.inspect","timeout":120}
+{"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-loupe"}
+{"memory":"raw-open","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":2500,"soft":true}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"develop.set","params":{"values":{"light.exposure":0.7,"light.shadows":40,"color.vibrance":20}}},"expectOk":true}
+{"ifFile":"tmp/rawpad-24mp.arw","sleep":5}
+{"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.pending","equals":false,"method":"ui.inspect","timeout":120}
+{"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-edited"}
+{"memory":"raw-edited","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":2500,"soft":true}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"ui.pointer","params":{"events":[{"kind":"move","x":0.5,"y":0.5}]},"expectOk":true}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"ui.zoom","params":{"factor":4},"expectOk":true}
+{"ifFile":"tmp/rawpad-24mp.arw","sleep":10}
+{"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.region.pending","equals":false,"method":"ui.inspect","timeout":120,"soft":true}
+{"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-zoomed"}
+{"memory":"raw-zoomed","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":2500,"soft":true}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"ui.set","params":{"zoom":"fit","pan":[0.5,0.5]},"expectOk":true}
+{"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
+{"ifFile":"tmp/rawpad-24mp.arw","sleep":5}
+{"memory":"after-raw","ifFile":"tmp/rawpad-24mp.arw"}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}

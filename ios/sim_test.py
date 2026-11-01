@@ -58,6 +58,48 @@ def log_text(out_dir, since):
         return ""
 
 
+def app_data():
+    return subprocess.run(["xcrun", "simctl", "get_app_container", "booted", BUNDLE, "data"], capture_output=True, text=True).stdout.strip()
+
+
+def app_rss_mb():
+    """Resident memory of the app process in MB (simulator apps are ordinary Mac processes), or None."""
+    try:
+        pids = subprocess.run(["pgrep", "-f", "RawPad.app/rawpad"], capture_output=True, text=True).stdout.split()
+        if not pids:
+            return None
+        rss = subprocess.run(["ps", "-o", "rss=", "-p", pids[0]], capture_output=True, text=True).stdout.strip()
+        return round(int(rss) / 1024, 1)
+    except (OSError, ValueError):
+        return None
+
+
+def substitute(value, names):
+    """Replace "$name" strings (whole string, or a "$APPDATA/..." prefix) in request params."""
+    if isinstance(value, dict):
+        return {k: substitute(v, names) for k, v in value.items()}
+    if isinstance(value, list):
+        return [substitute(v, names) for v in value]
+    if isinstance(value, str) and value.startswith("$"):
+        head, _, rest = value[1:].partition("/")
+        if head in names:
+            got = names[head]
+            return f"{got}/{rest}" if rest else got
+    return value
+
+
+def dig(value, path):
+    for key in path.split("."):
+        if isinstance(value, list):
+            try:
+                value = value[int(key)] if key.isdigit() else (value[0] if value else None)
+            except IndexError:
+                value = None
+        else:
+            value = value.get(key) if isinstance(value, dict) else None
+    return value
+
+
 def main():
     tour, out_dir = sys.argv[1], sys.argv[2]
     port = int(sys.argv[3]) if len(sys.argv) > 3 else 7980
@@ -66,12 +108,40 @@ def main():
     failures = []
     warnings = []
     marks = {}
+    names = {"APPDATA": app_data()}
     with open(f"{out_dir}/replies.jsonl", "w") as log:
         for raw in open(tour):
             raw = raw.strip()
             if not raw or raw.startswith("#"):
                 continue
             step = json.loads(raw)
+            if "ifFile" in step and not os.path.isfile(os.path.join(names["APPDATA"], step["ifFile"])):
+                # {"ifFile": "tmp/x.arw", ...}: only when CI could put that file in the app's
+                # container (a download that may fail); otherwise skipped with a warning
+                print(f"WARN skipped (no {step['ifFile']}): {raw[:120]}")
+                warnings.append(f"skipped, {step['ifFile']} missing: {raw[:120]}")
+                continue
+            if "params" in step:
+                step["params"] = substitute(step["params"], names)
+            if "memory" in step:
+                # {"memory": "label", "maxRssMB": 2500}: record the app's memory (ui.inspect ›
+                # memory, plus the process's resident size) in memory.jsonl
+                reply = request(sock, reader, "ui.inspect", {})
+                mem = (reply.get("result") or {}).get("memory")
+                rss = app_rss_mb()
+                with open(f"{out_dir}/memory.jsonl", "a") as m:
+                    m.write(json.dumps({"label": step["memory"], "rssMB": rss, "memory": mem}) + "\n")
+                engine = (mem or {}).get("engineBytes")
+                limit = step.get("maxRssMB")
+                good = rss is not None and (limit is None or rss <= limit)
+                engine_mb = round(engine / 1048576, 1) if isinstance(engine, (int, float)) else None
+                print(f"{'ok ' if good else ('WARN' if step.get('soft') else 'ERR')} memory {step['memory']}: rss {rss} MB (max {limit}), engine {engine_mb} MB")
+                if rss is None:
+                    # pgrep/ps found no process: a crash shows up in the tour's other checks
+                    warnings.append(f"memory {step['memory']}: the app's resident size was unreadable")
+                elif not good:
+                    (warnings if step.get("soft") else failures).append(f"memory {step['memory']}: rss {rss} MB over {limit} MB")
+                continue
             if "sleep" in step:
                 time.sleep(step["sleep"])
                 continue
@@ -205,6 +275,12 @@ def main():
             print(f"{'ok ' if ok else 'ERR'} {step['method']} {json.dumps(step.get('params', {}))[:120]}")
             if not ok:
                 print(f"    {json.dumps(reply)[:400]}")
+            for name, path in step.get("capture", {}).items():
+                # {"capture": {"rawId": "result.imported.0"}}: later params can use "$rawId"
+                names[name] = dig(reply, path)
+                print(f"    captured {name} = {json.dumps(names[name])[:80]}")
+                if names[name] is None:
+                    failures.append(f"{step['method']}: nothing at {path} to capture as {name}: {json.dumps(reply)[:300]}")
             if step.get("expectOk") and not ok:
                 failures.append(f"{step['method']} {json.dumps(step.get('params', {}))[:120]} failed: {json.dumps(reply)[:300]}")
             want = step.get("expectPhotosAtLeast")
