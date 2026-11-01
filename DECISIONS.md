@@ -457,3 +457,13 @@ morning session, which had taken 45 and 46.
     Simulator's *Debug › Simulate Memory Warning* (`hostMenu`) and checks the log line (soft
     until seen working). The renderer's per-view stage caches are left alone (private upstream
     API; they already trim to a budget).
+72. **2026-11-01: Crash safety is tested by killing the app in the CI tour.** At the end of the
+    tour the app rates photo 2, opens it, goes to the background (the tour launches the Settings
+    app: `{"background": …}`, winit `suspended` saves and logs "suspended: library and view
+    saved"), then `{"relaunch": true}` ends it with `simctl terminate` (no callback, like iPadOS
+    ending a suspended app or jetsam) and launches it again with the same environment. The log
+    after a relaunch goes to `app-stderr-2.log` (checkLog reads it). Hard checks: the library
+    opens again, has at least 24 photos and photo 2 is still rated 4. Soft: the suspend log line,
+    a non-zero "log records replayed" and the open photo coming back. Shot `14-relaunched`.
+    The memory warning (DECISIONS 71) runs right after the 24 MP raw test, followed by a
+    `memory` step (`after-memwarn`), so `memory.jsonl` shows what the trim gives back.

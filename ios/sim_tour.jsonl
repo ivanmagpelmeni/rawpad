@@ -268,10 +268,10 @@
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":5}
 {"memory":"after-raw","ifFile":"tmp/rawpad-24mp.arw"}
 # memory warning: the Simulator's Debug menu sends one; the app drops cached photos and logs what
-# it freed (rawpad-ios src/memtrim.rs). Soft until a run shows the menu item works on CI
+# it freed (rawpad-ios src/memtrim.rs). Hard since run 78 (587 MB held, 325 MB after)
 {"logMark":"memwarn"}
 {"hostMenu":["Debug","Simulate Memory Warning"]}
-{"checkLog":"memory warning: caches held","since":"memwarn","wait":10,"soft":true}
+{"checkLog":"memory warning: caches held","since":"memwarn","wait":10}
 {"sleep":2}
 {"memory":"after-memwarn"}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
