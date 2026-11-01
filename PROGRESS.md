@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-01 (evening 5, 22:55–23:40 Berlin, unattended)**
+1. Branch run 83 green (hard relaunch checks, memory ceilings); shot `15-grid-after-relaunch` checked; `p6-hard-checks` **merged** (main run 84 releases about 1.84).
+2. **Fewer cached previews on the iPad** (branch `p6-preview-cap`, DECISIONS 74): 3 loupe-sized decodes instead of 4 (saves about 52 MB), unit test on the macOS host, hard `maxPreviews` = 3 in the tour.
+3. Branch run 85: unit tests, build, clippy and the whole tour green; merged into main after run 84 finished (see HANDOFF for the merge state).
+4. Thumbnails: no extra cap for now (DECISIONS 75): after a relaunch the grid uses the disk cache (0 MB of thumbnail sources).
+5. Nothing new for Ivan; his iPad list is unchanged (update to 1.84 or later).
+
 **2026-11-01 (evening 4, 21:55–22:35 Berlin, unattended)**
 1. Main run 81 (the `p6-relaunch` merge) green, **released 1.81**; its tour passed the relaunch checks again (memory warning: 524 → 246 MB resident).
 2. Run 80's report read: every soft relaunch check passed and shot `14-relaunched` shows photo 2 open in the loupe with 4 stars.
@@ -275,10 +282,12 @@ Classic setup steps and source fix.
     **Share Exported Photo…** button right after an export (`src/share_offer.rs`).
     Export dialog + Add to Apple Photos no longer hangs (DECISIONS.md 33).
 - [~] **6. Performance and memory on the A16 (~6 GB):** (done: on-device log file with panics)
-  - tiling, preview downscaling, a smaller thumbnail cache
+  - tiling (open)
+  - [x] fewer cached previews: 3 instead of 4 (DECISIONS 74, branch run 85)
+  - [x] thumbnail cache: no extra cap needed for now (DECISIONS 75)
   - [x] memory warnings drop cached photos (DECISIONS 71; run 78: 587 → 325 MB)
   - [x] backgrounding and crash safety: kill-and-relaunch step in the tour (DECISIONS 72; hard since DECISIONS 73)
-  - [~] hard memory limits in the tour: 1500 MB resident, 1200 MB engine caches (branch `p6-hard-checks`, DECISIONS 73)
+  - [x] hard memory limits in the tour: 1500 MB resident, 1200 MB engine caches, 3 previews (DECISIONS 73, 74)
   - [x] 24 MP ARW test in the tour (merged: CC0 A7 III ARW in the tour, DECISIONS 70)
 - [ ] **7. Parity sweep against upstream** (minus AI and the second display):
   - touch polish
@@ -289,7 +298,7 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 81 green, released **1.81** (2026-11-01: memory-warning trim and the kill-and-relaunch tour step).
+Main run 84 green, releases about **1.84** (2026-11-01: hard relaunch checks and memory ceilings); `p6-preview-cap` (3 cached previews) merged after it.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -298,16 +307,14 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p6-hard-checks`** if its branch run (83 or later) is green: hard relaunch checks,
-   `maxRssMB` 1500, `maxEngineMB` 1200, the `grid-after-relaunch` memory step and shot
-   `15-grid-after-relaunch` (look at it: the square grid with every photo). If a hard check
-   failed, read `tour.log` and fix or put that one check back to soft with a DECISIONS entry.
-2. **Phase 6, preview downscaling on the iPad:** `memory.jsonl` shows `previewSources` at about
-   52 MB per photo (4 kept: 210 MB; 2560 px linear float, `crates/engine/src/media.rs`
-   `SourceLevel::Preview`). Options: fewer prefetched previews on iOS, or a smaller preview
-   level, set from the host (no upstream patch if `session.media` allows it; check first).
-3. **Thumbnail cache:** compare `thumbSources` in `grid-after-relaunch` (all thumbnails
-   reloaded from the disk cache) with `before-raw`; decide whether the grid needs a cap on iPad.
+1. **Merge `p6-preview-cap`** if HANDOFF says it is not merged yet (branch run 85 green), then
+   check the next main run's `memory.jsonl`: `previewSources` count ≤ 3 everywhere.
+2. **Phase 6, tiling / the zoomed view:** `raw-zoomed` in `memory.jsonl` shows GPU allocations
+   jump 117 → 513 MB (177 MB pooled) when zooming a 24 MP raw. Find out whether `gpu::trim_pool`
+   with a small budget after leaving the loupe is enough (host-side, no upstream patch), and
+   add a memory step after zooming out.
+3. **Phase 7, routine upstream merge** at the first run of the night (check releases), then the
+   parity sweep's touch polish (small touch targets from the audit list above).
 
 Also queued:
 - Delete merged branches (no tool for it from the sandbox).

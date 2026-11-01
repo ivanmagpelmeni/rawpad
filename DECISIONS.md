@@ -476,3 +476,17 @@ morning session, which had taken 45 and 46.
     637 MB so far). The tour ends with a `memory` step in the square grid after the relaunch
     (shot `15-grid-after-relaunch`) as the baseline for P6's thumbnail and preview budgets.
     Raised limits need a new entry, not a quiet edit.
+74. **2026-11-01: The iPad keeps at most 3 loupe-sized decodes.** `memory.jsonl` (run 83) showed
+    `previewSources` at 4 × 52 MB (≤ 2560 px, linear float; the engine's default capacity is 4).
+    `MediaCache::preview_capacity` is public, so the host sets it to 3 when the session opens
+    (`memtrim::set_ipad_limits`, no upstream patch), like the web build: both sides of Compare
+    plus the next photo still fit. The preview level itself (2560 px) stays: it matches the
+    12.9" iPad screen's long edge, and lowering it would need an upstream patch. Unit test on the
+    macOS host (5 previews rendered, at most 3 kept); the tour's memory steps get a hard
+    `maxPreviews` = 3.
+75. **2026-11-01: No extra thumbnail cap on the iPad for now.** Thumbnail sources are capped by
+    the engine at 384 MB inside the shared cache budget, are evicted least-recently-used with
+    everything else, and are dropped by a memory warning (DECISIONS 71). After a relaunch the
+    grid draws from the rendered disk cache: `grid-after-relaunch` (run 83) held 0 thumbnail
+    sources (vs 50 MB / 24 at `before-raw`). Revisit if Ivan's real library (hundreds of photos)
+    shows memory warnings or ends while scrolling the grid.
