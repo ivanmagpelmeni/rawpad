@@ -241,8 +241,8 @@
 {"method":"ui.inspect"}
 # 24 MP raw memory test: CI downloads a CC0 Sony A7 III raw (24 MP, compressed ARW) into the app's
 # tmp folder; without it these steps are skipped with a warning. Opens it, edits, zooms in, and logs
-# memory (ui.inspect › memory and the process's resident size) to memory.jsonl. maxRssMB is soft
-# until a few runs show the normal range (an iPad with 6 GB lets an app use about 3 GB)
+# memory (ui.inspect › memory and the process's resident size) to memory.jsonl. maxRssMB is hard at 1500
+# since runs 75-80 (resident at most 522 MB; an iPad with 6 GB lets an app use about 3 GB)
 {"memory":"before-raw","ifFile":"tmp/rawpad-24mp.arw"}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.import","params":{"paths":["$APPDATA/tmp/rawpad-24mp.arw"]}},"expectOk":true,"capture":{"rawId":"result.imported.0"}}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.select","params":{"ids":["$rawId"]}},"expectOk":true}
@@ -251,29 +251,29 @@
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":10}
 {"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.pending","equals":false,"method":"ui.inspect","timeout":120}
 {"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-loupe"}
-{"memory":"raw-open","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":2500,"soft":true}
+{"memory":"raw-open","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"develop.set","params":{"values":{"light.exposure":0.7,"light.shadows":40,"color.vibrance":20}}},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":5}
 {"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.pending","equals":false,"method":"ui.inspect","timeout":120}
 {"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-edited"}
-{"memory":"raw-edited","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":2500,"soft":true}
+{"memory":"raw-edited","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"ui.pointer","params":{"events":[{"kind":"move","x":0.5,"y":0.5}]},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"ui.zoom","params":{"factor":4},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":10}
 {"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.region.pending","equals":false,"method":"ui.inspect","timeout":120,"soft":true}
 {"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-zoomed"}
-{"memory":"raw-zoomed","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":2500,"soft":true}
+{"memory":"raw-zoomed","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"ui.set","params":{"zoom":"fit","pan":[0.5,0.5]},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":5}
-{"memory":"after-raw","ifFile":"tmp/rawpad-24mp.arw"}
+{"memory":"after-raw","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500}
 # memory warning: the Simulator's Debug menu sends one; the app drops cached photos and logs what
 # it freed (rawpad-ios src/memtrim.rs). Hard since run 78 (587 MB held, 325 MB after)
 {"logMark":"memwarn"}
 {"hostMenu":["Debug","Simulate Memory Warning"]}
 {"checkLog":"memory warning: caches held","since":"memwarn","wait":10}
 {"sleep":2}
-{"memory":"after-memwarn"}
+{"memory":"after-memwarn","maxRssMB":1500}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}
@@ -301,20 +301,22 @@
 # (Help › Open Log Folder → share sheet was checked in runs 15/16; a second sheet can't open over this one)
 # crash safety (P6, DECISIONS 72): rate photo 2, open it, send RawPad to the background (it saves
 # on `suspended`), kill it with simctl terminate (no callback, like iPadOS ending a suspended app)
-# and launch it again: the library, the rating and the open photo must come back
+# and launch it again: the library, the rating and the open photo must come back. All hard since
+# run 80 (suspend line, 22 records replayed, photo 2 open in the loupe)
 {"method":"engine.execute","params":{"command":"photo.rate","params":{"rating":4,"ids":[2]}},"expectOk":true}
 {"method":"engine.execute","params":{"command":"library.select","params":{"ids":[2]}},"expectOk":true}
 {"method":"engine.execute","params":{"command":"view.detail"},"expectOk":true}
 {"sleep":3}
 {"logMark":"bg"}
 {"background":"com.apple.Preferences"}
-{"checkLog":"suspended: library and view saved","since":"bg","wait":15,"soft":true}
+{"checkLog":"suspended: library and view saved","since":"bg","wait":15}
 {"sleep":3}
 {"relaunch":true}
 {"sleep":15}
 {"checkLog":"RawPad Library: ","wait":20}
-{"checkLog":"(0 log records replayed)","absent":true,"soft":true}
+{"checkLog":"(0 log records replayed)","absent":true}
 {"method":"engine.execute","params":{"command":"library.info"},"expectPhotosAtLeast":24}
 {"waitUntil":"rating","equals":4,"method":"engine.execute","params":{"command":"photo.inspect","params":{"id":2}},"timeout":20}
-{"waitUntil":"selection","equals":[2],"method":"ui.inspect","timeout":20,"soft":true}
+{"waitUntil":"selection","equals":[2],"method":"ui.inspect","timeout":20}
+{"waitUntil":"loupe.photo","equals":2,"method":"ui.inspect","timeout":30}
 {"shot":"14-relaunched"}
