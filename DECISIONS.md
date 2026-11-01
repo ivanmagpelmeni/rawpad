@@ -435,3 +435,25 @@ morning session, which had taken 45 and 46.
 69. **2026-11-01: The measured keyboard height is right.** Run 72's `04-low-field-keyboard`: the
     keyboard's top is at 1065 of 1400 px, 898 of 1180 pt, so it covers 282 pt, 257 pt above the
     25 pt safe area, exactly what the app logged ("covers 257 pt"). Off the queue.
+70. **2026-11-01: The 24 MP memory test uses a real raw that CI downloads, not a committed file.**
+    Media is never committed, and the sandbox can't download. CI's new step *Fetch a 24 MP raw*
+    downloads the CC0 Sony A7 III compressed ARW from raw.pixls.us (the same file and sha256 as
+    `cargo xtask corpus`, `arw-sony-a7m3-compressed.arw`), checks the hash and copies it into the
+    app's own `tmp/` folder after install. The tour imports it (`library.import` with
+    `$APPDATA/tmp/...`, the new id captured as `$rawId`), opens it, edits, zooms in 4×, and logs
+    memory at each point to `memory.jsonl` (`ui.inspect` › `memory` plus the process's resident
+    size from `ps`: simulator apps are Mac processes). New `sim_test.py` features: `ifFile` (skip
+    with a warning when the download failed, so a raw.pixls.us outage never turns CI red),
+    `capture`, `$name` substitution, `memory` steps with `maxRssMB`. The 2500 MB limit is soft
+    until a few runs show the normal range (an iPad with 6 GB lets an app use roughly 3 GB). The
+    simulator's numbers are a Mac's, not the A16's; they show trends and leaks, not the real limit.
+71. **2026-11-01: A memory warning drops the engine's cached photos.** Before, the host only saved
+    and returned freed pages. Now `memtrim::trim_caches` squeezes the media cache budget to 16 MB
+    for a moment (evicting least recently used decodes and rendered previews; the photo on screen
+    is never evicted) and puts the budget back, then frees the GPU's recycled buffers
+    (`gpu::trim_pool(0)`) and calls `memory::release`. No upstream patch: `session.media` is
+    public. Logs "memory warning: caches held X MB, now Y MB". Unit tests run on the macOS host
+    (`lightcraft-engine` is a dev-dependency of `rawpad-ios` now). The tour sends one with the
+    Simulator's *Debug › Simulate Memory Warning* (`hostMenu`) and checks the log line (soft
+    until seen working). The renderer's per-view stage caches are left alone (private upstream
+    API; they already trim to a budget).

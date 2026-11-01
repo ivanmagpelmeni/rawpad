@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-01 (evening 2, 19:54–20:40 Berlin, unattended)**
+1. Main run 74 green, **released 1.74** (rotation tour, hard checks). No new upstream release (still 0.9.1).
+2. **24 MP raw memory test** (branch `p4-raw24`): CI downloads a CC0 Sony A7 III raw, the tour opens, edits and zooms it and logs memory to `memory.jsonl` (DECISIONS 70). Branch run 75: tour passed; numbers to read next session.
+3. **Memory warnings** (branch `p6-memtrim`): the app now drops cached photos and GPU buffers when iPadOS warns, with unit tests and a simulated warning in the tour (DECISIONS 71). Branch run 78 still running at the end.
+4. Neither branch merged yet: next session checks runs 75 and 78, then merges.
+5. Nothing new for Ivan; his iPad list (1.74 now) is unchanged.
+
 **2026-11-01 (evening 1, 18:54–19:40 Berlin, unattended, first run of the night)**
 1. Main run 72 green, **released 1.72** (low text box: keyboard stays up, no flicker). No new upstream release (still 0.9.1).
 2. Checked run 72's shots: the Sync toast ("Sync Settings: 2 photos") is caught in `10-select-several-synced`; the keyboard height the app measures (257 pt) matches the screenshot (DECISIONS 69).
@@ -255,9 +262,9 @@ Classic setup steps and source fix.
     Export dialog + Add to Apple Photos no longer hangs (DECISIONS.md 33).
 - [~] **6. Performance and memory on the A16 (~6 GB):** (done: on-device log file with panics)
   - tiling, preview downscaling, a smaller thumbnail cache
-  - memory warnings
+  - memory warnings (branch `p6-memtrim`, DECISIONS 71)
   - backgrounding and crash safety
-  - 24 MP ARW/RW2 tests
+  - 24 MP ARW/RW2 tests (branch `p4-raw24`: CC0 A7 III ARW in the tour, DECISIONS 70)
 - [ ] **7. Parity sweep against upstream** (minus AI and the second display):
   - touch polish
   - ~~hide the AI mask tiles~~ and ~~AI items in mask menus~~ (done); ArtCraft links kept
@@ -267,8 +274,7 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 72 green, released **1.72** (2026-10-26: low text box keeps the keyboard, no flicker).
-Main's run for the `p4-rotate` merge (tour only: rotation, DECISIONS 68) releases about **1.74**.
+Main run 74 green, released **1.74** (2026-11-01: rotation to landscape and back in the tour).
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -277,11 +283,11 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check main's run for the `p4-rotate` merge** (releases about 1.74; `12-*` shots).
-2. **A 24 MP raw memory test in the simulator** (CC0 ARW/RW2 from `cargo xtask corpus`; the
-   sandbox can't download, so CI fetches it): open it, move a slider, read `ui.inspect` › `memory`.
-3. **Memory warnings** (phase 6): free caches when iPadOS sends a memory warning
-   (`UIApplicationDidReceiveMemoryWarningNotification`), logged, with a unit-testable trim.
+1. **Check branch run 75** (`p4-raw24`: `memory.jsonl`, `13-raw-*` shots), record the numbers, merge.
+2. **Check branch run 78** (`p6-memtrim`: unit tests, the simulated memory warning's log line), merge
+   after `p4-raw24` (small conflict in `sim_tour.jsonl`).
+3. **Phase 6 next:** backgrounding and crash safety (save on `suspended`, check the library
+   reopens after the app is killed in the simulator: `simctl terminate` + `launch`).
 
 Also queued:
 - Delete merged branches (no tool for it from the sandbox).
@@ -292,7 +298,7 @@ Also queued:
 ### This week: what to test on the iPad (start here)
 
 First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
-**My Apps** › **Update** next to RawPad (pick the newest: 1.70, or 1.72 once it shows up). Then try
+**My Apps** › **Update** next to RawPad (pick the newest: 1.74). Then try
 these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
 
 1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several
