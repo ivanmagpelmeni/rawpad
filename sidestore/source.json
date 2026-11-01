@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.84",
+          "buildVersion": "84",
+          "date": "2026-11-01T22:36:11Z",
+          "localizedDescription": "RawPad 1.84 (build 84, e230e59): Merge p6-hard-checks: relaunch checks hard, memory ceilings, grid-after-relaunch step (branch run 83 green)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.84/RawPad.ipa",
+          "size": 19862184,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.81",
           "buildVersion": "81",
           "date": "2026-11-01T21:11:20Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.57/RawPad.ipa",
           "size": 19847837,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.53",
-          "buildVersion": "53",
-          "date": "2026-10-25T21:07:20Z",
-          "localizedDescription": "RawPad 1.53 (build 53, 675afbd): P4: handoff links main run 53 and branch run 52",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.53/RawPad.ipa",
-          "size": 19848310,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.81",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.81/RawPad.ipa",
+      "version": "1.84",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.84/RawPad.ipa",
       "size": 19862184,
-      "versionDate": "2026-11-01T21:11:20Z",
-      "versionDescription": "RawPad 1.81 (build 81, 1a46ef7): P6: handoff and progress after 2026-11-01 evening-3 session (1.79 released; memtrim + relaunch merged)"
+      "versionDate": "2026-11-01T22:36:11Z",
+      "versionDescription": "RawPad 1.84 (build 84, e230e59): Merge p6-hard-checks: relaunch checks hard, memory ceilings, grid-after-relaunch step (branch run 83 green)"
     }
   ],
   "news": []
