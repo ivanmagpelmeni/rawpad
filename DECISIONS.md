@@ -420,3 +420,18 @@ morning session, which had taken 45 and 46.
     Info panel's GPS box) not fully inside its view calls `scroll_to_me` (upstream patch; the flag
     is never set on the desktop, so only the iPad scrolls). Only for a moment after the lift, so it
     never fights the user scrolling the panel while typing.
+68. **2026-11-01: The tour turns the simulator with the Simulator app's Device menu.** `simctl` has
+    no rotate command, and RawPad has no reason to rotate itself. CI already drives the Simulator
+    with System Events for hardware keys (hard checks since run 37), so the new `hostMenu` tour
+    step clicks *Device › Rotate Left* / *Rotate Right* the same way (CI Mac only, never a
+    person's computer). The new `waitUntil … "wider"` check reads `ui.inspect` › `window`
+    ([820, 1110] pt in portrait on the CI iPad) and waits for it to turn wide and back. Shots
+    `12-landscape-loupe`, `12-landscape-grid`, `12-portrait-again`. Branch run 73 turned it and
+    back, the shots show the whole UI laid out wide (menu bar, loupe, filmstrip, Edit panel, toolbar
+    clear of the home indicator) and portrait again afterwards, so both waits are hard checks. No
+    new "safe area" log line after turning (none expected: the insets stay bottom-only), so that
+    check was dropped. Split View and Stage Manager can't be scripted in the simulator: they stay
+    on Ivan's iPad list.
+69. **2026-11-01: The measured keyboard height is right.** Run 72's `04-low-field-keyboard`: the
+    keyboard's top is at 1065 of 1400 px, 898 of 1180 pt, so it covers 282 pt, 257 pt above the
+    25 pt safe area, exactly what the app logged ("covers 257 pt"). Off the queue.
