@@ -242,7 +242,8 @@
 # 24 MP raw memory test: CI downloads a CC0 Sony A7 III raw (24 MP, compressed ARW) into the app's
 # tmp folder; without it these steps are skipped with a warning. Opens it, edits, zooms in, and logs
 # memory (ui.inspect › memory and the process's resident size) to memory.jsonl. maxRssMB is hard at 1500
-# since runs 75-80 (resident at most 522 MB; an iPad with 6 GB lets an app use about 3 GB)
+# since runs 75-80 (resident at most 522 MB; an iPad with 6 GB lets an app use about 3 GB);
+# maxEngineMB (the engine's caches, budget 1536 MB) hard at 1200 (at most 637 MB so far)
 {"memory":"before-raw","ifFile":"tmp/rawpad-24mp.arw"}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.import","params":{"paths":["$APPDATA/tmp/rawpad-24mp.arw"]}},"expectOk":true,"capture":{"rawId":"result.imported.0"}}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.select","params":{"ids":["$rawId"]}},"expectOk":true}
@@ -251,29 +252,29 @@
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":10}
 {"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.pending","equals":false,"method":"ui.inspect","timeout":120}
 {"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-loupe"}
-{"memory":"raw-open","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500}
+{"memory":"raw-open","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500,"maxEngineMB":1200}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"develop.set","params":{"values":{"light.exposure":0.7,"light.shadows":40,"color.vibrance":20}}},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":5}
 {"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.pending","equals":false,"method":"ui.inspect","timeout":120}
 {"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-edited"}
-{"memory":"raw-edited","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500}
+{"memory":"raw-edited","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500,"maxEngineMB":1200}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"ui.pointer","params":{"events":[{"kind":"move","x":0.5,"y":0.5}]},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"ui.zoom","params":{"factor":4},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":10}
 {"ifFile":"tmp/rawpad-24mp.arw","waitUntil":"loupe.region.pending","equals":false,"method":"ui.inspect","timeout":120,"soft":true}
 {"ifFile":"tmp/rawpad-24mp.arw","shot":"13-raw-zoomed"}
-{"memory":"raw-zoomed","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500}
+{"memory":"raw-zoomed","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500,"maxEngineMB":1200}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"ui.set","params":{"zoom":"fit","pan":[0.5,0.5]},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","method":"engine.execute","params":{"command":"library.select","params":{"ids":[1]}},"expectOk":true}
 {"ifFile":"tmp/rawpad-24mp.arw","sleep":5}
-{"memory":"after-raw","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500}
+{"memory":"after-raw","ifFile":"tmp/rawpad-24mp.arw","maxRssMB":1500,"maxEngineMB":1200}
 # memory warning: the Simulator's Debug menu sends one; the app drops cached photos and logs what
 # it freed (rawpad-ios src/memtrim.rs). Hard since run 78 (587 MB held, 325 MB after)
 {"logMark":"memwarn"}
 {"hostMenu":["Debug","Simulate Memory Warning"]}
 {"checkLog":"memory warning: caches held","since":"memwarn","wait":10}
 {"sleep":2}
-{"memory":"after-memwarn","maxRssMB":1500}
+{"memory":"after-memwarn","maxRssMB":1500,"maxEngineMB":1200}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}
@@ -320,3 +321,9 @@
 {"waitUntil":"selection","equals":[2],"method":"ui.inspect","timeout":20}
 {"waitUntil":"loupe.photo","equals":2,"method":"ui.inspect","timeout":30}
 {"shot":"14-relaunched"}
+# memory after the relaunch with every thumbnail on screen (square grid, small cells): the thumbnail
+# cache's size for the whole demo library, for P6's thumbnail and preview budgets
+{"method":"ui.set","params":{"view":"squareGrid"},"expectOk":true}
+{"sleep":10}
+{"shot":"15-grid-after-relaunch"}
+{"memory":"grid-after-relaunch","maxRssMB":1500,"maxEngineMB":1200}
