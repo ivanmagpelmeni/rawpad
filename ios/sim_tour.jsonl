@@ -273,6 +273,8 @@
 {"logMark":"memwarn"}
 {"hostMenu":["Debug","Simulate Memory Warning"]}
 {"checkLog":"memory warning: caches held","since":"memwarn","wait":10}
+# freed pages go back to iPadOS too (DECISIONS 77; soft until seen working)
+{"checkLog":"memory warning: returned","since":"memwarn","wait":10,"soft":true}
 {"sleep":2}
 {"memory":"after-memwarn","maxRssMB":1500,"maxEngineMB":1200,"maxPreviews":3}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)

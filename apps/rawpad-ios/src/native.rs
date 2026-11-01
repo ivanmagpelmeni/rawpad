@@ -24,6 +24,24 @@ use objc2_ui_kit::{UIDocumentPickerDelegate, UIDocumentPickerViewController, UIK
 use objc2_uniform_type_identifiers::{UTType, UTTypeFolder, UTTypeImage, UTTypeItem};
 use winit::raw_window_handle::{HasWindowHandle, RawWindowHandle};
 
+unsafe extern "C" {
+    /// libSystem malloc (malloc/malloc.h, iOS 4.3+): release free memory of `zone` (all zones when
+    /// null) back to the system, up to `goal` bytes (0 = as much as possible). Returns the bytes
+    /// released.
+    fn malloc_zone_pressure_relief(zone: *mut std::ffi::c_void, goal: usize) -> usize;
+}
+
+/// Return the allocator's free pages to the system, as upstream's `lightcraft_sysmem` does on
+/// macOS (it releases nothing on other targets, iOS included, though iOS has the same libmalloc).
+/// Returns the bytes released. Any thread, any time (DECISIONS 77).
+pub fn release_free_memory() -> usize {
+    // SAFETY: `malloc_zone_pressure_relief` is a documented, thread-safe libSystem function. A
+    // null zone means "every zone" and a goal of 0 means "as much as possible". It only returns
+    // already-free pages to the system: it reads and writes no memory we own, takes no pointers
+    // we must keep alive, and has no failure mode beyond releasing 0 bytes.
+    unsafe { malloc_zone_pressure_relief(std::ptr::null_mut(), 0) }
+}
+
 /// Where exports land when a command asks for a save location: `Documents/Exports`, which the
 /// Files app shows under *On My iPad › RawPad* (`UIFileSharingEnabled`).
 pub fn exports_dir() -> Option<PathBuf> {

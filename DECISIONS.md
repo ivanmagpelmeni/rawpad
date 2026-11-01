@@ -501,3 +501,12 @@ morning session, which had taken 45 and 46.
     until a run shows it working. Open: the resident size rose from 450 MB (zoomed) to 541 MB
     after zooming out in run 85, while the engine's own numbers fell; the memory warning brings
     it back to 265 MB.
+77. **2026-11-01: RawPad returns the allocator's free pages to iPadOS itself.** Upstream's
+    `lightcraft_sysmem::release_free_memory` calls `malloc_zone_pressure_relief` only on macOS
+    (`cfg(target_os = "macos")`), and the iOS host never set the engine's release hook, so
+    `memory::release` (after idle GPU trims and memory warnings) did nothing on the iPad. iOS has
+    the same libmalloc, so `native::release_free_memory` makes the same one FFI call (in
+    `native.rs`, the one module allowed `unsafe`, with a `// SAFETY:` note) and `ios.rs` installs
+    it with `memory::set_release_hook` before the session opens. The memory warning logs
+    "memory warning: returned X MB of free pages" (tour: soft check). No upstream patch.
+    Expected effect: the resident size falls after zooming out of a raw (run 85: 450 → 541 MB).

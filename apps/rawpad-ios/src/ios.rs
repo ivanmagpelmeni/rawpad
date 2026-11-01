@@ -217,6 +217,8 @@ impl Host {
                     ..Services::default()
                 }
             };
+            // the engine's idle trims return freed pages to iPadOS (upstream only does it on macOS)
+            lightcraft_engine::memory::set_release_hook(release_free_memory);
             let mut session = open_session();
             crate::memtrim::set_ipad_limits(&mut session);
             let mut app = LightcraftApp::new(session, services);
@@ -554,8 +556,14 @@ impl ApplicationHandler<UserEvent> for Host {
             log::warn!("memory warning: caches held {:.1} MB, now {:.1} MB", t.before as f64 / 1_048_576.0, t.after as f64 / 1_048_576.0);
             self.ctx.request_repaint();
         }
-        lightcraft_sysmem::release_free_memory();
+        let released = crate::native::release_free_memory();
+        log::warn!("memory warning: returned {:.1} MB of free pages", released as f64 / 1_048_576.0);
     }
+}
+
+/// The engine's release hook (`memory::release`, called after idle GPU trims and memory warnings).
+fn release_free_memory() {
+    let _ = crate::native::release_free_memory();
 }
 
 /// `<app container>/Documents/Logs`: shown in Files › On My iPad › RawPad › Logs, so a log can be
