@@ -467,3 +467,12 @@ morning session, which had taken 45 and 46.
     a non-zero "log records replayed" and the open photo coming back. Shot `14-relaunched`.
     The memory warning (DECISIONS 71) runs right after the 24 MP raw test, followed by a
     `memory` step (`after-memwarn`), so `memory.jsonl` shows what the trim gives back.
+73. **2026-11-01: The relaunch checks and the memory limits are hard.** Run 80 passed every soft
+    check of DECISIONS 72 (the suspend line logged, 22 log records replayed, `selection` = [2],
+    shot `14-relaunched` shows photo 2 open in the loupe with 4 stars), so they fail the run now,
+    plus a new hard `loupe.photo` = 2. The memory steps' `maxRssMB` is hard at 1500 MB (runs
+    75–80: at most 522 MB resident) and a new `maxEngineMB` (ui.inspect › memory › engineBytes,
+    the engine's own caches; budget 1536 MB on the CI simulator) is hard at 1200 MB (at most
+    637 MB so far). The tour ends with a `memory` step in the square grid after the relaunch
+    (shot `15-grid-after-relaunch`) as the baseline for P6's thumbnail and preview budgets.
+    Raised limits need a new entry, not a quiet edit.
