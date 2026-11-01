@@ -146,7 +146,7 @@ def main():
             if "params" in step:
                 step["params"] = substitute(step["params"], names)
             if "memory" in step:
-                # {"memory": "label", "maxRssMB": 2500}: record the app's memory (ui.inspect ›
+                # {"memory": "label", "maxRssMB": 1500, "maxEngineMB": 1200}: record the app's memory (ui.inspect ›
                 # memory, plus the process's resident size) in memory.jsonl
                 reply = request(sock, reader, "ui.inspect", {})
                 mem = (reply.get("result") or {}).get("memory")
@@ -157,7 +157,12 @@ def main():
                 limit = step.get("maxRssMB")
                 good = rss is not None and (limit is None or rss <= limit)
                 engine_mb = round(engine / 1048576, 1) if isinstance(engine, (int, float)) else None
-                print(f"{'ok ' if good else ('WARN' if step.get('soft') else 'ERR')} memory {step['memory']}: rss {rss} MB (max {limit}), engine {engine_mb} MB")
+                # "maxEngineMB": ui.inspect › memory › engineBytes (the engine's own caches) must stay under it
+                engine_limit = step.get("maxEngineMB")
+                engine_good = engine_limit is None or (engine_mb is not None and engine_mb <= engine_limit)
+                print(f"{'ok ' if good and engine_good else ('WARN' if step.get('soft') else 'ERR')} memory {step['memory']}: rss {rss} MB (max {limit}), engine {engine_mb} MB (max {engine_limit})")
+                if not engine_good:
+                    (warnings if step.get("soft") else failures).append(f"memory {step['memory']}: engine {engine_mb} MB over {engine_limit} MB")
                 if rss is None:
                     # pgrep/ps found no process: a crash shows up in the tour's other checks
                     warnings.append(f"memory {step['memory']}: the app's resident size was unreadable")
