@@ -217,7 +217,9 @@ impl Host {
                     ..Services::default()
                 }
             };
-            let mut app = LightcraftApp::new(open_session(), services);
+            let mut session = open_session();
+            crate::memtrim::set_ipad_limits(&mut session);
+            let mut app = LightcraftApp::new(session, services);
             // the interface as it was left (panels, language, appearance…)
             let prefs_path = crate::prefs::path();
             let (saved, warning, keep) = prefs_path.as_deref().map_or((None, None, false), crate::prefs::load);
