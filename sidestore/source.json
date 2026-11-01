@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.86",
+          "buildVersion": "86",
+          "date": "2026-11-01T23:09:58Z",
+          "localizedDescription": "RawPad 1.86 (build 86, 9d4cdb6): P6: note 1.84 released",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.86/RawPad.ipa",
+          "size": 19861777,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.84",
           "buildVersion": "84",
           "date": "2026-11-01T22:36:11Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.60/RawPad.ipa",
           "size": 19859407,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.57",
-          "buildVersion": "57",
-          "date": "2026-10-25T22:08:55Z",
-          "localizedDescription": "RawPad 1.57 (build 57, f536a18): P4: handoff links main run 57 and branch run 56",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.57/RawPad.ipa",
-          "size": 19847837,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.84",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.84/RawPad.ipa",
-      "size": 19862184,
-      "versionDate": "2026-11-01T22:36:11Z",
-      "versionDescription": "RawPad 1.84 (build 84, e230e59): Merge p6-hard-checks: relaunch checks hard, memory ceilings, grid-after-relaunch step (branch run 83 green)"
+      "version": "1.86",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.86/RawPad.ipa",
+      "size": 19861777,
+      "versionDate": "2026-11-01T23:09:58Z",
+      "versionDescription": "RawPad 1.86 (build 86, 9d4cdb6): P6: note 1.84 released"
     }
   ],
   "news": []
