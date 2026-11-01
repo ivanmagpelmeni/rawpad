@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.81",
+          "buildVersion": "81",
+          "date": "2026-11-01T21:11:20Z",
+          "localizedDescription": "RawPad 1.81 (build 81, 1a46ef7): P6: handoff and progress after 2026-11-01 evening-3 session (1.79 released; memtrim + relaunch merged)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.81/RawPad.ipa",
+          "size": 19862184,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.79",
           "buildVersion": "79",
           "date": "2026-11-01T20:17:33Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.53/RawPad.ipa",
           "size": 19848310,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.47",
-          "buildVersion": "47",
-          "date": "2026-10-25T19:10:37Z",
-          "localizedDescription": "RawPad 1.47 (build 47, 96b182e): P4: handoff links main run 47",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.47/RawPad.ipa",
-          "size": 19850097,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.79",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.79/RawPad.ipa",
-      "size": 19858891,
-      "versionDate": "2026-11-01T20:17:33Z",
-      "versionDescription": "RawPad 1.79 (build 79, 27da14b): P6: handoff after merging p4-raw24 (run 75 memory numbers)"
+      "version": "1.81",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.81/RawPad.ipa",
+      "size": 19862184,
+      "versionDate": "2026-11-01T21:11:20Z",
+      "versionDescription": "RawPad 1.81 (build 81, 1a46ef7): P6: handoff and progress after 2026-11-01 evening-3 session (1.79 released; memtrim + relaunch merged)"
     }
   ],
   "news": []
