@@ -510,3 +510,11 @@ morning session, which had taken 45 and 46.
     it with `memory::set_release_hook` before the session opens. The memory warning logs
     "memory warning: returned X MB of free pages" (tour: soft check). No upstream patch.
     Expected effect: the resident size falls after zooming out of a raw (run 85: 450 → 541 MB).
+78. **2026-11-02: The GPU pool check is hard; the page release stays in, unproven.** Branch run 88
+    (`p6-gpu-pool`): `raw-zoomed` pooled 54.7 MB (limit 64; run 85: 177 MB) and allocated
+    390 MB (run 85: 512 MB); shot `13-raw-zoomed` still draws the zoomed raw. So
+    `maxGpuPooledMB` now fails the tour (unless the step says `"soft": true`), like
+    `maxPreviews`. The free-page release (DECISIONS 77) logged "returned 0.0 MB" in the
+    simulator, and `after-raw` resident size was 564 MB (run 85: 547 MB): no measurable effect
+    there (the simulator's malloc may differ from a real iPad's). It is harmless and stays; its
+    tour check stays soft. Merged into main the same night.

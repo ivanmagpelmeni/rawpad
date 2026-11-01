@@ -171,7 +171,7 @@ def main():
                         print(f"{'WARN' if step.get('soft') else 'ERR'} memory {step['memory']}: {previews} previews kept (max {previews_limit})")
                         (warnings if step.get("soft") else failures).append(f"memory {step['memory']}: {previews} previews kept, max {previews_limit}")
                 # "maxGpuPooledMB": ui.inspect › memory › gpu › pooled (recycled GPU buffers) must stay under it.
-                # Only a warning for now (DECISIONS 76: hard once a run shows the iPad pool limit working)
+                # Hard since branch run 88 showed the iPad limit working (DECISIONS 78); "soft": true makes it a warning
                 gpu_limit = step.get("maxGpuPooledMB")
                 if gpu_limit is not None:
                     gpu = (mem or {}).get("gpu") or {}
@@ -180,9 +180,10 @@ def main():
                     allocated = gpu.get("allocated")
                     allocated_mb = round(allocated / 1048576, 1) if isinstance(allocated, (int, float)) else None
                     gpu_good = pooled_mb is not None and pooled_mb <= gpu_limit
-                    print(f"{'ok ' if gpu_good else 'WARN'} memory {step['memory']}: gpu {allocated_mb} MB, pooled {pooled_mb} MB (max {gpu_limit})")
+                    gpu_tag = "ok " if gpu_good else ("WARN" if step.get("soft") else "ERR")
+                    print(f"{gpu_tag} memory {step['memory']}: gpu {allocated_mb} MB, pooled {pooled_mb} MB (max {gpu_limit})")
                     if not gpu_good:
-                        warnings.append(f"memory {step['memory']}: gpu pool {pooled_mb} MB over {gpu_limit} MB")
+                        (warnings if step.get("soft") else failures).append(f"memory {step['memory']}: gpu pool {pooled_mb} MB over {gpu_limit} MB")
                 if rss is None:
                     # pgrep/ps found no process: a crash shows up in the tour's other checks
                     warnings.append(f"memory {step['memory']}: the app's resident size was unreadable")
