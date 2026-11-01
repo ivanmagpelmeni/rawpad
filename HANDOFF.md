@@ -15,22 +15,24 @@ end. The next session reads it **first**.
     memory to `memory.jsonl` (shots `13-raw-loupe`, `13-raw-edited`, `13-raw-zoomed`). New
     `sim_test.py` features: `ifFile`, `capture`, `$name`/`$APPDATA` substitution, `memory` steps.
     **Branch run 75** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41339239175): build,
-    tests and the tour step passed (green so far at 20:26; report under `runs/75/` once published).
+    tests and tour green; **merged into main** (its main run releases about 1.76). Checked the
+    `13-raw-*` shots: the A7 III photo opens, edits (+0.70 exposure, +40 shadows) and zooms to
+    60 % with the navigator. `memory.jsonl` (resident MB / engine caches MB): before 184 / 584,
+    open 285 / 586, edited 291 / 591, zoomed 436 / 612, back on photo 1 557 / 591. Budget 1536 MB;
+    the 24 MP original holds 288 MB. (`ps` resident size is below the engine total: macOS
+    compresses idle memory, so treat RSS as a trend only.)
   - **`p6-memtrim`** (commits 92f45ac7, 5a75ec21): memory warnings drop cached photos
     (`apps/rawpad-ios/src/memtrim.rs`, two unit tests) and the tour sends *Debug › Simulate
     Memory Warning* then checks the log line (soft). **Branch run 78**
     (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41341201671) was still running at the
     end (run 77 was cancelled by GitHub while queued; 76 cancelled by me).
 - **Very next step:**
-  1. Run 75: read `runs/75/tour.log` and `runs/75/memory.jsonl`, look at the `13-raw-*` shots (is
-     the A7 III photo shown, edited, zoomed?). Note the resident sizes in PROGRESS.md (Metrics). If
-     good, merge `p4-raw24` into main (`git merge --no-ff`, fetch first: CI pushes SideStore
-     commits).
+  1. Check main's run for the `p4-raw24` merge is green (releases about 1.76).
   2. Run 78: unit tests `memtrim` passed? In `tour.log`: `ok hostMenu Debug > Simulate Memory
      Warning` and the `checkLog 'memory warning: caches held'` line. If the unit test
      `a_memory_warning_drops_cached_photos_but_keeps_the_budget` fails (after == before), the demo
      renders may not fill the media cache: render more photos or check `held()`. Then merge
-     `p6-memtrim` after `p4-raw24` (both touch `sim_tour.jsonl` right after `12-portrait-again`:
+     `p6-memtrim` (`p4-raw24` is already in main) (both touch `sim_tour.jsonl` right after `12-portrait-again`:
      expect a trivial conflict; keep both blocks, memory warning first).
   3. Once both are in: make the memory-warning check hard, and consider tightening `maxRssMB`.
 - **Open problems:**

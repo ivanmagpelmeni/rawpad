@@ -67,9 +67,9 @@ Classic setup steps and source fix.
 
 **2026-11-01 (evening 2, 19:54–20:40 Berlin, unattended)**
 1. Main run 74 green, **released 1.74** (rotation tour, hard checks). No new upstream release (still 0.9.1).
-2. **24 MP raw memory test** (branch `p4-raw24`): CI downloads a CC0 Sony A7 III raw, the tour opens, edits and zooms it and logs memory to `memory.jsonl` (DECISIONS 70). Branch run 75: tour passed; numbers to read next session.
+2. **24 MP raw memory test** (branch `p4-raw24`): CI downloads a CC0 Sony A7 III raw, the tour opens, edits and zooms it and logs memory to `memory.jsonl` (DECISIONS 70). Branch run 75 green, shots checked (opens, edits, zooms); resident size 184 → 436 MB zoomed, the original 288 MB; **merged** (main run releases about 1.76).
 3. **Memory warnings** (branch `p6-memtrim`): the app now drops cached photos and GPU buffers when iPadOS warns, with unit tests and a simulated warning in the tour (DECISIONS 71). Branch run 78 still running at the end.
-4. Neither branch merged yet: next session checks runs 75 and 78, then merges.
+4. `p6-memtrim` not merged yet: next session checks run 78, then merges.
 5. Nothing new for Ivan; his iPad list (1.74 now) is unchanged.
 
 **2026-11-01 (evening 1, 18:54–19:40 Berlin, unattended, first run of the night)**
@@ -264,7 +264,7 @@ Classic setup steps and source fix.
   - tiling, preview downscaling, a smaller thumbnail cache
   - memory warnings (branch `p6-memtrim`, DECISIONS 71)
   - backgrounding and crash safety
-  - 24 MP ARW/RW2 tests (branch `p4-raw24`: CC0 A7 III ARW in the tour, DECISIONS 70)
+  - [x] 24 MP ARW test in the tour (merged: CC0 A7 III ARW in the tour, DECISIONS 70)
 - [ ] **7. Parity sweep against upstream** (minus AI and the second display):
   - touch polish
   - ~~hide the AI mask tiles~~ and ~~AI items in mask menus~~ (done); ArtCraft links kept
@@ -283,7 +283,7 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check branch run 75** (`p4-raw24`: `memory.jsonl`, `13-raw-*` shots), record the numbers, merge.
+1. **Check main's run for the `p4-raw24` merge** (releases about 1.76).
 2. **Check branch run 78** (`p6-memtrim`: unit tests, the simulated memory warning's log line), merge
    after `p4-raw24` (small conflict in `sim_tour.jsonl`).
 3. **Phase 6 next:** backgrounding and crash safety (save on `suspended`, check the library
