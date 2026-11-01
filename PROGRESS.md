@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-01 (evening 1, 18:54–19:40 Berlin, unattended, first run of the night)**
+1. Main run 72 green, **released 1.72** (low text box: keyboard stays up, no flicker). No new upstream release (still 0.9.1).
+2. Checked run 72's shots: the Sync toast ("Sync Settings: 2 photos") is caught in `10-select-several-synced`; the keyboard height the app measures (257 pt) matches the screenshot (DECISIONS 69).
+3. **Rotation in the CI tour:** the tour turns the simulator to landscape and back through the Simulator's Device menu and waits for the window to turn wide and back (DECISIONS 68).
+4. Branch run 73 green; its shots show RawPad laid out properly in landscape (loupe and grid) and back in portrait. Rotation checks made hard; **merged `p4-rotate`** into main (its run releases about 1.74, tour change only).
+5. Next: a 24 MP raw memory test in the simulator; Split View / Stage Manager need Ivan's iPad.
+
 **2026-10-26 (night 4, 02:54–03:40 Berlin, unattended, last run of the night)**
 1. Main run 70 green: **released 1.70** (the loupe shows "Select Several: N photos | Done" above the filmstrip).
 2. Fixed run 69's keyboard flicker: a text box low on the screen (Info panel › Location) kept making the keyboard drop and come back. The keyboard now stays up while the box is being edited, and the box scrolls back into view (DECISIONS 67).
@@ -239,7 +246,7 @@ Classic setup steps and source fix.
 - [x] **2. App shell** launches on the iPad simulator with the LightCraft UI on Metal and the demo
       library; CI screenshots
 - [ ] **3. First install on Ivan's iPad via SideStore**: release 1.8 is ready, waiting for Ivan
-- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events), Pencil skips the long-press wait (brush strokes; DECISIONS.md 39), brush stroke in the CI tour, hardware keyboard read from UIKit with ⌘ as command (DECISIONS.md 40, 41; keys reach the app in CI run 33), on-screen keyboard (DECISIONS.md 43) and keyboard avoidance (DECISIONS.md 45). To do: real-finger and Pencil check on the iPad; rotation, Split View / Stage Manager resizing
+- [~] **4. Input:** done: long-press → context menu, safe area from UIKit, top gap for the multitasking button, pinch-zoom/pan in the loupe (tested in CI with egui events), rotation to landscape and back (CI tour, DECISIONS.md 68), Pencil skips the long-press wait (brush strokes; DECISIONS.md 39), brush stroke in the CI tour, hardware keyboard read from UIKit with ⌘ as command (DECISIONS.md 40, 41; keys reach the app in CI run 33), on-screen keyboard (DECISIONS.md 43) and keyboard avoidance (DECISIONS.md 45). To do: real-finger and Pencil check on the iPad; Split View / Stage Manager resizing (iPad only: not scriptable in the simulator)
 - [~] **5. Files:**
   - Done: Files picker import (photos and folders); JPEG export to `Documents/Exports`;
     Export › Add to Apple Photos (`native::photos_runner`).
@@ -260,25 +267,25 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 70 green, released **1.70** (2026-10-26: Select Several pill in the loupe). Main's run for
-the `p4-keyboard-check` merge (low text box: no keyboard flicker, DECISIONS 67) releases about
-**1.72**. CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
+Main run 72 green, released **1.72** (2026-10-26: low text box keeps the keyboard, no flicker).
+Main's run for the `p4-rotate` merge (tour only: rotation, DECISIONS 68) releases about **1.74**.
+CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
-Sync, the long-press menus, background export, Share button and sheet, Add to Apple Photos as a
-soft check), the export file and the log file.
+Sync, the long-press menus, landscape and back, background export, Share button and sheet, Add to
+Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check main's run for the merge** (releases about 1.72) and its `10-select-several-synced`
-   shot for the Sync toast (HANDOFF.md).
-2. **Rotation and Split View / Stage Manager resizing in the tour** (`simctl` can't rotate: try
-   the Simulator menu via osascript on the CI Mac).
-3. **A 24 MP raw memory test in the simulator** (CC0 ARW/RW2 from `cargo xtask corpus`).
+1. **Check main's run for the `p4-rotate` merge** (releases about 1.74; `12-*` shots).
+2. **A 24 MP raw memory test in the simulator** (CC0 ARW/RW2 from `cargo xtask corpus`; the
+   sandbox can't download, so CI fetches it): open it, move a slider, read `ui.inspect` › `memory`.
+3. **Memory warnings** (phase 6): free caches when iPadOS sends a memory warning
+   (`UIApplicationDidReceiveMemoryWarningNotification`), logged, with a unit-testable trim.
 
 Also queued:
-- Check the measured keyboard height (257 pt logged vs. the screenshot).
 - Delete merged branches (no tool for it from the sandbox).
+- `ui.inspect` › `canvasRect` in the grid includes the title row (the tour hard-codes `top`).
 
 ## Needs Ivan
 
@@ -307,6 +314,11 @@ these and tell Claude in chat what you see (a sentence per item is plenty; "work
    undone. **Three fingers**: redone.
 7. **Pencil and fingers:** paint a brush mask with the Pencil; pinch to zoom; scroll the Edit
    panel with a finger starting on a slider (the slider should not move).
+8. **Turning and sharing the screen:** turn the iPad sideways and back while a photo is open: the
+   screen should re-arrange itself each time. Then open RawPad next to another app (tap the
+   **•••** at the top middle of the screen › **Split View**, pick e.g. Files) and drag the black
+   divider between the two apps: does RawPad stay usable at each size? Say if anything is cut
+   off or squashed.
 
 If anything crashes or freezes: Files › On My iPad › RawPad › Logs › press and hold
 **lightcraft.log** › Share, and send it to Claude in chat.

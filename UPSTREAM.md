@@ -2,7 +2,7 @@
 
 - **Last merged upstream commit:** `4f0b110bcbd2e350c6d97b47f1d824c2222295c4`, Release 0.9.1
   (2026-10-17). This is the fork point.
-- **Last checked:** 2026-10-25 (newest upstream tag still `v0.9.1`; `git ls-remote --tags
+- **Last checked:** 2026-11-01 (newest upstream tag still `v0.9.1`; `git ls-remote --tags
   https://github.com/storytold/lightcraft` works from the sandbox when the releases API doesn't).
 - **Merge policy:** merge each upstream release tag, at most once a week (decided 2026-10-18). To
   merge:
