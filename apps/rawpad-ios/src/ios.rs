@@ -541,8 +541,13 @@ impl ApplicationHandler<UserEvent> for Host {
     }
 
     fn memory_warning(&mut self, _event_loop: &ActiveEventLoop) {
-        log::warn!("memory warning: saving and returning freed memory");
+        log::warn!("memory warning: saving, dropping cached photos and returning freed memory");
         self.save();
+        if let Some(app) = self.app.as_mut() {
+            let t = crate::memtrim::trim_caches(&mut app.session);
+            log::warn!("memory warning: caches held {:.1} MB, now {:.1} MB", t.before as f64 / 1_048_576.0, t.after as f64 / 1_048_576.0);
+            self.ctx.request_repaint();
+        }
         lightcraft_sysmem::release_free_memory();
     }
 }

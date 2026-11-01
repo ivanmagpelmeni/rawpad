@@ -15,6 +15,9 @@ mod keys;
 // keyboard avoidance (on-screen keyboard over a focused field): plain egui, tested on the CI's macOS host too
 #[cfg(any(target_os = "ios", test))]
 mod keyboard;
+// memory warnings: drop cached photos (plain engine calls, tested on the CI's macOS host too)
+#[cfg(any(target_os = "ios", test))]
+mod memtrim;
 #[cfg(target_os = "ios")]
 mod native;
 #[cfg(target_os = "ios")]

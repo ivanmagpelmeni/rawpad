@@ -18,6 +18,8 @@ path = "src/main.rs"
 # the touch-gesture tests (src/touch.rs) run on any host
 [dev-dependencies]
 egui = { workspace = true }
+# the memory-warning trim test (src/memtrim.rs)
+lightcraft-engine = { workspace = true }
 serde_json = { workspace = true }
 
 [target.'cfg(target_os = "ios")'.dependencies]
