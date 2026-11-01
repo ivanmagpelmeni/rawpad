@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.74",
+          "buildVersion": "74",
+          "date": "2026-11-01T19:08:37Z",
+          "localizedDescription": "RawPad 1.74 (build 74, 3bb320c): Merge p4-rotate: tour turns the simulator to landscape and back (branch run 73 green)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.74/RawPad.ipa",
+          "size": 19858890,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.72",
           "buildVersion": "72",
           "date": "2026-10-26T03:10:25Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.44/RawPad.ipa",
           "size": 19836879,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.40",
-          "buildVersion": "40",
-          "date": "2026-10-20T07:38:00Z",
-          "localizedDescription": "RawPad 1.40 (build 40, e773b29): P4: handoff: main run 40 link",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.40/RawPad.ipa",
-          "size": 19827576,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.72",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.72/RawPad.ipa",
-      "size": 19859891,
-      "versionDate": "2026-10-26T03:10:25Z",
-      "versionDescription": "RawPad 1.72 (build 72, d07fb2a): P4: low-field keyboard tour steps are hard checks (run 71: shot and log right)"
+      "version": "1.74",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.74/RawPad.ipa",
+      "size": 19858890,
+      "versionDate": "2026-11-01T19:08:37Z",
+      "versionDescription": "RawPad 1.74 (build 74, 3bb320c): Merge p4-rotate: tour turns the simulator to landscape and back (branch run 73 green)"
     }
   ],
   "news": []
