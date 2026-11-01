@@ -528,7 +528,11 @@ impl ApplicationHandler<UserEvent> for Host {
     }
 
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
+        // iPadOS may end a suspended app without another callback (the CI tour checks this line,
+        // then kills and relaunches the app)
         self.save();
+        let unsaved = self.app.as_ref().and_then(|a| a.session.unsaved().map(|(n, _)| n)).unwrap_or(0);
+        log::info!("suspended: library and view saved ({unsaved} changes unsaved)");
     }
 
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
