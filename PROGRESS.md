@@ -66,7 +66,7 @@ Classic setup steps and source fix.
 ## Latest session summary
 
 **2026-11-01 (evening 5, 22:55–23:40 Berlin, unattended)**
-1. Branch run 83 green (hard relaunch checks, memory ceilings); shot `15-grid-after-relaunch` checked; `p6-hard-checks` **merged** (main run 84 releases about 1.84).
+1. Branch run 83 green (hard relaunch checks, memory ceilings); shot `15-grid-after-relaunch` checked; `p6-hard-checks` **merged** (main run 84 green, released 1.84).
 2. **Fewer cached previews on the iPad** (branch `p6-preview-cap`, DECISIONS 74): 3 loupe-sized decodes instead of 4 (saves about 52 MB), unit test on the macOS host, hard `maxPreviews` = 3 in the tour.
 3. Branch run 85: unit tests, build, clippy and the whole tour green; merged into main after run 84 finished (see HANDOFF for the merge state).
 4. Thumbnails: no extra cap for now (DECISIONS 75): after a relaunch the grid uses the disk cache (0 MB of thumbnail sources).
@@ -298,7 +298,7 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 84 green, releases about **1.84** (2026-11-01: hard relaunch checks and memory ceilings); `p6-preview-cap` (3 cached previews) merged after it.
+Main run 84 green, released **1.84** (2026-11-01: hard relaunch checks and memory ceilings); `p6-preview-cap` (3 cached previews) merged after it.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and

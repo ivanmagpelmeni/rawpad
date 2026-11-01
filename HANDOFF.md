@@ -7,8 +7,8 @@ end. The next session reads it **first**.
   the fifth run of the night).
 - **Upstream:** not re-checked this session (checked at 19:54 Berlin: newest tag `v0.9.1`).
 - **Main:** run 84 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41354485607), the
-  `p6-hard-checks` merge: tour passed, green; it releases about 1.84. Then `p6-preview-cap` was
-  merged on top (its main run releases about 1.86; not watched by this session).
+  `p6-hard-checks` merge: tour passed, green, **released 1.84**. Then `p6-preview-cap` was
+  merged on top (commit ba34be30; its main run releases about 1.86, not watched by this session).
 - **Done this session:**
   - Run 83's report: hard relaunch checks passed; `15-grid-after-relaunch` shows the grid with
     photo 2 selected and 4 stars; `grid-after-relaunch`: 264 MB resident, 174 MB engine.
