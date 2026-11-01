@@ -163,6 +163,13 @@ def main():
                 print(f"{'ok ' if good and engine_good else ('WARN' if step.get('soft') else 'ERR')} memory {step['memory']}: rss {rss} MB (max {limit}), engine {engine_mb} MB (max {engine_limit})")
                 if not engine_good:
                     (warnings if step.get("soft") else failures).append(f"memory {step['memory']}: engine {engine_mb} MB over {engine_limit} MB")
+                # "maxPreviews": ui.inspect › memory › previewSources › count (loupe-sized decodes) must stay under it
+                previews_limit = step.get("maxPreviews")
+                if previews_limit is not None:
+                    previews = ((mem or {}).get("previewSources") or {}).get("count")
+                    if not isinstance(previews, int) or previews > previews_limit:
+                        print(f"{'WARN' if step.get('soft') else 'ERR'} memory {step['memory']}: {previews} previews kept (max {previews_limit})")
+                        (warnings if step.get("soft") else failures).append(f"memory {step['memory']}: {previews} previews kept, max {previews_limit}")
                 if rss is None:
                     # pgrep/ps found no process: a crash shows up in the tour's other checks
                     warnings.append(f"memory {step['memory']}: the app's resident size was unreadable")
