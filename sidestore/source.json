@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.79",
+          "buildVersion": "79",
+          "date": "2026-11-01T20:17:33Z",
+          "localizedDescription": "RawPad 1.79 (build 79, 27da14b): P6: handoff after merging p4-raw24 (run 75 memory numbers)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.79/RawPad.ipa",
+          "size": 19858891,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.74",
           "buildVersion": "74",
           "date": "2026-11-01T19:08:37Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.47/RawPad.ipa",
           "size": 19850097,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.44",
-          "buildVersion": "44",
-          "date": "2026-10-20T09:47:30Z",
-          "localizedDescription": "RawPad 1.44 (build 44, 8f782ac): Merge audit-2026-10-19 (editing audit: keyboard only for a tapped text box, Before/After menu, two-finger undo, slider scrolling, pins visible, AltStore setup; branch run 43 green)",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.44/RawPad.ipa",
-          "size": 19836879,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.74",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.74/RawPad.ipa",
-      "size": 19858890,
-      "versionDate": "2026-11-01T19:08:37Z",
-      "versionDescription": "RawPad 1.74 (build 74, 3bb320c): Merge p4-rotate: tour turns the simulator to landscape and back (branch run 73 green)"
+      "version": "1.79",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.79/RawPad.ipa",
+      "size": 19858891,
+      "versionDate": "2026-11-01T20:17:33Z",
+      "versionDescription": "RawPad 1.79 (build 79, 27da14b): P6: handoff after merging p4-raw24 (run 75 memory numbers)"
     }
   ],
   "news": []
