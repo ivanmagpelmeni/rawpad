@@ -3,53 +3,54 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-01, about 20:30 Berlin, by the scheduled session (19:54–20:40 Berlin,
-  the second run of the night).
-- **Upstream:** checked (`git ls-remote --tags`): newest tag still `v0.9.1`, nothing to merge.
-- **Main:** run 74 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41336426686) green,
-  **released 1.74** (rotation tour, hard checks passed: `ok hostMenu`, `ok waitUntil window`).
-  Main is unchanged by code this session (docs only).
-- **Done this session (DECISIONS 70, 71), on two branches, NOT merged yet:**
-  - **`p4-raw24`** (commit 734ee6f9): the 24 MP raw memory test. CI downloads the CC0 Sony A7 III
-    ARW (sha-checked) into the app's `tmp/`; the tour imports it, opens, edits, zooms 4× and logs
-    memory to `memory.jsonl` (shots `13-raw-loupe`, `13-raw-edited`, `13-raw-zoomed`). New
-    `sim_test.py` features: `ifFile`, `capture`, `$name`/`$APPDATA` substitution, `memory` steps.
-    **Branch run 75** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41339239175): build,
-    tests and tour green; **merged into main** (its main run releases about 1.76). Checked the
-    `13-raw-*` shots: the A7 III photo opens, edits (+0.70 exposure, +40 shadows) and zooms to
-    60 % with the navigator. `memory.jsonl` (resident MB / engine caches MB): before 184 / 584,
-    open 285 / 586, edited 291 / 591, zoomed 436 / 612, back on photo 1 557 / 591. Budget 1536 MB;
-    the 24 MP original holds 288 MB. (`ps` resident size is below the engine total: macOS
-    compresses idle memory, so treat RSS as a trend only.)
-  - **`p6-memtrim`** (commits 92f45ac7, 5a75ec21): memory warnings drop cached photos
-    (`apps/rawpad-ios/src/memtrim.rs`, two unit tests) and the tour sends *Debug › Simulate
-    Memory Warning* then checks the log line (soft). **Branch run 78**
-    (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41341201671) was still running at the
-    end (run 77 was cancelled by GitHub while queued; 76 cancelled by me).
+- **Written:** 2026-11-01, about 21:35 Berlin, by the scheduled session (20:54–21:40 Berlin,
+  the third run of the night).
+- **Upstream:** not re-checked this session (checked at 19:54 Berlin: newest tag `v0.9.1`).
+- **Main:** run 79 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41342404278) green,
+  **released 1.79** (the `p4-raw24` merge). Run 79's `memory.jsonl` (resident MB / engine MB):
+  before-raw 147 / 582, raw-open 193 / 584, edited 93 / 589, zoomed 376 / 610, after 522 / 589.
+- **Done this session:**
+  - Branch run 78 (`p6-memtrim`) green: unit tests `memtrim::*` pass, the Simulator's *Debug ›
+    Simulate Memory Warning* reaches the app, log "caches held 587.1 MB, now 324.7 MB". The check
+    is hard now (commit 47338afc).
+  - **Crash safety** (DECISIONS 72, commit 21b78011): `sim_test.py` has `background` (launch
+    another app, e.g. Settings) and `relaunch` (`simctl terminate`, launch again with the same env,
+    reconnect; the log continues in `app-stderr-2.log`, stdout in `app-stdout-2.log`). The host
+    logs "suspended: library and view saved (N changes unsaved)". The tour's last block rates
+    photo 2 → 4, opens it, backgrounds, kills, relaunches and checks: library line in the new
+    log (hard), ≥ 24 photos (hard), photo 2 rated 4 (hard), suspend line / non-zero replay /
+    `selection` = [2] (soft). Shot `14-relaunched`. Memory warning moved right after the raw
+    test with a new `after-memwarn` memory step.
+  - **Branch run 80** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41344375571, branch
+    `p6-relaunch` incl. the memtrim merge): build, unit tests, clippy and the tour step green
+    (so the hard relaunch checks passed); the device build was still running. **Merged into
+    main** (commit b3e4b830); main's run releases about 1.81.
 - **Very next step:**
-  1. Check main's run for the `p4-raw24` merge is green (releases about 1.76).
-  2. Run 78: unit tests `memtrim` passed? In `tour.log`: `ok hostMenu Debug > Simulate Memory
-     Warning` and the `checkLog 'memory warning: caches held'` line. If the unit test
-     `a_memory_warning_drops_cached_photos_but_keeps_the_budget` fails (after == before), the demo
-     renders may not fill the media cache: render more photos or check `held()`. Then merge
-     `p6-memtrim` (`p4-raw24` is already in main) (both touch `sim_tour.jsonl` right after `12-portrait-again`:
-     expect a trivial conflict; keep both blocks, memory warning first).
-  3. Once both are in: make the memory-warning check hard, and consider tightening `maxRssMB`.
+  1. Check main's run for b3e4b830 is green (releases about 1.81). If red: the only code change
+     is one `log::info!` in `ios.rs` `suspended` and the tour/sim_test changes; revert the merge
+     if it can't be fixed quickly.
+  2. Read run 80's (or main's) report: `tour.log` from `relaunch:` on (did terminate leave the app
+     gone? rc of the launch?), the three soft checks, `app-stderr-2.log`, shot `14-relaunched`
+     (must show photo 2 open in the loupe, not the launch screen). Make passed soft checks hard.
+     If the suspend line is missing: winit's `suspended` may not fire on backgrounding in the
+     simulator; check `app-stderr.log` around the `background` step.
+  3. `memory.jsonl`: compare `after-raw` vs `after-memwarn` (the trim's effect on resident size).
+     Then tighten `maxRssMB` (soft 2500 now; make it hard at about 1500).
 - **Open problems:**
   - Split View / Stage Manager resizing can't be scripted in the simulator: on Ivan's list
     (PROGRESS.md › Needs Ivan › item 8).
   - `ui.inspect` › `canvasRect` in the grid includes the title row, so the tour hard-codes `top`.
   - FEEDBACK.md's two items wait for Ivan to re-test (PROGRESS.md › Needs Ivan › This week).
   - Real-device checks (Pencil, finger pinch, long-press) need Ivan.
+  - Add to Apple Photos in the simulator stays flaky (run 78: soft ERR/WARN as before).
   - Merged branches to delete on GitHub some time: `audit-2026-10-19`, `p4-curve-touch`,
     `p4-touch-all`, `p4-touch-2`, `p4-select-several`, `p4-select-bar`, `p4-select-sync`,
     `p4-reset-menu`, `p4-sync-test`, `p4-preset-preview`, `p4-snapshot-preview`,
-    `p4-film-select`, `p4-keyboard-check`, `p4-rotate` (and later `p4-raw24`, `p6-memtrim`).
+    `p4-film-select`, `p4-keyboard-check`, `p4-rotate`, `p4-raw24`, `p6-memtrim`, `p6-relaunch`.
   - The artifact zip download URL (blob.core.windows.net) is blocked from the sandbox: wait for
     the `ci-artifacts` report.
-  - `ui.inspect`'s `window` is [820, 1110] pt in portrait on the CI simulator (1180 minus the top
-    gap and safe area); the `simctl` screenshot stays in the portrait framebuffer, so landscape
-    shots look turned sideways.
+  - `ui.inspect`'s `window` is [820, 1110] pt in portrait on the CI simulator; the `simctl`
+    screenshot stays in the portrait framebuffer, so landscape shots look turned sideways.
 - **How to check CI:**
   - Runs: `https://api.github.com/repos/Ivanmagpelmeni/rawpad/actions/runs?per_page=3`;
     steps: `…/actions/runs/<id>/jobs` (public, 60 requests/hour). Releases: `…/releases?per_page=2`.
@@ -73,4 +74,5 @@ end. The next session reads it **first**.
     to open a panel for sure use `ui.set {"right": "edit"}` (also `openSections`).
   - `crate::i18n::tr_format!` accepts only messages already in the translations; build new text
     from existing messages or plain `tr`.
-  - `date` in the sandbox runs on UTC; Berlin is UTC+1 (winter time).
+  - `date` in the sandbox runs on UTC; Berlin is UTC+1 (winter time). Shell commands time out
+    after 2 minutes: wait for CI with `sleep 115` per call.

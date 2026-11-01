@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-01 (evening 3, 20:54–21:40 Berlin, unattended)**
+1. Main run 79 (the `p4-raw24` merge) green, **released 1.79** (memory numbers: resident 147 MB before the raw, 376 MB zoomed in). Upstream not re-checked (not the first run of the night).
+2. Branch run 78 green: the simulated memory warning works (caches 587 MB → 325 MB, unit tests pass); the check is hard now. `p6-memtrim` merged into the `p6-relaunch` branch.
+3. **Crash safety in the tour** (branch `p6-relaunch`, DECISIONS 72): the app goes to the background (saves), is killed with `simctl terminate` and launched again; the library, a rating and the open photo must come back.
+4. Branch run 80: build, unit tests, clippy and the whole tour green, so the hard relaunch checks passed (library back, photo 2 still rated 4); **merged** into main (its run releases about 1.81). Run 80's report (soft checks, shot `14-relaunched`) was not published yet at the end.
+5. Nothing new for Ivan; his iPad list is unchanged.
+
 **2026-11-01 (evening 2, 19:54–20:40 Berlin, unattended)**
 1. Main run 74 green, **released 1.74** (rotation tour, hard checks). No new upstream release (still 0.9.1).
 2. **24 MP raw memory test** (branch `p4-raw24`): CI downloads a CC0 Sony A7 III raw, the tour opens, edits and zooms it and logs memory to `memory.jsonl` (DECISIONS 70). Branch run 75 green, shots checked (opens, edits, zooms); resident size 184 → 436 MB zoomed, the original 288 MB; **merged** (main run releases about 1.76).
@@ -262,8 +269,8 @@ Classic setup steps and source fix.
     Export dialog + Add to Apple Photos no longer hangs (DECISIONS.md 33).
 - [~] **6. Performance and memory on the A16 (~6 GB):** (done: on-device log file with panics)
   - tiling, preview downscaling, a smaller thumbnail cache
-  - memory warnings (branch `p6-memtrim`, DECISIONS 71)
-  - backgrounding and crash safety
+  - [x] memory warnings drop cached photos (DECISIONS 71; run 78: 587 → 325 MB)
+  - [~] backgrounding and crash safety: kill-and-relaunch step in the tour (branch `p6-relaunch`, DECISIONS 72)
   - [x] 24 MP ARW test in the tour (merged: CC0 A7 III ARW in the tour, DECISIONS 70)
 - [ ] **7. Parity sweep against upstream** (minus AI and the second display):
   - touch polish
@@ -274,7 +281,7 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 74 green, released **1.74** (2026-11-01: rotation to landscape and back in the tour).
+Main run 79 green, released **1.79** (2026-11-01: 24 MP raw memory test). Main now also has the memory-warning trim and the kill-and-relaunch tour step (its run releases about 1.81).
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -283,11 +290,16 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check main's run for the `p4-raw24` merge** (releases about 1.76).
-2. **Check branch run 78** (`p6-memtrim`: unit tests, the simulated memory warning's log line), merge
-   after `p4-raw24` (small conflict in `sim_tour.jsonl`).
-3. **Phase 6 next:** backgrounding and crash safety (save on `suspended`, check the library
-   reopens after the app is killed in the simulator: `simctl terminate` + `launch`).
+1. **Check main's run for the `p6-relaunch` merge** (releases about 1.81) and run 80/81's
+   report: `tour.log` lines after `relaunch`, the soft checks (suspend log line, non-zero log
+   records replayed, `selection` = [2]), shot `14-relaunched`, `app-stderr-2.log`. Make the soft
+   ones hard if they passed; if "suspended" never appears, winit may not call `suspended` on
+   backgrounding: look for another hook (`UIApplicationDidEnterBackgroundNotification`).
+2. **Tighten memory limits:** with a few runs of `memory.jsonl` (75, 78, 80…), make `maxRssMB`
+   hard at a limit with room (e.g. 1500 MB) and add an engine-bytes limit.
+3. **Phase 6 next:** thumbnail cache size and preview downscaling on the iPad (look at
+   `ui.inspect` › `memory` breakdown in `memory.jsonl` after the grid has scrolled through
+   every photo).
 
 Also queued:
 - Delete merged branches (no tool for it from the sandbox).
@@ -298,7 +310,7 @@ Also queued:
 ### This week: what to test on the iPad (start here)
 
 First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
-**My Apps** › **Update** next to RawPad (pick the newest: 1.74). Then try
+**My Apps** › **Update** next to RawPad (pick the newest: 1.79 or later). Then try
 these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
 
 1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several
