@@ -3,37 +3,50 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-01, about 23:40 Berlin, by the scheduled session (22:55–23:40 Berlin,
-  the fifth run of the night).
+- **Written:** 2026-11-02, about 00:35 Berlin, by the scheduled session (23:55–00:35 Berlin,
+  the sixth run of the night).
 - **Upstream:** not re-checked this session (checked at 19:54 Berlin: newest tag `v0.9.1`).
-- **Main:** run 84 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41354485607), the
-  `p6-hard-checks` merge: tour passed, green, **released 1.84**. Then `p6-preview-cap` was
-  merged on top (commit ba34be30; its main run releases about 1.86, not watched by this session).
-- **Done this session:**
-  - Run 83's report: hard relaunch checks passed; `15-grid-after-relaunch` shows the grid with
-    photo 2 selected and 4 stars; `grid-after-relaunch`: 264 MB resident, 174 MB engine.
-    `p6-hard-checks` merged (e230e59e).
-  - Branch **`p6-preview-cap`** (DECISIONS 74, f4db3660): `memtrim::set_ipad_limits` sets
-    `session.media.preview_capacity = 3` in `ios.rs` › `start` (no upstream patch); unit test
-    `the_ipad_keeps_at_most_three_loupe_sized_decodes`; `sim_test.py` memory steps take a hard
-    `maxPreviews` (3 on every memory step after `before-raw`).
-  - Branch run 85 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41354581646) green:
-    `previewSources` count 3 at every step (157 MB instead of 210 MB); shot `08-side-by-side`
-    looks right. Merged into main after run 84.
-  - DECISIONS 75: no extra thumbnail cap for now.
+- **Main:** run 86 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41358103103), the
+  `p6-preview-cap` merge + docs: green, **released 1.86**. Its `memory.jsonl`: `previewSources`
+  count ≤ 3 at every step (1 after the memory warning). Nothing new merged into main since.
+- **Done this session:** branch **`p6-gpu-pool`** (2 commits, not merged yet):
+  - 55bc82fd (DECISIONS 76): `memtrim::set_ipad_limits` settles `memory::budget()` and calls
+    `gpu::set_pool_limit(64 MB)` (engine default: budget/8 = 192 MB; run 85 had 177 MB pooled
+    while zoomed into the 24 MP raw). Unit test `the_ipad_pools_at_most_64_mb_of_gpu_buffers`.
+    `sim_test.py`: new memory-step key `maxGpuPooledMB` (always only a warning for now) on
+    `raw-zoomed` and `after-raw`. Finding: leaving the zoomed view already frees the whole pool
+    (upstream's `trim_when_idle`), so the pool only mattered for the zoomed peak.
+  - 9f702491 (DECISIONS 77): upstream's `lightcraft_sysmem` returns free malloc pages only on
+    macOS, and the iOS host never set the engine's release hook, so `memory::release` did nothing
+    on the iPad. `native::release_free_memory` (one FFI call to `malloc_zone_pressure_relief`,
+    `// SAFETY:` note) + `memory::set_release_hook` in `ios.rs` › `start`; the memory warning logs
+    "memory warning: returned X MB of free pages" (tour: soft `checkLog`). Aim: the resident size
+    that rose from ~470 to ~547 MB after zooming out (runs 83–86) should fall.
+  - DECISIONS 76 and 77 are written on the branch only (they reach main with the merge).
+  - Branch run 88 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41359954963): unit
+    tests (incl. the new one) and the simulator build green; the whole simulator tour passed (23:32 UTC, then the device build); its report (`memory.jsonl`, screenshots) was not published yet when the session ended
 - **Very next step:**
-  1. Check the main run after the `p6-preview-cap` merge (the newest `main` run): green, and its
-     `memory.jsonl` shows `previewSources` count ≤ 3. If HANDOFF's merge didn't happen
-     (`git log origin/main` has no "Merge p6-preview-cap"), merge it now
-     (`git merge --no-ff origin/p6-preview-cap`, fetch first).
-  2. Then PROGRESS.md › Next 3 tasks › 2 (GPU pool after zooming a 24 MP raw: 117 → 513 MB).
+  1. Check branch run 88: green? Then read `runs/88/memory.jsonl` (`ci-artifacts`): `raw-zoomed`
+     gpu `pooled` ≤ 64 MB and `allocated` lower than 489 MB; `after-raw` `rssMB` lower than
+     ~547; `tour.log` has `ok checkLog 'memory warning: returned'`. Look at shot
+     `13-raw-zoomed` (zoomed raw still drawn). If all good, merge into main
+     (`git fetch origin; git checkout main; git merge --ff-only origin/main;
+     git merge --no-ff origin/p6-gpu-pool`) and push — only when no main run is going.
+  2. If the pool check passed, make `maxGpuPooledMB` hard (and the `returned` checkLog) in a
+     follow-up with a DECISIONS entry.
+  3. Then PROGRESS.md › Next 3 tasks › 2 (touch polish: small touch targets) or the upstream
+     merge at the first run of the night.
 - **Open problems:**
+  - Whether a 64 MB pool slows panning a zoomed raw is not measured (the tour has no pan timing
+    on the raw). Watch `ui.inspect` › `perf` if Ivan reports slow pans.
   - Split View / Stage Manager resizing can't be scripted in the simulator: on Ivan's list
     (PROGRESS.md › Needs Ivan › item 8).
   - `ui.inspect` › `canvasRect` in the grid includes the title row, so the tour hard-codes `top`.
   - FEEDBACK.md's two items wait for Ivan to re-test (PROGRESS.md › Needs Ivan › This week).
   - Real-device checks (Pencil, finger pinch, long-press) need Ivan.
   - Add to Apple Photos in the simulator stays flaky (soft check).
+  - `apps/rawpad-ios/Cargo.toml` still lists `lightcraft-sysmem` (now unused on iOS); removing it
+    changes Cargo.lock, which this sandbox can't regenerate: leave it.
   - Merged branches to delete on GitHub some time: `audit-2026-10-19`, `p4-curve-touch`,
     `p4-touch-all`, `p4-touch-2`, `p4-select-several`, `p4-select-bar`, `p4-select-sync`,
     `p4-reset-menu`, `p4-sync-test`, `p4-preset-preview`, `p4-snapshot-preview`,
@@ -58,12 +71,14 @@ end. The next session reads it **first**.
     raw.githubusercontent.com is blocked from the sandbox: use `git fetch` as above.
   - Pushing code to main while a run is going cancels it. Markdown-only pushes don't start a run.
     CI pushes `SideStore source: RawPad x.y` to main after each release: fetch before merging.
-    `git reset --hard` is refused in the sandbox: use `git checkout -B main origin/main`.
+    `git reset --hard` (and a chained fetch/checkout/reset) is refused in the sandbox: use
+    `git checkout main` then `git merge --ff-only origin/main`.
     `git fetch origin main` overwrites FETCH_HEAD: fetch `ci-artifacts` again before `git show`.
   - A memory step's numbers: `runs/<n>/memory.jsonl` (one JSON line per `memory` tour step).
   - Branch runs: `workflow_dispatch` of `ipad.yml` on the branch with `{"release": false}`
     (GitHub MCP `actions_run_trigger`, owner `ivanmagpelmeni`). A full run takes 25–35 minutes;
-    two branch runs can go at once. A push to a branch doesn't start a run, so push every commit
+    two branch runs can go at once, but a run triggered on a branch that already has one queued
+    replaces it (concurrency group per ref). A push to a branch doesn't start a run, so push every commit
     before triggering. CI only runs the `tests_curve` module of the UI crate's unit tests, so
     app-level tests for iPad patches go there.
   - `ui.set` view names: `photoGrid`, `squareGrid`, `detail`, `compare`, `survey`, `reference`,

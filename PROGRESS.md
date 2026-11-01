@@ -65,6 +65,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-01/02 (night 6, 23:55–00:35 Berlin, unattended)**
+1. Main run 86 (the `p6-preview-cap` merge) green, **released 1.86**; its `memory.jsonl` keeps at most 3 cached previews everywhere.
+2. Zoomed-raw memory: leaving the zoom already frees the GPU pool; branch `p6-gpu-pool` caps the pool at 64 MB on the iPad (was 192 MB; 177 MB used while zoomed), DECISIONS 76.
+3. Found that RawPad never handed freed memory pages back to iPadOS (upstream only does it on macOS): same branch fixes it (DECISIONS 77), aiming at the resident size that grew after zooming out (~470 → ~547 MB).
+4. Branch run 88: unit tests, build and the whole simulator tour green; memory numbers not read yet; not merged yet (next session checks its memory numbers, then merges).
+5. Nothing new for Ivan; his iPad list is unchanged (update to 1.86 or later).
+
 **2026-11-01 (evening 5, 22:55–23:40 Berlin, unattended)**
 1. Branch run 83 green (hard relaunch checks, memory ceilings); shot `15-grid-after-relaunch` checked; `p6-hard-checks` **merged** (main run 84 green, released 1.84).
 2. **Fewer cached previews on the iPad** (branch `p6-preview-cap`, DECISIONS 74): 3 loupe-sized decodes instead of 4 (saves about 52 MB), unit test on the macOS host, hard `maxPreviews` = 3 in the tour.
@@ -283,6 +290,7 @@ Classic setup steps and source fix.
     Export dialog + Add to Apple Photos no longer hangs (DECISIONS.md 33).
 - [~] **6. Performance and memory on the A16 (~6 GB):** (done: on-device log file with panics)
   - tiling (open)
+  - [~] zoomed raw: GPU pool capped at 64 MB, free pages returned to iPadOS (DECISIONS 76, 77; branch `p6-gpu-pool`)
   - [x] fewer cached previews: 3 instead of 4 (DECISIONS 74, branch run 85)
   - [x] thumbnail cache: no extra cap needed for now (DECISIONS 75)
   - [x] memory warnings drop cached photos (DECISIONS 71; run 78: 587 → 325 MB)
@@ -298,7 +306,7 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 84 green, released **1.84** (2026-11-01: hard relaunch checks and memory ceilings); `p6-preview-cap` (3 cached previews) merged after it.
+Main run 86 green, released **1.86** (2026-11-01: at most 3 cached previews). Branch `p6-gpu-pool` (GPU pool cap, free pages back to iPadOS) waits for its run 88 check.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -307,14 +315,12 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p6-preview-cap`** if HANDOFF says it is not merged yet (branch run 85 green), then
-   check the next main run's `memory.jsonl`: `previewSources` count ≤ 3 everywhere.
-2. **Phase 6, tiling / the zoomed view:** `raw-zoomed` in `memory.jsonl` shows GPU allocations
-   jump 117 → 513 MB (177 MB pooled) when zooming a 24 MP raw. Find out whether `gpu::trim_pool`
-   with a small budget after leaving the loupe is enough (host-side, no upstream patch), and
-   add a memory step after zooming out.
-3. **Phase 7, routine upstream merge** at the first run of the night (check releases), then the
-   parity sweep's touch polish (small touch targets from the audit list above).
+1. **Merge `p6-gpu-pool`** once branch run 88 is green and `runs/88/memory.jsonl` shows the GPU
+   pool ≤ 64 MB at `raw-zoomed` and a lower `rssMB` at `after-raw` (HANDOFF has the steps);
+   then make those checks hard.
+2. **Phase 7, touch polish** (parity sweep): small touch targets from the audit list above
+   (curve points, mask handles, crop corners, radial rotate knob, rating stars).
+3. **Phase 7, routine upstream merge** at the first run of the night (check releases).
 
 Also queued:
 - Delete merged branches (no tool for it from the sandbox).
@@ -325,7 +331,7 @@ Also queued:
 ### This week: what to test on the iPad (start here)
 
 First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
-**My Apps** › **Update** next to RawPad (pick the newest: 1.79 or later). Then try
+**My Apps** › **Update** next to RawPad (pick the newest: 1.86 or later). Then try
 these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
 
 1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several
