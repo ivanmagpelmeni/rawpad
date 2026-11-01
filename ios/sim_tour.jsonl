@@ -224,6 +224,24 @@
 {"method":"ui.key","params":{"key":"Escape"}}
 {"method":"engine.execute","params":{"command":"panel.edit"}}
 {"sleep":2}
+# rotation (DECISIONS.md 68): the Simulator's Device menu turns the iPad (simctl can't). The window
+# must turn wide and back, the safe area be read again, the app keep running. Soft until the
+# screenshots 12-* are checked
+{"logMark":"rotate"}
+{"hostMenu":["Device","Rotate Left"]}
+{"waitUntil":"window","wider":true,"method":"ui.inspect","timeout":20,"soft":true}
+{"sleep":2}
+{"shot":"12-landscape-loupe"}
+{"method":"ui.set","params":{"view":"photoGrid"}}
+{"sleep":2}
+{"shot":"12-landscape-grid"}
+{"method":"ui.set","params":{"view":"detail"}}
+{"checkLog":"safe area (points)","since":"rotate","soft":true}
+{"hostMenu":["Device","Rotate Right"]}
+{"waitUntil":"window","wider":false,"method":"ui.inspect","timeout":20,"soft":true}
+{"sleep":2}
+{"shot":"12-portrait-again"}
+{"method":"ui.inspect"}
 # export: the first export goes to Documents/Exports (Files ▸ On My iPad ▸ RawPad)
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"jpeg"}},"expectOk":true}
 {"sleep":10}

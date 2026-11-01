@@ -92,6 +92,11 @@ def main():
                     elif "differs" in step:
                         # {"waitUntil": "ui.pan", "differs": [0.5, 0.5]}: until the value changes
                         value = value is not None and value != step["differs"]
+                    elif "wider" in step:
+                        # {"waitUntil": "window", "wider": true}: a [width, height] in landscape
+                        # (false: in portrait), e.g. after a hostMenu rotation
+                        wide = isinstance(value, list) and len(value) == 2 and value[0] > value[1]
+                        value = wide == bool(step["wider"])
                     if value or time.time() > deadline:
                         break
                     time.sleep(2)
@@ -116,6 +121,22 @@ def main():
                 except (OSError, subprocess.TimeoutExpired) as e:
                     status, err = "WARN", str(e)[:200]
                 print(f"{status} hostKeys {keys!r} cmd={cmd} {err}")
+                continue
+            if "hostMenu" in step:
+                # {"hostMenu": ["Device", "Rotate Left"]}: pick a menu item of the Simulator app on
+                # the CI Mac (rotation; simctl has no command for it). Same System Events access as
+                # hostKeys; never fails the tour itself: the waitUntil after it checks the effect
+                menu, item = step["hostMenu"]
+                script = (
+                    'tell application "Simulator" to activate\ndelay 1\n'
+                    f'tell application "System Events" to tell process "Simulator" to click menu item "{item}" of menu "{menu}" of menu bar 1'
+                )
+                try:
+                    r = subprocess.run(["osascript", "-e", script], capture_output=True, text=True, timeout=30)
+                    status, err = ("ok " if r.returncode == 0 else "WARN"), r.stderr.strip()[:200]
+                except (OSError, subprocess.TimeoutExpired) as e:
+                    status, err = "WARN", str(e)[:200]
+                print(f"{status} hostMenu {menu} > {item} {err}")
                 continue
             if "logMark" in step:
                 # remember how far the app's log (app-stderr.log, written by simctl launch) is
