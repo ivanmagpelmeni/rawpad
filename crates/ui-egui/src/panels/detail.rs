@@ -2160,9 +2160,14 @@ fn mask_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
                     points.push(n);
                 }
                 _ => {
+                    let mut points = stroke_lead_in(ui, resp, map);
                     let mut pressure = Vec::new();
-                    record_pressure(&mut pressure, 0, force);
-                    app.gesture = Some(Gesture::Brush { points: vec![n], pressure });
+                    for i in 0..points.len() {
+                        record_pressure(&mut pressure, i, force);
+                    }
+                    record_pressure(&mut pressure, points.len(), force);
+                    points.push(n);
+                    app.gesture = Some(Gesture::Brush { points, pressure });
                 }
             }
         }
@@ -2437,7 +2442,11 @@ fn remove_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respo
         let n = map.norm(q);
         match &mut app.gesture {
             Some(Gesture::Spot { points }) => points.push(n),
-            _ => app.gesture = Some(Gesture::Spot { points: vec![n] }),
+            _ => {
+                let mut points = stroke_lead_in(ui, resp, map);
+                points.push(n);
+                app.gesture = Some(Gesture::Spot { points });
+            }
         }
     }
     if let Some(Gesture::Spot { points }) = &app.gesture {
@@ -3060,6 +3069,20 @@ pub(crate) fn pen_force(i: &egui::InputState) -> Option<f32> {
         egui::Event::Touch { force: Some(f), .. } if f.is_finite() => Some(f.clamp(0.0, 1.0)),
         _ => None,
     })
+}
+
+/// RawPad (iOS, and this crate's tests): where a brush or spot stroke that starts with a drag
+/// really began. egui reports the drag only once the finger has moved past its threshold, so
+/// without this the first few millimetres of a finger or Pencil stroke were lost (editing audit,
+/// item 15). Returns the press point when it differs from where the drag was noticed, else nothing.
+fn stroke_lead_in(ui: &egui::Ui, resp: &egui::Response, map: &CanvasMap) -> Vec<Point> {
+    if !(cfg!(target_os = "ios") || cfg!(test)) || !resp.drag_started() {
+        return Vec::new();
+    }
+    let (Some(press), Some(now)) = (ui.input(|i| i.pointer.press_origin()), resp.interact_pointer_pos()) else {
+        return Vec::new();
+    };
+    if press == now { Vec::new() } else { vec![map.norm(press)] }
 }
 
 /// Record the pressure of the stroke's point `index`: `force` when the pen reported one this frame, else the last

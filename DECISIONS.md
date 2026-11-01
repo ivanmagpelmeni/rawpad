@@ -518,3 +518,10 @@ morning session, which had taken 45 and 46.
     simulator, and `after-raw` resident size was 564 MB (run 85: 547 MB): no measurable effect
     there (the simulator's malloc may differ from a real iPad's). It is harmless and stays; its
     tour check stays soft. Merged into main the same night.
+79. **2026-11-02: Brush and Remove strokes start where the finger touched.** egui reports a drag
+    only after the pointer moved past its threshold, so the brush and spot tools began the stroke
+    there and lost its first few millimetres (editing audit, item 15; the crop and targeted
+    adjustment already use `press_origin()`, DECISIONS of the touch-target work). On iOS and in
+    unit tests, `detail.rs › stroke_lead_in` puts the press point in front of the first sample
+    when a new stroke starts with a drag (clicks and still holds are unchanged; pressure is
+    copied to the extra point). Desktop behaviour is untouched. Unit test in `tests_curve.rs`.
