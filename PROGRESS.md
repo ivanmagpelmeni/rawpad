@@ -42,7 +42,7 @@ the program (no screenshot yet). Statuses are for 1.38, the version on Ivan's iP
 | 27 | Zoom (fit, 1:1, pinch), navigator | Works (CI) | Screenshots 04-pinch-zoom, 04-panned. Real fingers not checked. |
 | 28 | Histogram and clipping warnings | Works (code) | Tap the triangles on the histogram. |
 | 29 | Ratings, flags | Works (CI) | Stars in the bottom bar are small (19 pt). |
-| 30 | Colour labels | Works (code) | Info panel or Photo menu; not in the bottom bar. |
+| 30 | Colour labels | Works (code) | Info panel or Photo menu. **Being added 2026-11-02:** a label button at the end of the bottom bar's star/flag pill (branch `p7-label-pill`, DECISIONS 80). |
 | 31 | Export | Works (CI) | Export, Share button, Add to Apple Photos. |
 | 32 | Search box and keyword fields bring up the keyboard | Works (CI) | Screenshot 04-text-field. |
 | — | Apple Pencil, real-finger pinch, two-finger tap, long-press | Not checked | Need the real iPad (see Needs Ivan). |
@@ -65,6 +65,13 @@ three-finger redo; up/down drags on sliders scroll the panel; mask pins always v
 Classic setup steps and source fix.
 
 ## Latest session summary
+
+**2026-11-02 (night 8, 01:54–02:40 Berlin, unattended)**
+1. Main run 89 green (released 1.89); **`p7-stroke-start` merged** (brush/Remove strokes start where the finger touched); main run 91 releases it (about 1.91) if green.
+2. New branch **`p7-label-pill`** (DECISIONS 80): a colour-label button at the end of the bottom bar's star/flag pill on the iPad (audit item 30). Unit test, build and clippy green in branch run 92.
+3. Run 92's tour failed only on the new label steps: in portrait with the Edit panel open the bottom bar has no room for the pill at all (stars and flags are hidden there too, already before). The tour now closes the panel first; branch run 93 is checking it.
+4. Upstream not checked (its GitHub isn't attached to this session).
+5. Nothing new for Ivan; his iPad list is unchanged.
 
 **2026-11-02 (night 7, 00:55–01:40 Berlin, unattended)**
 1. Branch run 88 checked: GPU pool 55 MB while zoomed into the 24 MP raw (was 177 MB), zoomed shot fine; **`p6-gpu-pool` merged** (main run 89, releases about 1.89).
@@ -323,10 +330,14 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p7-stroke-start`** (branch run 90 green) once main run 89 has finished (HANDOFF
-   has the steps).
-2. **Phase 7, touch polish** (audit list, remaining): item 2's last bit is done; next are the
-   hover-only reset hints and colour labels in the bottom bar (audit items 5, 30).
+1. **Check branch run 93 (`p7-label-pill`)**: tour 0 ERR and shots `08-label-menu` /
+   `08-label-green` show the menu and a green dot; then merge it when no main run is going
+   (HANDOFF has the steps).
+2. **Phase 7, touch polish**: the bottom bar hides the stars, flags (and now the label) in
+   portrait with a right panel open (820 pt is too narrow). Consider a compact pill (stars only,
+   or a single "rating" button with a menu) when there is no room. Then the hover-only reset hint
+   (audit item 5: the long-press *Reset* menu already exists, DECISIONS 61; maybe just say so in
+   the slider's long-press menu / SETUP tips).
 3. **Phase 7, routine upstream merge**: needs the upstream repo attached to the session
    (`storytold/lightcraft`, read access); check its releases first.
 
