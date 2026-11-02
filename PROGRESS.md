@@ -66,6 +66,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-02 (night 9, 02:54–03:40 Berlin, unattended, last run of the night)**
+1. Main run 91 (the `p7-stroke-start` merge) green, **released 1.91**: brush and Remove strokes start where the finger or Pencil touched.
+2. Branch run 93 showed why the label button was missing: in portrait the bottom bar has about 205 pt for the pill, the full pill needs 208 (236 with the label), so the iPad showed **no stars, flags or label at all** in portrait.
+3. **Compact pill** (branch `p7-label-pill`, DECISIONS 81 in that branch): when the full pill doesn't fit, a small rating button (star, count, flag) opens a menu with the stars and flags, followed by the label button. New unit test; tour shots `08-compact-pill`, `08-rating-menu`, `08-rated-3`.
+4. Branch run 94: see HANDOFF for its result. **Not merged tonight on purpose** (DECISIONS 82, in that branch): a main run takes 40 minutes, longer than this session, and the last run of the night must leave main green.
+5. For Ivan: update to 1.91 or later and try the list below; item 7 now includes the brush starting where the Pencil touched.
+
 **2026-11-02 (night 8, 01:54–02:40 Berlin, unattended)**
 1. Main run 89 green (released 1.89); **`p7-stroke-start` merged** (brush/Remove strokes start where the finger touched); main run 91: tests, tour and device build green, release (about 1.91) pending at session end.
 2. New branch **`p7-label-pill`** (DECISIONS 80): a colour-label button at the end of the bottom bar's star/flag pill on the iPad (audit item 30). Unit test, build and clippy green in branch run 92.
@@ -321,7 +328,9 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 89 (the `p6-gpu-pool` merge + hard GPU-pool check) was running at 01:40 Berlin; it releases about 1.89. Branch `p7-stroke-start` (strokes start at the touch) waits for branch run 90 and then a merge.
+Main is green: main run 91 (the `p7-stroke-start` merge) released 1.91. Branch `p7-label-pill`
+(colour-label button and compact rating pill in the bottom bar) waits for a merge; branch run 94
+is its check (HANDOFF has the result).
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -330,14 +339,10 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check branch run 93 (`p7-label-pill`)**: tour 0 ERR and shots `08-label-menu` /
-   `08-label-green` show the menu and a green dot; then merge it when no main run is going
-   (HANDOFF has the steps).
-2. **Phase 7, touch polish**: the bottom bar hides the stars, flags (and now the label) in
-   portrait with a right panel open (820 pt is too narrow). Consider a compact pill (stars only,
-   or a single "rating" button with a menu) when there is no room. Then the hover-only reset hint
-   (audit item 5: the long-press *Reset* menu already exists, DECISIONS 61; maybe just say so in
-   the slider's long-press menu / SETUP tips).
+1. **Merge `p7-label-pill`** if branch run 94 is green (HANDOFF has the steps), at the start of
+   a session so its main run (about 40 minutes) can be watched to the end.
+2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5),
+   then the hover-only colour wheels' eye (item 10).
 3. **Phase 7, routine upstream merge**: needs the upstream repo attached to the session
    (`storytold/lightcraft`, read access); check its releases first.
 
@@ -350,7 +355,7 @@ Also queued:
 ### This week: what to test on the iPad (start here)
 
 First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
-**My Apps** › **Update** next to RawPad (pick the newest: 1.86 or later). Then try
+**My Apps** › **Update** next to RawPad (pick the newest: 1.91 or later). Then try
 these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
 
 1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several
@@ -371,7 +376,9 @@ these and tell Claude in chat what you see (a sentence per item is plenty; "work
 6. **Undo with fingers:** after a slider change, tap the photo with **two fingers** at once:
    undone. **Three fingers**: redone.
 7. **Pencil and fingers:** paint a brush mask with the Pencil; pinch to zoom; scroll the Edit
-   panel with a finger starting on a slider (the slider should not move).
+   panel with a finger starting on a slider (the slider should not move). New in 1.91: the
+   brush line (and a Remove stroke) should start exactly where the Pencil first touched, not a
+   few millimetres later.
 8. **Turning and sharing the screen:** turn the iPad sideways and back while a photo is open: the
    screen should re-arrange itself each time. Then open RawPad next to another app (tap the
    **•••** at the top middle of the screen › **Split View**, pick e.g. Files) and drag the black

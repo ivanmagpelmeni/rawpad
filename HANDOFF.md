@@ -3,43 +3,49 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-02, about 02:30 Berlin, by the scheduled session (01:54–02:40 Berlin,
-  the eighth run of the night).
+- **Written:** 2026-11-02, about 03:35 Berlin, by the scheduled session (02:54–03:40 Berlin,
+  the ninth and last run of the night).
 - **Upstream:** not checked: `storytold/lightcraft` isn't attached to this session. Last known:
   `v0.9.1` (checked 2026-11-01 19:54 Berlin).
-- **Main:** main run 89 green, released 1.89. **`p7-stroke-start` merged** (e3c8d6be); main run
-  91 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41369736165) started 00:55 UTC and
-  releases about 1.91: at 01:31 UTC its unit tests, clippy, the whole tour and the
-  device build were green; only the release step was still to come.
+- **Main:** green. Main run 91 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41369736165,
+  the `p7-stroke-start` merge) succeeded and **released v1.91**. Only Markdown was pushed to main
+  this session (no run). **Nothing merged tonight on purpose** (DECISIONS 82, in the branch).
 - **Done this session:**
-  - Branch **`p7-label-pill`** (DECISIONS 80, UPSTREAM row): on iOS and in unit tests the bottom
-    bar's star/flag pill ends with a colour-label button (`icon:labelMenu`) opening the label menu
-    (`bottomLabel:<colour>` / `bottomLabel:none`); unit test
-    `tests_curve::the_bottom_bars_label_button_sets_and_clears_the_colour_label`; tour shots
-    `08-label-menu`, `08-label-green`.
-  - Branch run 92 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41369868252): unit tests
-    (incl. the new one), build, clippy green; **tour failed only on the 4 new label steps**: in
-    portrait (820 pt) with the Edit panel open the bottom bar has no room for the pill at all (no
-    stars or flags there either, before this change too; see `runs/92/08-label-menu.jpg`).
-  - Fix pushed (843ce5b7, "tour closes the Edit panel before the label button steps"): `ui.set
-    {"right":"none"}` before, `{"right":"edit"}` after. Branch run 93
-    (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41372532845) started 01:26 UTC.
+  - Branch run 93 failed only on the tour's label steps: even with the Edit panel closed, in
+    portrait (820 pt) the bottom bar has about 205 pt between the view modes and the zoom group;
+    the full pill needs 208 (236 with the label button), so the iPad shows **no stars, flags or
+    label in portrait at all** (`runs/93/08-label-menu.jpg`).
+  - Branch **`p7-label-pill`**, commit a19ab7bd (DECISIONS 81 and an UPSTREAM row, in the
+    branch): the stars/flags code moved into `bottombar.rs › rate_and_flag`; on iOS and in unit
+    tests, a bar too narrow for the full pill but at least 98 pt wide shows a **compact pill**: a
+    50-pt rating button `icon:ratingMenu` (star, count, pick/reject flag) whose menu holds the
+    stars and flags (`star:bottom:<n>`, `flag:<id>`), then the label button `icon:labelMenu`.
+    Unit test `tests_curve::a_narrow_bottom_bar_shows_the_compact_rating_pill` (narrows the
+    window with `ui.resize` until the compact pill shows; rates 4, picks, labels green). Tour:
+    new shots `08-compact-pill`, `08-rating-menu`, `08-rated-3` before the label steps.
+  - Branch run 94 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41375114684):
+    unit tests (incl. the new one), format, build and clippy green; the tour was running at
+    03:16 Berlin (result: see the run page; this line is updated if known before 03:40).
 - **Very next step:**
-  1. Main run 91 green? (If red: read its log; fix or revert the merge e3c8d6be.)
-  2. Branch run 93: tour 0 ERR? Look at `runs/93/08-label-menu.jpg` (menu with five colours
-     above the pill) and `08-label-green.jpg` (green dot at the pill's end). If the label button
-     is still missing, the bar is too narrow even without the panel: read `replies.jsonl` /
-     `ui.widgets`, maybe turn the phone landscape in the tour or shrink the pill.
-  3. If green and no main run is going: `git fetch origin; git checkout main; git merge --ff-only
-     origin/main; git merge --no-ff origin/p7-label-pill`, push.
-  4. Then PROGRESS.md › Next 3 tasks › 2 (a compact pill when the bar is narrow).
+  1. Branch run 94: if the tour has 0 ERR, look at `runs/94/08-compact-pill.jpg` (a small pill
+     with a star, "0" and a ring left of the zoom controls), `08-rating-menu.jpg` (five stars and
+     three flags in a menu), `08-rated-3.jpg` (count 3), `08-label-menu.jpg`,
+     `08-label-green.jpg`. If a step failed: if `star:bottom:3` failed, the menu may close on
+     the press before the click (check `replies.jsonl`); if `icon:labelMenu` failed after the
+     star, the rating menu stayed open (egui's Popup close behaviour): call `ui.close()` after
+     `photo.rate` / `photo.flag` inside `compact_pill`'s menu.
+  2. If green and no main run is going: `git fetch origin; git checkout main; git merge --ff-only
+     origin/main; git merge --no-ff origin/p7-label-pill`, push, and **watch the main run to the
+     end** (about 40 minutes; it releases about 1.95). PROGRESS.md and DECISIONS.md may conflict
+     (main has newer PROGRESS, the branch has DECISIONS 80–82): keep both sides.
+  3. Then add to PROGRESS › Needs Ivan › This week: "the star/flag/label pill in portrait (tap
+     the small star button at the bottom)".
+  4. Then PROGRESS.md › Next 3 tasks › 2 (hover-only reset hints, audit item 5).
 - **Open problems:**
-  - In portrait with a right panel open, the bottom bar shows no stars, flags or label (no room
-    for the pill). Pre-existing; noted in PROGRESS › Next 3 tasks › 2.
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
     ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
-  - Whether a 64 MB pool slows panning a zoomed raw is not measured (the tour has no pan timing
-    on the raw). Watch `ui.inspect` › `perf` if Ivan reports slow pans.
+  - Whether a 64 MB pool slows panning a zoomed raw is not measured. Watch `ui.inspect` › `perf`
+    if Ivan reports slow pans.
   - Split View / Stage Manager resizing can't be scripted in the simulator: on Ivan's list
     (PROGRESS.md › Needs Ivan › item 8).
   - `ui.inspect` › `canvasRect` in the grid includes the title row, so the tour hard-codes `top`.
@@ -85,6 +91,7 @@ end. The next session reads it **first**.
   - `ui.set` view names: `photoGrid`, `squareGrid`, `detail`, `compare`, `survey`, `reference`,
     `people`. Panels: `panel.edit`, `panel.presets` (toggle!), `panel.versions`, `panel.activity`;
     to open a panel for sure use `ui.set {"right": "edit"}` (also `openSections`).
+    `ui.resize {"width", "height"}` resizes the headless window in unit tests.
   - `crate::i18n::tr_format!` accepts only messages already in the translations; build new text
     from existing messages or plain `tr`.
   - `date` in the sandbox runs on UTC; Berlin is UTC+1 (winter time). Shell commands time out
