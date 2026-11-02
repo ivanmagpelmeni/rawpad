@@ -70,7 +70,7 @@ Classic setup steps and source fix.
 1. Main run 91 (the `p7-stroke-start` merge) green, **released 1.91**: brush and Remove strokes start where the finger or Pencil touched.
 2. Branch run 93 showed why the label button was missing: in portrait the bottom bar has about 205 pt for the pill, the full pill needs 208 (236 with the label), so the iPad showed **no stars, flags or label at all** in portrait.
 3. **Compact pill** (branch `p7-label-pill`, DECISIONS 81 in that branch): when the full pill doesn't fit, a small rating button (star, count, flag) opens a menu with the stars and flags, followed by the label button. New unit test; tour shots `08-compact-pill`, `08-rating-menu`, `08-rated-3`.
-4. Branch run 94: see HANDOFF for its result. **Not merged tonight on purpose** (DECISIONS 82, in that branch): a main run takes 40 minutes, longer than this session, and the last run of the night must leave main green.
+4. Branch run 94: new steps and shots fine; it failed only because the tour tapped the photo's current rating (which clears it) before a ⌘Z check; fixed, branch run 95 running at session end. **Not merged tonight on purpose** (DECISIONS 82, in that branch): a main run takes 40 minutes, longer than this session, and the last run of the night must leave main green.
 5. For Ivan: update to 1.91 or later and try the list below; item 7 now includes the brush starting where the Pencil touched.
 
 **2026-11-02 (night 8, 01:54–02:40 Berlin, unattended)**
@@ -329,8 +329,8 @@ Classic setup steps and source fix.
 ## Current status
 
 Main is green: main run 91 (the `p7-stroke-start` merge) released 1.91. Branch `p7-label-pill`
-(colour-label button and compact rating pill in the bottom bar) waits for a merge; branch run 94
-is its check (HANDOFF has the result).
+(colour-label button and compact rating pill in the bottom bar) waits for a merge; branch run 95
+is its check (HANDOFF has the details).
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -339,7 +339,7 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p7-label-pill`** if branch run 94 is green (HANDOFF has the steps), at the start of
+1. **Merge `p7-label-pill`** if branch run 95 is green (HANDOFF has the steps), at the start of
    a session so its main run (about 40 minutes) can be watched to the end.
 2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5),
    then the hover-only colour wheels' eye (item 10).

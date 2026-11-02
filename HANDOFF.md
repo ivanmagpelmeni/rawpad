@@ -23,23 +23,25 @@ end. The next session reads it **first**.
     Unit test `tests_curve::a_narrow_bottom_bar_shows_the_compact_rating_pill` (narrows the
     window with `ui.resize` until the compact pill shows; rates 4, picks, labels green). Tour:
     new shots `08-compact-pill`, `08-rating-menu`, `08-rated-3` before the label steps.
-  - Branch run 94 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41375114684):
-    unit tests (incl. the new one), format, build and clippy green; the tour was running at
-    03:16 Berlin (result: see the run page; this line is updated if known before 03:40).
+  - Branch run 94 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41375114684): unit
+    tests (incl. the new one), build and clippy green; **all new tour steps passed** and the shots
+    look right (`runs/94/08-rating-menu.jpg`: five stars and three flags in a menu above the
+    compact pill; `08-label-menu.jpg`: the colour menu). The one failure was the tour's own
+    fault: the photo already had 3 stars, so tapping star 3 cleared it (desktop toggle
+    behaviour), and the later ⌘Z check (expects 3 after undoing key 5) failed.
+  - Fix pushed (645a56bc): the tour taps star 4 (shot `08-rated-4`), then opens the menu again
+    and taps star 3. Branch run 95 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41378092175)
+    started 02:33 UTC; not finished at session end.
 - **Very next step:**
-  1. Branch run 94: if the tour has 0 ERR, look at `runs/94/08-compact-pill.jpg` (a small pill
-     with a star, "0" and a ring left of the zoom controls), `08-rating-menu.jpg` (five stars and
-     three flags in a menu), `08-rated-3.jpg` (count 3), `08-label-menu.jpg`,
-     `08-label-green.jpg`. If a step failed: if `star:bottom:3` failed, the menu may close on
-     the press before the click (check `replies.jsonl`); if `icon:labelMenu` failed after the
-     star, the rating menu stayed open (egui's Popup close behaviour): call `ui.close()` after
-     `photo.rate` / `photo.flag` inside `compact_pill`'s menu.
+  1. Branch run 95 green (tour 0 ERR)? Look at `runs/95/08-rated-4.jpg` (the pill says 4). If the
+     ⌘Z check still fails, read `replies.jsonl` around `star:bottom:3` (maybe the second menu
+     didn't open: add a `{"sleep":2}`).
   2. If green and no main run is going: `git fetch origin; git checkout main; git merge --ff-only
      origin/main; git merge --no-ff origin/p7-label-pill`, push, and **watch the main run to the
-     end** (about 40 minutes; it releases about 1.95). PROGRESS.md and DECISIONS.md may conflict
+     end** (about 40 minutes; it releases about 1.97). PROGRESS.md / DECISIONS.md may conflict
      (main has newer PROGRESS, the branch has DECISIONS 80–82): keep both sides.
-  3. Then add to PROGRESS › Needs Ivan › This week: "the star/flag/label pill in portrait (tap
-     the small star button at the bottom)".
+  3. Then add to PROGRESS › Needs Ivan › This week: "in portrait, tap the small ★ button at the
+     bottom to rate/flag; the circle next to it sets a colour label".
   4. Then PROGRESS.md › Next 3 tasks › 2 (hover-only reset hints, audit item 5).
 - **Open problems:**
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
