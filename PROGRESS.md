@@ -27,7 +27,7 @@ the program (no screenshot yet). Statuses are for 1.38, the version on Ivan's iP
 | 12 | Crop, straighten, aspect, rotate, flip | Works, fiddly (code) | Corner handles are small and grabbed a bit off; to finish, double-tap inside the crop (no Done button). |
 | 13 | Masks: create brush / linear / radial | Works (CI) | Screenshots 03-masking and 03-brush. |
 | 14 | Masks: move, resize, rotate, erase, delete, invert, overlay | Works, fiddly (code) | Pins were invisible until touched (**fixed in the audit**); handles are small, the radial rotate knob is tiny. Erase = the Erase button. |
-| 15 | Spot removal / healing | Works (code) | The first few millimetres of a stroke are lost. |
+| 15 | Spot removal / healing | Works (code) | The first few millimetres of a stroke were lost. **Fixed 2026-11-02** (brush too, DECISIONS 79). |
 | 16 | Presets: apply, create | Works (code) | |
 | 17 | Presets: preview on hover | **Unusable by touch** (code) | Needs hover. The preset thumbnails still show each look. |
 | 18 | Copy / paste settings | Works (code) | Bottom-bar Copy and Paste. |
@@ -50,8 +50,9 @@ the program (no screenshot yet). Statuses are for 1.38, the version on Ivan's iP
 **Still broken or hard to use, most painful first** (queued below):
 1. Small touch targets: curve points, mask handles, crop corners, the radial mask's rotate knob,
    rating stars.
-2. Handles are grabbed where the finger is after it moved a little, not where it landed (crop,
-   targeted adjustment, first bit of a brush or spot stroke).
+2. ~~Handles are grabbed where the finger is after it moved a little, not where it landed (crop,
+   targeted adjustment, first bit of a brush or spot stroke)~~ (crop and targeted adjustment in
+   the touch-target work; brush and spot strokes 2026-11-02, DECISIONS 79).
 3. Sync to several photos: no way to pick several photos by touch.
 4. Removing a tone-curve point needs a precise double-tap.
 5. Crop has no Done button (double-tap inside the crop, or Return).
@@ -64,6 +65,13 @@ three-finger redo; up/down drags on sliders scroll the panel; mask pins always v
 Classic setup steps and source fix.
 
 ## Latest session summary
+
+**2026-11-02 (night 7, 00:55–01:40 Berlin, unattended)**
+1. Branch run 88 checked: GPU pool 55 MB while zoomed into the 24 MP raw (was 177 MB), zoomed shot fine; **`p6-gpu-pool` merged** (main run 89, releases about 1.89).
+2. The tour's GPU-pool check is now hard (DECISIONS 78). Returning free pages showed no effect in the simulator (0 MB); it stays, harmless.
+3. **Brush and Remove strokes now start where the finger touched** (audit item 15; branch `p7-stroke-start`, DECISIONS 79): branch run 90 green, merge waits for main run 89 to finish.
+4. Upstream not checked (its GitHub isn't reachable from this session).
+5. Nothing new for Ivan; his iPad list is unchanged (update to the newest version).
 
 **2026-11-01/02 (night 6, 23:55–00:35 Berlin, unattended)**
 1. Main run 86 (the `p6-preview-cap` merge) green, **released 1.86**; its `memory.jsonl` keeps at most 3 cached previews everywhere.
@@ -290,7 +298,7 @@ Classic setup steps and source fix.
     Export dialog + Add to Apple Photos no longer hangs (DECISIONS.md 33).
 - [~] **6. Performance and memory on the A16 (~6 GB):** (done: on-device log file with panics)
   - tiling (open)
-  - [~] zoomed raw: GPU pool capped at 64 MB, free pages returned to iPadOS (DECISIONS 76, 77; branch `p6-gpu-pool`)
+  - [x] zoomed raw: GPU pool capped at 64 MB (run 88: 55 MB pooled, was 177), free pages returned to iPadOS (no effect seen in the simulator) (DECISIONS 76–78)
   - [x] fewer cached previews: 3 instead of 4 (DECISIONS 74, branch run 85)
   - [x] thumbnail cache: no extra cap needed for now (DECISIONS 75)
   - [x] memory warnings drop cached photos (DECISIONS 71; run 78: 587 → 325 MB)
@@ -306,7 +314,7 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main run 86 green, released **1.86** (2026-11-01: at most 3 cached previews). Branch `p6-gpu-pool` (GPU pool cap, free pages back to iPadOS) waits for its run 88 check.
+Main run 89 (the `p6-gpu-pool` merge + hard GPU-pool check) was running at 01:40 Berlin; it releases about 1.89. Branch `p7-stroke-start` (strokes start at the touch) waits for branch run 90 and then a merge.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -315,12 +323,12 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p6-gpu-pool`** once branch run 88 is green and `runs/88/memory.jsonl` shows the GPU
-   pool ≤ 64 MB at `raw-zoomed` and a lower `rssMB` at `after-raw` (HANDOFF has the steps);
-   then make those checks hard.
-2. **Phase 7, touch polish** (parity sweep): small touch targets from the audit list above
-   (curve points, mask handles, crop corners, radial rotate knob, rating stars).
-3. **Phase 7, routine upstream merge** at the first run of the night (check releases).
+1. **Merge `p7-stroke-start`** (branch run 90 green) once main run 89 has finished (HANDOFF
+   has the steps).
+2. **Phase 7, touch polish** (audit list, remaining): item 2's last bit is done; next are the
+   hover-only reset hints and colour labels in the bottom bar (audit items 5, 30).
+3. **Phase 7, routine upstream merge**: needs the upstream repo attached to the session
+   (`storytold/lightcraft`, read access); check its releases first.
 
 Also queued:
 - Delete merged branches (no tool for it from the sandbox).

@@ -3,40 +3,32 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-02, about 00:35 Berlin, by the scheduled session (23:55–00:35 Berlin,
-  the sixth run of the night).
-- **Upstream:** not re-checked this session (checked at 19:54 Berlin: newest tag `v0.9.1`).
-- **Main:** run 86 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41358103103), the
-  `p6-preview-cap` merge + docs: green, **released 1.86**. Its `memory.jsonl`: `previewSources`
-  count ≤ 3 at every step (1 after the memory warning). Nothing new merged into main since.
-- **Done this session:** branch **`p6-gpu-pool`** (2 commits, not merged yet):
-  - 55bc82fd (DECISIONS 76): `memtrim::set_ipad_limits` settles `memory::budget()` and calls
-    `gpu::set_pool_limit(64 MB)` (engine default: budget/8 = 192 MB; run 85 had 177 MB pooled
-    while zoomed into the 24 MP raw). Unit test `the_ipad_pools_at_most_64_mb_of_gpu_buffers`.
-    `sim_test.py`: new memory-step key `maxGpuPooledMB` (always only a warning for now) on
-    `raw-zoomed` and `after-raw`. Finding: leaving the zoomed view already frees the whole pool
-    (upstream's `trim_when_idle`), so the pool only mattered for the zoomed peak.
-  - 9f702491 (DECISIONS 77): upstream's `lightcraft_sysmem` returns free malloc pages only on
-    macOS, and the iOS host never set the engine's release hook, so `memory::release` did nothing
-    on the iPad. `native::release_free_memory` (one FFI call to `malloc_zone_pressure_relief`,
-    `// SAFETY:` note) + `memory::set_release_hook` in `ios.rs` › `start`; the memory warning logs
-    "memory warning: returned X MB of free pages" (tour: soft `checkLog`). Aim: the resident size
-    that rose from ~470 to ~547 MB after zooming out (runs 83–86) should fall.
-  - DECISIONS 76 and 77 are written on the branch only (they reach main with the merge).
-  - Branch run 88 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41359954963): unit
-    tests (incl. the new one) and the simulator build green; the whole simulator tour passed (23:32 UTC, then the device build); its report (`memory.jsonl`, screenshots) was not published yet when the session ended
+- **Written:** 2026-11-02, about 01:40 Berlin, by the scheduled session (00:55–01:40 Berlin,
+  the seventh run of the night).
+- **Upstream:** not checked: `storytold/lightcraft` isn't attached to this session (the public
+  API answers "use add_repo"). Last known: `v0.9.1` (checked 2026-11-01 19:54 Berlin).
+- **Main:** `p6-gpu-pool` merged (b862fa38) plus 9d77bcba (DECISIONS 78: the tour's
+  `maxGpuPooledMB` is hard now). Main run 89
+  (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41364478335) started 23:55 UTC and
+  releases about 1.89 if green: still in the device build at 00:33 UTC (tour, unit tests, clippy all passed; GPU pool check hard and passing).
+- **Done this session:**
+  - Branch run 88's report checked: `raw-zoomed` GPU pooled 54.7 MB (≤ 64; run 85: 177 MB),
+    allocated 390 MB (was 512); shot `13-raw-zoomed` draws the zoomed raw; `after-raw` rss 564 MB
+    (no better than 547); "memory warning: returned 0.0 MB of free pages" in the simulator. So
+    the pool cap works, the page release shows no effect in the simulator (kept, soft check).
+  - Branch **`p7-stroke-start`** (ae432403, DECISIONS 79, UPSTREAM row): on iOS and in unit
+    tests, a brush or Remove stroke that starts with a drag begins at `press_origin()` (audit
+    item 15: the first few millimetres were lost). `detail.rs › stroke_lead_in`, unit test
+    `tests_curve::a_brush_or_spot_stroke_starts_where_the_finger_touched`.
+    Branch run 90 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41364616737): unit tests (incl. the new one), clippy and the whole tour green (0 ERR; GPU pool 52 MB), report `runs/90/` published; shot `03-brush` paints the mask. **Not merged** only because main run 89 was still going.
 - **Very next step:**
-  1. Check branch run 88: green? Then read `runs/88/memory.jsonl` (`ci-artifacts`): `raw-zoomed`
-     gpu `pooled` ≤ 64 MB and `allocated` lower than 489 MB; `after-raw` `rssMB` lower than
-     ~547; `tour.log` has `ok checkLog 'memory warning: returned'`. Look at shot
-     `13-raw-zoomed` (zoomed raw still drawn). If all good, merge into main
-     (`git fetch origin; git checkout main; git merge --ff-only origin/main;
-     git merge --no-ff origin/p6-gpu-pool`) and push — only when no main run is going.
-  2. If the pool check passed, make `maxGpuPooledMB` hard (and the `returned` checkLog) in a
-     follow-up with a DECISIONS entry.
-  3. Then PROGRESS.md › Next 3 tasks › 2 (touch polish: small touch targets) or the upstream
-     merge at the first run of the night.
+  1. Main run 89 green? (If red: read its log; fix or revert 9d77bcba / the merge.)
+  2. Branch run 90 was green (check it finished `success`). Then, only when no main run is going: `git fetch origin; git checkout
+     main; git merge --ff-only origin/main; git merge --no-ff origin/p7-stroke-start`, push.
+  3. Then PROGRESS.md › Next 3 tasks › 2 (hover-only reset hints, colour labels in the bottom bar).
 - **Open problems:**
+  - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
+    ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
   - Whether a 64 MB pool slows panning a zoomed raw is not measured (the tour has no pan timing
     on the raw). Watch `ui.inspect` › `perf` if Ivan reports slow pans.
   - Split View / Stage Manager resizing can't be scripted in the simulator: on Ivan's list
@@ -51,7 +43,7 @@ end. The next session reads it **first**.
     `p4-touch-all`, `p4-touch-2`, `p4-select-several`, `p4-select-bar`, `p4-select-sync`,
     `p4-reset-menu`, `p4-sync-test`, `p4-preset-preview`, `p4-snapshot-preview`,
     `p4-film-select`, `p4-keyboard-check`, `p4-rotate`, `p4-raw24`, `p6-memtrim`, `p6-relaunch`,
-    `p6-hard-checks`, `p6-preview-cap`.
+    `p6-hard-checks`, `p6-preview-cap`, `p6-gpu-pool`.
   - The artifact zip download URL (blob.core.windows.net) is blocked from the sandbox: wait for
     the `ci-artifacts` report.
   - `ui.inspect`'s `window` is [820, 1110] pt in portrait on the CI simulator; the `simctl`
