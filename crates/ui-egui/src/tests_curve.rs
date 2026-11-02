@@ -421,3 +421,45 @@ fn the_loupe_shows_select_several_above_the_filmstrip_and_done_ends_it() {
     assert!(!crate::panels::grid::touch_multi(&h.view.ctx), "Done turned Select Several off");
     assert!(!has(&h, "filmSelectSeveral"), "and the pill is gone");
 }
+
+/// iPad: a brush or Remove stroke starts where the finger first touched, not where egui noticed the
+/// drag (past its threshold): the first few millimetres were lost (editing audit, item 15). Lives
+/// here so CI runs it.
+#[test]
+fn a_brush_or_spot_stroke_starts_where_the_finger_touched() {
+    let open = |panel: &str| {
+        let services = Services { png: None, ..Default::default() };
+        let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+        let mut h = Headless::new(app, [1200.0, 800.0], 1.0);
+        let r = h.request("ui.set", json!({"view": "detail"}), T);
+        assert_eq!(r["ok"], true, "{r}");
+        let r = h.request("engine.execute", json!({"command": panel}), T);
+        assert_eq!(r["ok"], true, "{r}");
+        h.step();
+        h
+    };
+    let stroke = |h: &mut Headless| {
+        let events = json!([
+            {"kind": "down", "x": 0.15, "y": 0.4},
+            {"kind": "drag", "x": 0.3, "y": 0.4},
+            {"kind": "drag", "x": 0.5, "y": 0.4},
+            {"kind": "up", "x": 0.5, "y": 0.4}
+        ]);
+        let r = h.request("ui.pointer", json!({"events": events}), T);
+        assert_eq!(r["ok"], true, "{r}");
+    };
+    let min_x = |v: &[lightcraft_geom::Point]| v.iter().map(|p| p.x).fold(f64::INFINITY, f64::min);
+    // brush
+    let mut h = open("panel.masking");
+    exec(&mut h, "tool.brush", json!({"new": true}));
+    stroke(&mut h);
+    let d = develop(&h);
+    let lightcraft_develop::MaskShape::Brush { strokes } = &d.masks[0].components[0].shape else { panic!("a brush mask") };
+    assert!((min_x(&strokes[0].points) - 0.15).abs() < 0.02, "the brush stroke starts at the press: {:?}", strokes[0].points);
+    // Remove (spot) stroke
+    let mut h = open("panel.remove");
+    stroke(&mut h);
+    let spots = develop(&h).spots;
+    assert_eq!(spots.len(), 1, "one spot");
+    assert!((min_x(&spots[0].points) - 0.15).abs() < 0.02, "the spot stroke starts at the press: {:?}", spots[0].points);
+}
