@@ -463,3 +463,33 @@ fn a_brush_or_spot_stroke_starts_where_the_finger_touched() {
     assert_eq!(spots.len(), 1, "one spot");
     assert!((min_x(&spots[0].points) - 0.15).abs() < 0.02, "the spot stroke starts at the press: {:?}", spots[0].points);
 }
+
+/// iPad: the bottom bar's rating pill ends in a colour-label button whose menu sets and clears the
+/// active photo's label (editing audit, item 30: labels were out of reach by touch; DECISIONS 80).
+/// Lives here so CI runs it.
+#[test]
+fn the_bottom_bars_label_button_sets_and_clears_the_colour_label() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    let id = h.app.session.active().expect("active photo");
+    let label = |h: &Headless| h.app.session.catalog.photo(id).and_then(|p| p.label);
+    let rect = |h: &Headless, id: &str| h.app.widgets.iter().find(|(w, _)| w == id).map(|(_, r)| *r);
+    let button = rect(&h, "icon:labelMenu").expect("the pill has the label button");
+    let last_flag = rect(&h, "flag:reject").expect("the pill has its flags");
+    assert!(button.left() >= last_flag.right(), "the label button comes after the flags: {button:?} {last_flag:?}");
+    click_widget(&mut h, "icon:labelMenu", 1);
+    h.step();
+    click_widget(&mut h, "bottomLabel:purple", 1);
+    h.step();
+    assert_eq!(label(&h), Some(lightcraft_catalog::ColorLabel::Purple), "Purple set from the bottom bar");
+    click_widget(&mut h, "icon:labelMenu", 1);
+    h.step();
+    click_widget(&mut h, "bottomLabel:none", 1);
+    h.step();
+    assert_eq!(label(&h), None, "None clears it");
+}

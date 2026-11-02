@@ -82,6 +82,16 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
 /// and 10-point padding at both ends.
 const PILL_W: f32 = 208.0;
 
+/// RawPad (iPad): a 6-point gap and a 22-point colour-label button at the end of the pill. On the
+/// desktop the label is the 6–9 keys, the Photo menu or the Info panel; on a touch screen the
+/// bottom bar is the one place in reach (editing audit, item 30). Also in unit tests, so CI runs it.
+const LABEL_W: f32 = 28.0;
+
+/// Whether the pill carries the colour-label button (iOS, and this crate's unit tests).
+fn touch_label() -> bool {
+    cfg!(target_os = "ios") || cfg!(test)
+}
+
 /// The rating/flag pill and copy/paste settings, between `from` and `to` (the side groups): the
 /// copy buttons go first when there is no room (they are in the Edit menu too), then the pill.
 fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to: f32) {
@@ -89,17 +99,20 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
     let has_clip = app.session.clipboard.is_some();
     let label = crate::i18n::tr(if has_clip { "Paste Edit Settings" } else { "Copy Edit Settings" });
     let copy_width = (ui.painter().layout_no_wrap(label.to_string(), t.font(13.0), t.text_label).size().x + 24.0).max(136.0);
-    let centre_width = PILL_W + 10.0 + copy_width + 4.0 + 30.0;
     let room = to - from;
-    if room < PILL_W {
+    // the label button goes before the pill does when there is no room
+    let with_label = touch_label() && room >= PILL_W + LABEL_W;
+    let pill_w = if with_label { PILL_W + LABEL_W } else { PILL_W };
+    let centre_width = pill_w + 10.0 + copy_width + 4.0 + 30.0;
+    if room < pill_w {
         return;
     }
     let with_copy = room >= centre_width;
-    let w = if with_copy { centre_width } else { PILL_W };
+    let w = if with_copy { centre_width } else { pill_w };
     // where it sits with room to spare (slightly left of centre), kept between the side groups
-    let left = (full.center().x - 60.0 - PILL_W / 2.0).clamp(from, to - w);
+    let left = (full.center().x - 60.0 - pill_w / 2.0).clamp(from, to - w);
     let active = app.session.active().and_then(|id| app.session.catalog.photo(id).cloned());
-    let pill = Rect::from_min_size(pos2(left, full.center().y - 15.0), vec2(PILL_W, 30.0));
+    let pill = Rect::from_min_size(pos2(left, full.center().y - 15.0), vec2(pill_w, 30.0));
     ui.painter().rect_filled(pill, 15.0, t.canvas);
     let mut pill_ui =
         ui.new_child(egui::UiBuilder::new().max_rect(pill.shrink2(vec2(10.0, 4.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
@@ -139,6 +152,10 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
             let _ = app.run("photo.flag", params);
         }
     }
+    if with_label {
+        pill_ui.add_space(6.0);
+        label_button(app, &mut pill_ui, active.as_ref().and_then(|p| p.label));
+    }
     // copy / paste settings
     if !with_copy {
         return;
@@ -163,6 +180,33 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
     if gresp.clicked() {
         let _ = app.run("dialog.copySettings", json!({}));
     }
+}
+
+/// RawPad (iPad): the colour-label button at the end of the pill (`icon:labelMenu`): a dot in the
+/// active photo's label colour (a ring when it has none) that opens the label menu, items
+/// `bottomLabel:<colour>` / `bottomLabel:none` (DECISIONS 80).
+fn label_button(app: &mut LightcraftApp, ui: &mut egui::Ui, current: Option<lightcraft_catalog::ColorLabel>) {
+    let t = Tokens::get(ui.ctx());
+    let (r, resp) = ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
+    crate::widgets::announce(&resp, crate::i18n::tr("Set Color Label"));
+    register(ui.ctx(), "icon:labelMenu", r);
+    match current {
+        Some(l) => {
+            ui.painter().circle_filled(r.center(), 6.5, crate::panels::grid::label_color(l));
+        }
+        None => {
+            let c = if resp.hovered() { t.text } else { t.icon };
+            ui.painter().circle_stroke(r.center(), 6.0, egui::Stroke::new(1.5, c));
+        }
+    }
+    egui::Popup::menu(&resp).show(|ui| {
+        if let Some(l) = crate::panels::grid::label_items(app, ui, current, "bottomLabel") {
+            let mut params = json!({"label": crate::panels::grid::label_param(l)});
+            crate::panels::compare::target_active(app, &mut params);
+            let _ = app.run("photo.label", params);
+            ui.close();
+        }
+    });
 }
 
 /// The right-hand group (zoom, view toggles or thumbnail size); returns its left edge.
