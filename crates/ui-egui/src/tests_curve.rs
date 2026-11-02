@@ -493,3 +493,58 @@ fn the_bottom_bars_label_button_sets_and_clears_the_colour_label() {
     h.step();
     assert_eq!(label(&h), None, "None clears it");
 }
+
+/// iPad: when the bottom bar is too narrow for the full rating pill (portrait with the side
+/// toolbars), a compact pill keeps rating, flag and colour label in reach: a rating button whose
+/// menu holds the stars and flags, then the label button (DECISIONS 81). Lives here so CI runs it.
+#[test]
+fn a_narrow_bottom_bar_shows_the_compact_rating_pill() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail", "right": "none"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    let has = |h: &Headless, id: &str| h.app.widgets.iter().any(|(w, _)| w == id);
+    assert!(has(&h, "flag:reject") && !has(&h, "icon:ratingMenu"), "a wide bar has the full pill");
+    // narrow the window until the full pill gives way
+    let mut found = false;
+    for w in (500..=1200).rev().step_by(10) {
+        let r = h.request("ui.resize", json!({"width": w, "height": 1400}), T);
+        assert_eq!(r["ok"], true, "{r}");
+        h.step();
+        h.step();
+        assert!(!(has(&h, "flag:reject") && has(&h, "icon:ratingMenu")), "never both pills at {w}");
+        if has(&h, "icon:ratingMenu") {
+            found = true;
+            break;
+        }
+    }
+    assert!(found, "some narrow width shows the compact pill");
+    assert!(has(&h, "icon:labelMenu"), "the compact pill keeps the label button");
+    let id = h.app.session.active().expect("active photo");
+    let photo = |h: &Headless| h.app.session.catalog.photo(id).cloned().expect("photo");
+    click_widget(&mut h, "icon:ratingMenu", 1);
+    h.step();
+    click_widget(&mut h, "star:bottom:4", 1);
+    h.step();
+    assert_eq!(photo(&h).rating, 4, "four stars from the compact pill's menu");
+    if !has(&h, "flag:pick") {
+        click_widget(&mut h, "icon:ratingMenu", 1);
+        h.step();
+    }
+    click_widget(&mut h, "flag:pick", 1);
+    h.step();
+    assert_eq!(photo(&h).flag, lightcraft_catalog::Flag::Pick, "picked from the compact pill's menu");
+    if has(&h, "flag:pick") {
+        // the menu stayed open: close it before the label button
+        let _ = h.request("ui.key", json!({"key": "esc"}), T);
+        h.step();
+    }
+    click_widget(&mut h, "icon:labelMenu", 1);
+    h.step();
+    click_widget(&mut h, "bottomLabel:green", 1);
+    h.step();
+    assert_eq!(photo(&h).label, Some(lightcraft_catalog::ColorLabel::Green), "Green from the compact pill");
+}

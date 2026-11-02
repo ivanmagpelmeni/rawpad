@@ -68,9 +68,17 @@
 {"method":"ui.clickWidget","params":{"id":"icon:beforeAfter"},"expectOk":true}
 {"sleep":2}
 # colour label by touch: the button at the end of the rating pill (iPad only) opens the label menu.
-# In portrait with the Edit panel open the bar has no room for the pill: close the panel first.
+# In portrait the bar is too narrow for the full pill: the compact pill (rating button + label
+# button) stands in. Close the Edit panel first so the bar has room for even that.
 {"method":"ui.set","params":{"right":"none"},"expectOk":true}
 {"sleep":2}
+{"shot":"08-compact-pill"}
+{"method":"ui.clickWidget","params":{"id":"icon:ratingMenu"},"expectOk":true}
+{"sleep":2}
+{"shot":"08-rating-menu"}
+{"method":"ui.clickWidget","params":{"id":"star:bottom:3"},"expectOk":true}
+{"sleep":2}
+{"shot":"08-rated-3"}
 {"method":"ui.clickWidget","params":{"id":"icon:labelMenu"},"expectOk":true}
 {"sleep":2}
 {"shot":"08-label-menu"}

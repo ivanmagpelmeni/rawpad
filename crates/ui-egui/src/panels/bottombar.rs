@@ -105,6 +105,9 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
     let pill_w = if with_label { PILL_W + LABEL_W } else { PILL_W };
     let centre_width = pill_w + 10.0 + copy_width + 4.0 + 30.0;
     if room < pill_w {
+        if touch_label() && room >= COMPACT_W {
+            compact_pill(app, ui, full, from, to);
+        }
         return;
     }
     let with_copy = room >= centre_width;
@@ -117,41 +120,7 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
     let mut pill_ui =
         ui.new_child(egui::UiBuilder::new().max_rect(pill.shrink2(vec2(10.0, 4.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
     pill_ui.spacing_mut().item_spacing.x = 3.0;
-    let rating = active.as_ref().map(|p| p.rating).unwrap_or(0);
-    if let Some(r) = stars(&mut pill_ui, "bottom", rating, 19.0) {
-        let mut params = json!({"rating": r});
-        crate::panels::compare::target_active(app, &mut params);
-        let _ = app.run("photo.rate", params);
-    }
-    pill_ui.add_space(6.0);
-    let flag = active.as_ref().map(|p| p.flag).unwrap_or_default();
-    for (id, icon, f) in [("unflag", Icon::Circle, Flag::None), ("pick", Icon::FlagPick, Flag::Pick), ("reject", Icon::FlagReject, Flag::Reject)] {
-        let (r, resp) = pill_ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
-        crate::widgets::announce_selected(
-            &resp,
-            crate::i18n::tr(match f {
-                Flag::None => "Unflagged",
-                Flag::Pick => "Pick",
-                Flag::Reject => "Reject",
-            }),
-            flag == f,
-        );
-        register(pill_ui.ctx(), format!("flag:{id}"), r);
-        let on = flag == f && f != Flag::None;
-        let c = if on {
-            if f == Flag::Reject { t.reject } else { t.pick }
-        } else if resp.hovered() {
-            t.text
-        } else {
-            t.icon
-        };
-        paint(pill_ui.painter(), r.shrink(3.0), icon, c);
-        if resp.clicked() {
-            let mut params = json!({"flag": match f { Flag::Pick => "pick", Flag::Reject => "reject", Flag::None => "none" }});
-            crate::panels::compare::target_active(app, &mut params);
-            let _ = app.run("photo.flag", params);
-        }
-    }
+    rate_and_flag(app, &mut pill_ui, active.as_deref());
     if with_label {
         pill_ui.add_space(6.0);
         label_button(app, &mut pill_ui, active.as_ref().and_then(|p| p.label));
@@ -180,6 +149,89 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
     if gresp.clicked() {
         let _ = app.run("dialog.copySettings", json!({}));
     }
+}
+
+/// The five stars (`star:bottom:<n>`) and three flags (`flag:<id>`) of the pill, laid out left to
+/// right in `ui` (the pill itself, or the compact pill's menu on a narrow iPad bar).
+fn rate_and_flag(app: &mut LightcraftApp, ui: &mut egui::Ui, active: Option<&lightcraft_catalog::Photo>) {
+    let t = Tokens::get(ui.ctx());
+    let rating = active.map(|p| p.rating).unwrap_or(0);
+    if let Some(r) = stars(ui, "bottom", rating, 19.0) {
+        let mut params = json!({"rating": r});
+        crate::panels::compare::target_active(app, &mut params);
+        let _ = app.run("photo.rate", params);
+    }
+    ui.add_space(6.0);
+    let flag = active.map(|p| p.flag).unwrap_or_default();
+    for (id, icon, f) in [("unflag", Icon::Circle, Flag::None), ("pick", Icon::FlagPick, Flag::Pick), ("reject", Icon::FlagReject, Flag::Reject)] {
+        let (r, resp) = ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
+        crate::widgets::announce_selected(
+            &resp,
+            crate::i18n::tr(match f {
+                Flag::None => "Unflagged",
+                Flag::Pick => "Pick",
+                Flag::Reject => "Reject",
+            }),
+            flag == f,
+        );
+        register(ui.ctx(), format!("flag:{id}"), r);
+        let on = flag == f && f != Flag::None;
+        let c = if on {
+            if f == Flag::Reject { t.reject } else { t.pick }
+        } else if resp.hovered() {
+            t.text
+        } else {
+            t.icon
+        };
+        paint(ui.painter(), r.shrink(3.0), icon, c);
+        if resp.clicked() {
+            let mut params = json!({"flag": match f { Flag::Pick => "pick", Flag::Reject => "reject", Flag::None => "none" }});
+            crate::panels::compare::target_active(app, &mut params);
+            let _ = app.run("photo.flag", params);
+        }
+    }
+}
+
+/// RawPad (iPad): a rating button 50 points wide and the label button, with 10-point padding and
+/// a 6-point gap, for a bar too narrow for the full pill (portrait, DECISIONS 81).
+const COMPACT_W: f32 = 10.0 + 50.0 + 6.0 + 22.0 + 10.0;
+
+/// RawPad (iPad): the compact pill. A button (`icon:ratingMenu`) showing the active photo's star
+/// count and flag opens a menu with the full stars and flags; the label button follows it.
+fn compact_pill(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to: f32) {
+    let t = Tokens::get(ui.ctx());
+    let left = (full.center().x - 60.0 - COMPACT_W / 2.0).clamp(from, (to - COMPACT_W).max(from));
+    let pill = Rect::from_min_size(pos2(left, full.center().y - 15.0), vec2(COMPACT_W, 30.0));
+    ui.painter().rect_filled(pill, 15.0, t.canvas);
+    let mut pill_ui =
+        ui.new_child(egui::UiBuilder::new().max_rect(pill.shrink2(vec2(10.0, 4.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
+    pill_ui.spacing_mut().item_spacing.x = 0.0;
+    let active = app.session.active().and_then(|id| app.session.catalog.photo(id).cloned());
+    let rating = active.as_ref().map(|p| p.rating).unwrap_or(0);
+    let flag = active.as_ref().map(|p| p.flag).unwrap_or_default();
+    let (r, resp) = pill_ui.allocate_exact_size(vec2(50.0, 22.0), Sense::click());
+    crate::widgets::announce(&resp, format!("{rating} ★"));
+    register(pill_ui.ctx(), "icon:ratingMenu", r);
+    if resp.hovered() {
+        pill_ui.painter().rect_filled(r, 4.0, t.hover);
+    }
+    let star = Rect::from_center_size(pos2(r.left() + 9.0, r.center().y), vec2(15.0, 15.0));
+    paint(pill_ui.painter(), star, if rating > 0 { Icon::StarFilled } else { Icon::Star }, if rating > 0 { t.star } else { t.icon });
+    pill_ui.painter().text(pos2(r.left() + 20.0, r.center().y), Align2::LEFT_CENTER, rating.to_string(), t.font(13.0), t.text_label);
+    let flag_r = Rect::from_center_size(pos2(r.right() - 9.0, r.center().y), vec2(15.0, 15.0));
+    match flag {
+        Flag::Pick => paint(pill_ui.painter(), flag_r, Icon::FlagPick, t.pick),
+        Flag::Reject => paint(pill_ui.painter(), flag_r, Icon::FlagReject, t.reject),
+        Flag::None => {}
+    }
+    egui::Popup::menu(&resp).show(|ui| {
+        ui.horizontal(|ui| {
+            ui.spacing_mut().item_spacing.x = 3.0;
+            rate_and_flag(app, ui, active.as_deref());
+        });
+    });
+    pill_ui.add_space(6.0);
+    label_button(app, &mut pill_ui, active.as_ref().and_then(|p| p.label));
 }
 
 /// RawPad (iPad): the colour-label button at the end of the pill (`icon:labelMenu`): a dot in the
