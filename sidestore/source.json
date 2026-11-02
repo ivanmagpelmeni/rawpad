@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.89",
+          "buildVersion": "89",
+          "date": "2026-11-02T00:35:46Z",
+          "localizedDescription": "RawPad 1.89 (build 89, 22beed6): P7: handoff and progress after the 2026-11-02 night-7 session (p6-gpu-pool merged, p7-stroke-start waiting)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.89/RawPad.ipa",
+          "size": 19863095,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.86",
           "buildVersion": "86",
           "date": "2026-11-01T23:09:58Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.64/RawPad.ipa",
           "size": 19848920,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.60",
-          "buildVersion": "60",
-          "date": "2026-10-25T23:05:01Z",
-          "localizedDescription": "RawPad 1.60 (build 60, 4b6deef): P4: handoff: main run 60 tour flake re-run, run 61 status",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.60/RawPad.ipa",
-          "size": 19859407,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.86",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.86/RawPad.ipa",
-      "size": 19861777,
-      "versionDate": "2026-11-01T23:09:58Z",
-      "versionDescription": "RawPad 1.86 (build 86, 9d4cdb6): P6: note 1.84 released"
+      "version": "1.89",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.89/RawPad.ipa",
+      "size": 19863095,
+      "versionDate": "2026-11-02T00:35:46Z",
+      "versionDescription": "RawPad 1.89 (build 89, 22beed6): P7: handoff and progress after the 2026-11-02 night-7 session (p6-gpu-pool merged, p7-stroke-start waiting)"
     }
   ],
   "news": []
