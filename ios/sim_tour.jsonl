@@ -76,9 +76,14 @@
 {"method":"ui.clickWidget","params":{"id":"icon:ratingMenu"},"expectOk":true}
 {"sleep":2}
 {"shot":"08-rating-menu"}
-{"method":"ui.clickWidget","params":{"id":"star:bottom:3"},"expectOk":true}
+# star 4 (tapping the current rating would clear it); then back to 3, which the ⌘Z check expects
+{"method":"ui.clickWidget","params":{"id":"star:bottom:4"},"expectOk":true}
 {"sleep":2}
-{"shot":"08-rated-3"}
+{"shot":"08-rated-4"}
+{"method":"ui.clickWidget","params":{"id":"icon:ratingMenu"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"star:bottom:3"},"expectOk":true}
+{"sleep":1}
 {"method":"ui.clickWidget","params":{"id":"icon:labelMenu"},"expectOk":true}
 {"sleep":2}
 {"shot":"08-label-menu"}
