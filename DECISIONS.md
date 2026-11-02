@@ -544,3 +544,7 @@ morning session, which had taken 45 and 46.
     helper (`rate_and_flag`) shared by both pills. Desktop unchanged (the pill still just hides).
     Unit test `a_narrow_bottom_bar_shows_the_compact_rating_pill`; tour shots `08-compact-pill`,
     `08-rating-menu`, `08-rated-3`.
+82. **2026-11-02: The last run of the night doesn't merge code.** A main run takes about 40
+    minutes with the release, longer than what is left of a session after a branch run (25–35
+    minutes). The last run of the night (02:54 Berlin) must leave main green, so it leaves a
+    green branch unmerged and the next session merges it at its start and watches the main run.
