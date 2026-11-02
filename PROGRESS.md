@@ -67,7 +67,7 @@ Classic setup steps and source fix.
 ## Latest session summary
 
 **2026-11-02 (night 8, 01:54–02:40 Berlin, unattended)**
-1. Main run 89 green (released 1.89); **`p7-stroke-start` merged** (brush/Remove strokes start where the finger touched); main run 91 releases it (about 1.91) if green.
+1. Main run 89 green (released 1.89); **`p7-stroke-start` merged** (brush/Remove strokes start where the finger touched); main run 91: tests, tour and device build green, release (about 1.91) pending at session end.
 2. New branch **`p7-label-pill`** (DECISIONS 80): a colour-label button at the end of the bottom bar's star/flag pill on the iPad (audit item 30). Unit test, build and clippy green in branch run 92.
 3. Run 92's tour failed only on the new label steps: in portrait with the Edit panel open the bottom bar has no room for the pill at all (stars and flags are hidden there too, already before). The tour now closes the panel first; branch run 93 is checking it.
 4. Upstream not checked (its GitHub isn't attached to this session).

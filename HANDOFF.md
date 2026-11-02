@@ -9,7 +9,8 @@ end. The next session reads it **first**.
   `v0.9.1` (checked 2026-11-01 19:54 Berlin).
 - **Main:** main run 89 green, released 1.89. **`p7-stroke-start` merged** (e3c8d6be); main run
   91 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/41369736165) started 00:55 UTC and
-  releases about 1.91 if green (still running at 01:27 UTC).
+  releases about 1.91: at 01:31 UTC its unit tests, clippy, the whole tour and the
+  device build were green; only the release step was still to come.
 - **Done this session:**
   - Branch **`p7-label-pill`** (DECISIONS 80, UPSTREAM row): on iOS and in unit tests the bottom
     bar's star/flag pill ends with a colour-label button (`icon:labelMenu`) opening the label menu
