@@ -525,3 +525,12 @@ morning session, which had taken 45 and 46.
     unit tests, `detail.rs › stroke_lead_in` puts the press point in front of the first sample
     when a new stroke starts with a drag (clicks and still holds are unchanged; pressure is
     copied to the extra point). Desktop behaviour is untouched. Unit test in `tests_curve.rs`.
+80. **2026-11-02: Colour labels in the bottom bar on the iPad.** Labels were reachable only
+    through the Info panel, the Photo menu or the 6–9 keys (editing audit, item 30). On iOS (and
+    in unit tests) the rating pill ends with a 22-point label button (`icon:labelMenu`): a dot in
+    the photo's label colour, a ring when it has none. It opens the same label menu as the grid's
+    context menu (ids `bottomLabel:<colour>`, `bottomLabel:none`) and runs `photo.label` with the
+    Compare/Survey target like the stars. The pill grows 28 points; when the bar is too narrow
+    the button goes first (before the pill itself), so the stars and flags never disappear because
+    of it; Copy/Paste Settings may hide 28 points sooner (they are in the Edit menu too). Desktop
+    unchanged. Unit test in `tests_curve.rs`, tour shots `08-label-menu` and `08-label-green`.
