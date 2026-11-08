@@ -573,3 +573,7 @@ morning session, which had taken 45 and 46.
     have a file of their own that upstream never touches. CI runs `--lib tests::ipad`.
 85. **2026-11-08: Check upstream tags with `sort -V`.** `git ls-remote --tags
     https://github.com/storytold/lightcraft | grep -v '\^{}' | awk '{print $2}' | sort -V | tail -3`.
+86. **2026-11-08 (20:00 Berlin): No upstream self-update check on the iPad.** Upstream 0.19
+    added craft-update (download a newer desktop build). RawPad is installed and updated through
+    SideStore, so on iOS the Help › Check for Updates item is hidden and the command answers with
+    a SideStore hint; the startup check stays off (the iOS host never turns it on).

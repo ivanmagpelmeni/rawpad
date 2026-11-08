@@ -66,6 +66,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-08 (19:55–20:40 Berlin, unattended)**
+1. Main green: main run 96 released **1.96** (compact rating pill + colour-label button).
+2. Branch `upstream-0.19.0`: fixed the two iOS build errors of run 98 (chrono for the shared logger, new `raw_input_hook` signature).
+3. **Branch run 99: upstream 0.19.0 with all iPad patches now builds for the iPad, passes clippy and all unit tests, and launches in the simulator.**
+4. The tour still has 24 failed taps: the bottom-bar buttons are refused by upstream's new "is it visible when pressed" check, and a few long-press menu / Share ids are missing. Next session fixes these (HANDOFF).
+5. Upstream's built-in updater is switched off on the iPad (RawPad updates through SideStore); not merged to main yet.
+
 **2026-11-08 (18:56–19:40 Berlin, unattended, first run of the night)**
 1. Branch run 95 was green (the pill says 4 in `runs/95/08-rated-4.jpg`): **`p7-label-pill` merged into main** (compact rating pill + colour-label button); main run 96 releases about 1.97.
 2. **Upstream was ten releases ahead** (v0.10 … v0.19.0, not v0.9.1: a text sort hid them, DECISIONS 85). Started the merge of **v0.19.0** in branch `upstream-0.19.0` (DECISIONS 83): no shared history, so v0.9.1 is the explicit merge base.
@@ -335,9 +342,9 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main: `p7-label-pill` merged 2026-11-08 (main run 96, releases about 1.97; HANDOFF says whether it
-finished green). Branch `upstream-0.19.0`: the upstream v0.19.0 merge with every iPad patch
-re-applied, being fixed through branch runs (98 and on) before it can go to main.
+Main: `p7-label-pill` merged 2026-11-08, main run 96 green, **released 1.96**. Branch
+`upstream-0.19.0`: the upstream v0.19.0 merge with every iPad patch re-applied; since branch run
+99 it builds for iOS, passes clippy and the unit tests and launches; the tour still fails 24 taps.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -346,9 +353,9 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Get branch `upstream-0.19.0` green** (HANDOFF has the run and the steps): fix compile errors
-   from egui 0.37 / the reorganised UI in the host and the patches, then the tour (widget ids may
-   have changed upstream). Then merge it into main at the start of a session and watch the main run.
+1. **Get branch `upstream-0.19.0`'s tour clean** (it compiles and launches since run 99;
+   HANDOFF lists the 24 failing taps and where to look), then merge it into main at the start of
+   a session and watch the main run.
 2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5).
 3. **Update UPSTREAM.md's patch table** to the new 0.19.0 paths row by row (the paths note on top
    lists them for now).

@@ -3,47 +3,52 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-08, about 19:35 Berlin, by the scheduled session (18:56–19:40 Berlin,
-  the first run of the night).
-- **Upstream:** **v0.19.0** (2026-11-06) is the newest tag; main is still on v0.9.1. Earlier
-  sessions missed v0.10–v0.19 because plain `sort` puts `v0.9.1` last (DECISIONS 85: use `sort -V`).
-- **Main:** `p7-label-pill` merged at the start of this session (a20dd94a, branch run 95 green).
-  Main run 96 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42507547011) builds and
-  releases it (about 1.97). At 19:35 Berlin its tests, tour and device build had passed and it was saving the cache before the release step; check `…/releases?per_page=2` for 1.97.
-- **Done this session:**
-  - Branch **`upstream-0.19.0`**: merge commit 876cbdc0 (parents: main and upstream v0.19.0;
-    made with `git merge-recursive v0.9.1 -- HEAD v0.19.0` because the fork has no upstream
-    history, DECISIONS 83). Conflicting upstream UI files: upstream's version taken; old patches
-    saved in `ios/upstream-patches-v0.9.1.diff`.
-  - Then five commits re-applying **every iPad patch** in upstream's new file layout (UPSTREAM.md
-    › "Paths after 0.19.0"; each patch has a `RawPad` comment: `grep -rn RawPad crates/`).
-  - egui is 0.37 on storytold's fork: `egui::Id::new` is **`egui::Id::unique`** there (changed in
-    the host too); host `egui-winit`/`egui-wgpu` bumped to 0.37 (patched to the fork by the
-    workspace). Cargo.lock came from upstream and has no `rawpad-ios` entry: CI's cargo (not
-    `--locked`) adds it.
-  - iPad UI tests moved to `crates/ui-egui/src/tests/ipad.rs` (DECISIONS 84); `ipad.yml` runs
-    `--lib tests::ipad`.
-  - Branch run 98 (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42508300021) on
-    70e3eddb: at 19:35 Berlin **fmt, the host unit tests and the UI unit tests
-    (`tests::ipad`, so upstream 0.19.0 + all re-applied patches compile and the iPad tests pass)
-    were green**; "Build for the simulator" (the first compile of the host for iOS against egui
-    0.37) was still running. Check that `ui-tests.log` really ran the ten iPad tests (not "0 tests").
+- **Written:** 2026-11-08, about 20:40 Berlin, by the scheduled session (19:55–20:40 Berlin).
+- **Upstream:** **v0.19.0** (2026-11-06) is the newest tag; main is still on v0.9.1. The merge
+  lives in branch `upstream-0.19.0` (DECISIONS 83–85).
+- **Main:** green. Main run 96 (a20dd94a, `p7-label-pill`) released **1.96** (not 1.97);
+  CI then pushed `SideStore source: RawPad 1.96` (6ae8ec86). Nothing was pushed to main's code
+  this session.
+- **Done this session (branch `upstream-0.19.0`):**
+  - Run 98 had failed in "Build for the simulator" with two things: the desktop `logging.rs`
+    (shared into the host via `#[path]`) now uses **chrono**, and `raw_input_hook` takes
+    `(&ctx, &mut raw)`. Fixed in 11524b9a (chrono added to the host's iOS dependencies).
+  - **Branch run 99** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42512460453) on
+    11524b9a: fmt, both unit-test steps, **the simulator build and clippy are green**: upstream
+    0.19.0 + the iPad patches compile for iOS. The app launches and the tour ran (128 steps
+    ok), but **24 tour steps failed** (report `runs/99/` on `ci-artifacts`; `tour.log`).
+  - f857f1a1: craft-update (upstream's
+    self-updater) is off on the iPad: Help › Check for Updates is hidden on iOS
+    (`menubar.rs` › `host_supports`) and the command returns "RawPad updates through
+    SideStore…" (`dialogs/updates_ui.rs` › `check`). Not yet in a CI run (it was pushed after
+    run 99 was triggered).
+- **The tour failures in run 99** (all `ui.clickWidget`):
+  - Bottom bar: `icon:beforeAfterModes`, `icon:beforeAfter`, `icon:ratingMenu`,
+    `icon:labelMenu` fail with **"canceled: widget … is no longer visible before its press;
+    nothing was retargeted"**. The items of the menus they open (`beforeAfterMode:*`,
+    `star:bottom:*`, `bottomLabel:*`) then fail with "no widget on screen" as a consequence.
+    The message comes from upstream's new press-time check in `crates/ui-egui/src/app/control.rs`
+    (around line 250: `control::widget_target_visible(ctx, latest_hit, target.at)`). Guess:
+    the bottom bar's iPad buttons are registered with `register(ui, id, rect)` but egui's hit
+    test at that point finds another layer/widget (or nothing) on top, e.g. the pill's child
+    `Ui`, or a rect that is off by the safe-area inset. Look at what upstream widgets do to
+    pass this check (search `widget_target_visible` and `check_visible`), and at the bottom-bar
+    screenshots in `runs/99/`.
+  - `gridMenu:selectSeveral`, `button:selectSeveralSync`, `button:selectSeveralDone` (Select
+    Several, the grid's long-press menu), `sliderMenu:reset:light.exposure` (slider long-press
+    menu) and `button:rawpadShareExport` (the host's Share offer): "no widget on screen". Either
+    the menus didn't open (long-press timing/ids changed upstream) or the patches don't register
+    these ids any more: check `ui.widgets` replies in `runs/99/replies.jsonl` around those steps.
 - **Very next step:**
-  1. Look at branch run 98 (or the latest run on `upstream-0.19.0`). Compile errors are in
-     `runs/<n>/unit-tests.log` (host crate), `ui-tests.log` (UI crate) or `build-sim.log`; if the
-     report wasn't published (early failure), read the job log with the GitHub MCP
-     `get_job_logs` (owner `ivanmagpelmeni`, `failed_only: true`, `return_content: true`).
-     Likely spots: the host's egui-winit / egui-wgpu / winit calls (`apps/rawpad-ios/src/ios.rs`)
-     after the 0.37 bump; `register(ui, …)` now takes the `Ui`, not the context; the copied tests in
-     `tests/ipad.rs` (harness fields like `h.view.ctx`, `h.app.widgets` may have moved).
-  2. Fix, push, trigger `ipad.yml` on `upstream-0.19.0` with `{"release": false}`; repeat until
-     green, then look at the tour screenshots (widget ids may have changed upstream; the tour is
-     `ios/sim_tour.jsonl`).
-  3. When green with 0 tour ERR and the shots look right: merge into main **at the start of a
-     session** (`git checkout main; git merge --ff-only origin/main; git merge --no-ff
-     origin/upstream-0.19.0`), push, watch the main run to the end. Check craft-update (the
-     upstream self-updater, new in ui-egui) doesn't offer desktop updates on the iPad.
-  4. Then PROGRESS.md › Next 3 tasks.
+  1. Trigger `ipad.yml` on `upstream-0.19.0` with `{"release": false}` (GitHub MCP
+     `actions_run_trigger`, owner `ivanmagpelmeni`) so the craft-update commit gets a run, and
+     meanwhile read `runs/99/tour.log`, `replies.jsonl` and the screenshots.
+  2. Fix the press-time visibility failure of the bottom-bar buttons (one cause, most failures),
+     then the missing long-press-menu and share ids. Push, re-run, repeat until 0 tour ERR and
+     the shots look right.
+  3. Merge into main **at the start of a session** (`git checkout main; git merge --ff-only
+     origin/main; git merge --no-ff origin/upstream-0.19.0`), push, watch the main run to the
+     end.
 - **Open problems:**
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
     ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
