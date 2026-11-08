@@ -355,7 +355,7 @@ impl Host {
             .unwrap_or_default();
         crate::keys::apply(&mut raw.events, self.logo_key || uikit_cmd);
         raw.events.extend(uikit_events);
-        app.raw_input_hook(&mut raw);
+        app.raw_input_hook(&self.ctx, &mut raw);
         // (after the hook: the CI's pointer events count as taps too)
         if let Some(at) = crate::keys::tap_pos(&raw.events) {
             self.last_tap = Some((Instant::now(), self.frames, at));

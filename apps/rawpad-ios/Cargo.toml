@@ -38,6 +38,8 @@ winit = { version = "0.30", default-features = false, features = ["rwh_06"] }
 pollster = { workspace = true }
 serde_json = { workspace = true }
 log = { workspace = true }
+# the desktop logging.rs (shared via #[path]) formats timestamps with chrono since upstream 0.19
+chrono = { workspace = true }
 # UIKit bridges (src/native.rs): document picker; same objc2 generation as egui-winit's
 objc2 = "0.6"
 # blocks for Photos' change requests (src/native.rs)
