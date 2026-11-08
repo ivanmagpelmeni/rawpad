@@ -30,8 +30,8 @@ lightcraft-codecs = { workspace = true }
 lightcraft-raster = { workspace = true }
 egui = { workspace = true }
 # no clipboard (egui-winit keeps an in-app clipboard on iOS), no X11/Wayland
-egui-winit = { version = "0.36", default-features = false, features = ["links"] }
-egui-wgpu = { version = "0.36", default-features = false, features = ["winit"] }
+egui-winit = { version = "0.37", default-features = false, features = ["links"] }
+egui-wgpu = { version = "0.37", default-features = false, features = ["winit"] }
 # the workspace wgpu carries the Metal backend
 wgpu = { workspace = true }
 winit = { version = "0.30", default-features = false, features = ["rwh_06"] }
