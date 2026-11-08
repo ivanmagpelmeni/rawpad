@@ -54,6 +54,9 @@ pub fn label(language: &str, n: usize) -> String {
 pub struct Shown {
     /// The Share button's rectangle (egui points).
     pub rect: Rect,
+    /// The Share button's egui id: the host registers it for the control channel.
+    #[cfg_attr(not(target_os = "ios"), allow(dead_code))]
+    pub id: egui::Id,
     /// Tapped this frame: share these files.
     pub share: Option<Vec<String>>,
 }
@@ -94,7 +97,7 @@ impl ShareOffer {
             return None;
         }
         let label = label(language, n);
-        let (share, close) = egui::Area::new(egui::Id::new("rawpad-share-export"))
+        let (share, close) = egui::Area::new(egui::Id::unique("rawpad-share-export"))
             .order(egui::Order::Foreground)
             .pivot(egui::Align2::CENTER_BOTTOM)
             .fixed_pos(bottom_center)
@@ -118,7 +121,7 @@ impl ShareOffer {
         }
         // come back to take it down when the time is up
         ctx.request_repaint_after(Duration::from_secs_f64((self.until - now).clamp(0.05, SHOW_FOR)));
-        Some(Shown { rect: share.rect, share: files })
+        Some(Shown { rect: share.rect, id: share.id, share: files })
     }
 }
 

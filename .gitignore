@@ -15,5 +15,5 @@ plan/
 *.safetensors
 *.safetensors.part
 
-# Python bytecode
+# Python tools import their public operator family.
 __pycache__/

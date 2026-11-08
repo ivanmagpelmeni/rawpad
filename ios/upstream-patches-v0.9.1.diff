@@ -1,0 +1,1336 @@
+diff --git a/crates/engine/src/export.rs b/crates/engine/src/export.rs
+index d294ed4d..23616d00 100644
+--- a/crates/engine/src/export.rs
++++ b/crates/engine/src/export.rs
+@@ -750,7 +750,8 @@ pub const OPTION_PARAMS: &[&str] = &[
+ /// Why an export can't add its files to Apple Photos on this platform (`None`: it can, when the
+ /// session has the runner; see [`crate::Session::after_export`]).
+ pub fn apple_photos_unsupported() -> Option<&'static str> {
+-    (!cfg!(target_os = "macos")).then_some("Apple Photos is only available on macOS")
++    // RawPad: the iPad host installs a Photos runner too (apps/rawpad-ios, native::photos_runner)
++    (!cfg!(any(target_os = "macos", target_os = "ios"))).then_some("Apple Photos is only available on macOS")
+ }
+ 
+ /// The keys of a `watermark` object ([`Watermark`], camelCase). `inset` sets `insetX` and `insetY`
+diff --git a/crates/ui-egui/src/menus.rs b/crates/ui-egui/src/menus.rs
+index d575d749..6006b6c7 100644
+--- a/crates/ui-egui/src/menus.rs
++++ b/crates/ui-egui/src/menus.rs
+@@ -2259,7 +2259,10 @@ pub fn confirm_delete(app: &mut LightcraftApp) -> bool {
+ 
+ /// Platform-appropriate label for revealing a file in the system file manager.
+ pub fn reveal_label() -> &'static str {
+-    if cfg!(target_os = "macos") {
++    // RawPad: the iPad has no file manager to reveal in; its host opens the share sheet instead
++    if cfg!(target_os = "ios") {
++        "Share…"
++    } else if cfg!(target_os = "macos") {
+         "Show in Finder"
+     } else if cfg!(target_os = "windows") {
+         "Show in Explorer"
+diff --git a/crates/ui-egui/src/panels/bottombar.rs b/crates/ui-egui/src/panels/bottombar.rs
+index 62cbe896..c6c0463d 100644
+--- a/crates/ui-egui/src/panels/bottombar.rs
++++ b/crates/ui-egui/src/panels/bottombar.rs
+@@ -82,6 +82,16 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+ /// and 10-point padding at both ends.
+ const PILL_W: f32 = 208.0;
+ 
++/// RawPad (iPad): a 6-point gap and a 22-point colour-label button at the end of the pill. On the
++/// desktop the label is the 6–9 keys, the Photo menu or the Info panel; on a touch screen the
++/// bottom bar is the one place in reach (editing audit, item 30). Also in unit tests, so CI runs it.
++const LABEL_W: f32 = 28.0;
++
++/// Whether the pill carries the colour-label button (iOS, and this crate's unit tests).
++fn touch_label() -> bool {
++    cfg!(target_os = "ios") || cfg!(test)
++}
++
+ /// The rating/flag pill and copy/paste settings, between `from` and `to` (the side groups): the
+ /// copy buttons go first when there is no room (they are in the Edit menu too), then the pill.
+ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to: f32) {
+@@ -89,31 +99,72 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
+     let has_clip = app.session.clipboard.is_some();
+     let label = crate::i18n::tr(if has_clip { "Paste Edit Settings" } else { "Copy Edit Settings" });
+     let copy_width = (ui.painter().layout_no_wrap(label.to_string(), t.font(13.0), t.text_label).size().x + 24.0).max(136.0);
+-    let centre_width = PILL_W + 10.0 + copy_width + 4.0 + 30.0;
+     let room = to - from;
+-    if room < PILL_W {
++    // the label button goes before the pill does when there is no room
++    let with_label = touch_label() && room >= PILL_W + LABEL_W;
++    let pill_w = if with_label { PILL_W + LABEL_W } else { PILL_W };
++    let centre_width = pill_w + 10.0 + copy_width + 4.0 + 30.0;
++    if room < pill_w {
++        if touch_label() && room >= COMPACT_W {
++            compact_pill(app, ui, full, from, to);
++        }
+         return;
+     }
+     let with_copy = room >= centre_width;
+-    let w = if with_copy { centre_width } else { PILL_W };
++    let w = if with_copy { centre_width } else { pill_w };
+     // where it sits with room to spare (slightly left of centre), kept between the side groups
+-    let left = (full.center().x - 60.0 - PILL_W / 2.0).clamp(from, to - w);
++    let left = (full.center().x - 60.0 - pill_w / 2.0).clamp(from, to - w);
+     let active = app.session.active().and_then(|id| app.session.catalog.photo(id).cloned());
+-    let pill = Rect::from_min_size(pos2(left, full.center().y - 15.0), vec2(PILL_W, 30.0));
++    let pill = Rect::from_min_size(pos2(left, full.center().y - 15.0), vec2(pill_w, 30.0));
+     ui.painter().rect_filled(pill, 15.0, t.canvas);
+     let mut pill_ui =
+         ui.new_child(egui::UiBuilder::new().max_rect(pill.shrink2(vec2(10.0, 4.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
+     pill_ui.spacing_mut().item_spacing.x = 3.0;
+-    let rating = active.as_ref().map(|p| p.rating).unwrap_or(0);
+-    if let Some(r) = stars(&mut pill_ui, "bottom", rating, 19.0) {
++    rate_and_flag(app, &mut pill_ui, active.as_deref());
++    if with_label {
++        pill_ui.add_space(6.0);
++        label_button(app, &mut pill_ui, active.as_ref().and_then(|p| p.label));
++    }
++    // copy / paste settings
++    if !with_copy {
++        return;
++    }
++    let copy_r = Rect::from_min_size(pos2(pill.right() + 10.0, pill.top()), vec2(copy_width, 30.0));
++    let cresp = ui.interact(copy_r, egui::Id::new("copy-settings"), Sense::click());
++    crate::widgets::announce(&cresp, label.to_string());
++    register(ui.ctx(), "button:copySettings", copy_r);
++    ui.painter().rect_filled(copy_r, 15.0, if cresp.hovered() { t.hover } else { t.canvas });
++    ui.painter().text(copy_r.center(), Align2::CENTER_CENTER, label, t.font(13.0), if active.is_some() { t.text_label } else { t.text_disabled });
++    if cresp.clicked() && active.is_some() {
++        let _ = if has_clip { app.run("develop.paste", json!({})) } else { app.run("develop.copy", json!({})) };
++        let msg = if has_clip { "Settings pasted" } else { "Edit settings copied" };
++        app.toast(ui.ctx(), crate::i18n::tr(msg));
++    }
++    let gear_r = Rect::from_min_size(pos2(copy_r.right() + 4.0, pill.top()), vec2(30.0, 30.0));
++    let gresp = ui.interact(gear_r, egui::Id::new("copy-gear"), Sense::click());
++    crate::widgets::announce(&gresp, crate::i18n::tr("Copy Settings…"));
++    register(ui.ctx(), "icon:copyGear", gear_r);
++    ui.painter().rect_filled(gear_r, 15.0, if gresp.hovered() { t.hover } else { t.canvas });
++    paint(ui.painter(), gear_r.shrink(7.0), Icon::Gear, t.icon);
++    if gresp.clicked() {
++        let _ = app.run("dialog.copySettings", json!({}));
++    }
++}
++
++/// The five stars (`star:bottom:<n>`) and three flags (`flag:<id>`) of the pill, laid out left to
++/// right in `ui` (the pill itself, or the compact pill's menu on a narrow iPad bar).
++fn rate_and_flag(app: &mut LightcraftApp, ui: &mut egui::Ui, active: Option<&lightcraft_catalog::Photo>) {
++    let t = Tokens::get(ui.ctx());
++    let rating = active.map(|p| p.rating).unwrap_or(0);
++    if let Some(r) = stars(ui, "bottom", rating, 19.0) {
+         let mut params = json!({"rating": r});
+         crate::panels::compare::target_active(app, &mut params);
+         let _ = app.run("photo.rate", params);
+     }
+-    pill_ui.add_space(6.0);
+-    let flag = active.as_ref().map(|p| p.flag).unwrap_or_default();
++    ui.add_space(6.0);
++    let flag = active.map(|p| p.flag).unwrap_or_default();
+     for (id, icon, f) in [("unflag", Icon::Circle, Flag::None), ("pick", Icon::FlagPick, Flag::Pick), ("reject", Icon::FlagReject, Flag::Reject)] {
+-        let (r, resp) = pill_ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
++        let (r, resp) = ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
+         crate::widgets::announce_selected(
+             &resp,
+             crate::i18n::tr(match f {
+@@ -123,7 +174,7 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
+             }),
+             flag == f,
+         );
+-        register(pill_ui.ctx(), format!("flag:{id}"), r);
++        register(ui.ctx(), format!("flag:{id}"), r);
+         let on = flag == f && f != Flag::None;
+         let c = if on {
+             if f == Flag::Reject { t.reject } else { t.pick }
+@@ -132,37 +183,82 @@ fn centre(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to:
+         } else {
+             t.icon
+         };
+-        paint(pill_ui.painter(), r.shrink(3.0), icon, c);
++        paint(ui.painter(), r.shrink(3.0), icon, c);
+         if resp.clicked() {
+             let mut params = json!({"flag": match f { Flag::Pick => "pick", Flag::Reject => "reject", Flag::None => "none" }});
+             crate::panels::compare::target_active(app, &mut params);
+             let _ = app.run("photo.flag", params);
+         }
+     }
+-    // copy / paste settings
+-    if !with_copy {
+-        return;
++}
++
++/// RawPad (iPad): a rating button 50 points wide and the label button, with 10-point padding and
++/// a 6-point gap, for a bar too narrow for the full pill (portrait, DECISIONS 81).
++const COMPACT_W: f32 = 10.0 + 50.0 + 6.0 + 22.0 + 10.0;
++
++/// RawPad (iPad): the compact pill. A button (`icon:ratingMenu`) showing the active photo's star
++/// count and flag opens a menu with the full stars and flags; the label button follows it.
++fn compact_pill(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, from: f32, to: f32) {
++    let t = Tokens::get(ui.ctx());
++    let left = (full.center().x - 60.0 - COMPACT_W / 2.0).clamp(from, (to - COMPACT_W).max(from));
++    let pill = Rect::from_min_size(pos2(left, full.center().y - 15.0), vec2(COMPACT_W, 30.0));
++    ui.painter().rect_filled(pill, 15.0, t.canvas);
++    let mut pill_ui =
++        ui.new_child(egui::UiBuilder::new().max_rect(pill.shrink2(vec2(10.0, 4.0))).layout(egui::Layout::left_to_right(egui::Align::Center)));
++    pill_ui.spacing_mut().item_spacing.x = 0.0;
++    let active = app.session.active().and_then(|id| app.session.catalog.photo(id).cloned());
++    let rating = active.as_ref().map(|p| p.rating).unwrap_or(0);
++    let flag = active.as_ref().map(|p| p.flag).unwrap_or_default();
++    let (r, resp) = pill_ui.allocate_exact_size(vec2(50.0, 22.0), Sense::click());
++    crate::widgets::announce(&resp, format!("{rating} ★"));
++    register(pill_ui.ctx(), "icon:ratingMenu", r);
++    if resp.hovered() {
++        pill_ui.painter().rect_filled(r, 4.0, t.hover);
+     }
+-    let copy_r = Rect::from_min_size(pos2(pill.right() + 10.0, pill.top()), vec2(copy_width, 30.0));
+-    let cresp = ui.interact(copy_r, egui::Id::new("copy-settings"), Sense::click());
+-    crate::widgets::announce(&cresp, label.to_string());
+-    register(ui.ctx(), "button:copySettings", copy_r);
+-    ui.painter().rect_filled(copy_r, 15.0, if cresp.hovered() { t.hover } else { t.canvas });
+-    ui.painter().text(copy_r.center(), Align2::CENTER_CENTER, label, t.font(13.0), if active.is_some() { t.text_label } else { t.text_disabled });
+-    if cresp.clicked() && active.is_some() {
+-        let _ = if has_clip { app.run("develop.paste", json!({})) } else { app.run("develop.copy", json!({})) };
+-        let msg = if has_clip { "Settings pasted" } else { "Edit settings copied" };
+-        app.toast(ui.ctx(), crate::i18n::tr(msg));
++    let star = Rect::from_center_size(pos2(r.left() + 9.0, r.center().y), vec2(15.0, 15.0));
++    paint(pill_ui.painter(), star, if rating > 0 { Icon::StarFilled } else { Icon::Star }, if rating > 0 { t.star } else { t.icon });
++    pill_ui.painter().text(pos2(r.left() + 20.0, r.center().y), Align2::LEFT_CENTER, rating.to_string(), t.font(13.0), t.text_label);
++    let flag_r = Rect::from_center_size(pos2(r.right() - 9.0, r.center().y), vec2(15.0, 15.0));
++    match flag {
++        Flag::Pick => paint(pill_ui.painter(), flag_r, Icon::FlagPick, t.pick),
++        Flag::Reject => paint(pill_ui.painter(), flag_r, Icon::FlagReject, t.reject),
++        Flag::None => {}
+     }
+-    let gear_r = Rect::from_min_size(pos2(copy_r.right() + 4.0, pill.top()), vec2(30.0, 30.0));
+-    let gresp = ui.interact(gear_r, egui::Id::new("copy-gear"), Sense::click());
+-    crate::widgets::announce(&gresp, crate::i18n::tr("Copy Settings…"));
+-    register(ui.ctx(), "icon:copyGear", gear_r);
+-    ui.painter().rect_filled(gear_r, 15.0, if gresp.hovered() { t.hover } else { t.canvas });
+-    paint(ui.painter(), gear_r.shrink(7.0), Icon::Gear, t.icon);
+-    if gresp.clicked() {
+-        let _ = app.run("dialog.copySettings", json!({}));
++    egui::Popup::menu(&resp).show(|ui| {
++        ui.horizontal(|ui| {
++            ui.spacing_mut().item_spacing.x = 3.0;
++            rate_and_flag(app, ui, active.as_deref());
++        });
++    });
++    pill_ui.add_space(6.0);
++    label_button(app, &mut pill_ui, active.as_ref().and_then(|p| p.label));
++}
++
++/// RawPad (iPad): the colour-label button at the end of the pill (`icon:labelMenu`): a dot in the
++/// active photo's label colour (a ring when it has none) that opens the label menu, items
++/// `bottomLabel:<colour>` / `bottomLabel:none` (DECISIONS 80).
++fn label_button(app: &mut LightcraftApp, ui: &mut egui::Ui, current: Option<lightcraft_catalog::ColorLabel>) {
++    let t = Tokens::get(ui.ctx());
++    let (r, resp) = ui.allocate_exact_size(vec2(22.0, 22.0), Sense::click());
++    crate::widgets::announce(&resp, crate::i18n::tr("Set Color Label"));
++    register(ui.ctx(), "icon:labelMenu", r);
++    match current {
++        Some(l) => {
++            ui.painter().circle_filled(r.center(), 6.5, crate::panels::grid::label_color(l));
++        }
++        None => {
++            let c = if resp.hovered() { t.text } else { t.icon };
++            ui.painter().circle_stroke(r.center(), 6.0, egui::Stroke::new(1.5, c));
++        }
+     }
++    egui::Popup::menu(&resp).show(|ui| {
++        if let Some(l) = crate::panels::grid::label_items(app, ui, current, "bottomLabel") {
++            let mut params = json!({"label": crate::panels::grid::label_param(l)});
++            crate::panels::compare::target_active(app, &mut params);
++            let _ = app.run("photo.label", params);
++            ui.close();
++        }
++    });
+ }
+ 
+ /// The right-hand group (zoom, view toggles or thumbnail size); returns its left edge.
+@@ -191,6 +287,12 @@ fn right_side(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, compact_zo
+     if app.ui.view == ViewMode::Survey {
+         // no zoom or thumbnail size in Survey
+     } else if matches!(app.ui.view, ViewMode::Detail | ViewMode::Compare) {
++        // RawPad (iPad): every Before/After view in a menu right of the button. On the desktop
++        // they are Shift+Y, Alt+Y, Alt+Shift+Y, \ and the View menu, out of reach by touch.
++        if cfg!(target_os = "ios") {
++            let modes = icon_button(&mut child, "beforeAfterModes", Icon::ChevronDown, vec2(26.0, 30.0), false, true, "Before/After views");
++            egui::Popup::menu(&modes).show(|ui| before_after_menu(app, ui));
++        }
+         if icon_button(&mut child, "beforeAfter", Icon::BeforeAfter, vec2(30.0, 30.0), app.ui.before_after.is_layout(), true, "Before/After (Y)")
+             .clicked()
+         {
+@@ -258,6 +360,26 @@ fn right_side(app: &mut LightcraftApp, ui: &mut egui::Ui, full: Rect, compact_zo
+     if child.min_rect().width() > 0.0 { child.min_rect().left() } else { full.right() }
+ }
+ 
++/// Every Before/After view, for touch (RawPad: without a keyboard the iPad has no Y, Shift+Y,
++/// Alt+Y or `\`). Picking the view that is on turns it off.
++fn before_after_menu(app: &mut LightcraftApp, ui: &mut egui::Ui) {
++    use crate::state::BeforeAfter;
++    for (key, label, mode) in [
++        ("sideBySide", "Compare Before and After", BeforeAfter::SideBySide),
++        ("split", "Before/After Split", BeforeAfter::Split),
++        ("topBottom", "Before/After Top/Bottom", BeforeAfter::TopBottom),
++        ("splitTopBottom", "Before/After Split Top/Bottom", BeforeAfter::SplitTopBottom),
++        ("original", "Show Original", BeforeAfter::Original),
++    ] {
++        let on = app.ui.before_after == mode;
++        let r = ui.selectable_label(on, crate::i18n::tr(label));
++        register(ui.ctx(), format!("beforeAfterMode:{key}"), r.rect);
++        if r.clicked() {
++            app.ui.before_after = if on { BeforeAfter::Off } else { mode };
++        }
++    }
++}
++
+ fn click_zoom_menu(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+     for pct in crate::state::CLICK_ZOOMS {
+         if ui.selectable_label(app.ui.click_zoom == pct, format!("{}:1", pct / 100)).clicked() {
+diff --git a/crates/ui-egui/src/panels/detail.rs b/crates/ui-egui/src/panels/detail.rs
+index 44427565..b19bed79 100644
+--- a/crates/ui-egui/src/panels/detail.rs
++++ b/crates/ui-egui/src/panels/detail.rs
+@@ -1315,8 +1315,10 @@ fn quick_name(q: lightcraft_engine::media::QuickSource) -> &'static str {
+ /// the colour-mixer bands under the press point (`develop.targeted`, one call per whole step, all
+ /// in one interaction = one undo step).
+ fn targeted_drag(app: &mut LightcraftApp, resp: &egui::Response, map: &CanvasMap, target: &str) {
++    // on iPad the sample point is where the finger landed, not where it is once egui calls it a drag
++    let press = if cfg!(target_os = "ios") { resp.ctx.input(|i| i.pointer.press_origin()) } else { None };
+     if resp.drag_started()
+-        && let Some(q) = resp.interact_pointer_pos()
++        && let Some(q) = press.or(resp.interact_pointer_pos())
+     {
+         let _ = app.run("develop.beginInteraction", json!({"label": "Targeted Adjustment"}));
+         app.gesture = Some(Gesture::Targeted { at: map.norm(q), acc: 0.0 });
+@@ -1551,7 +1553,7 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
+             Some(Gesture::CropHandle { handle, .. }) => Some(usize::from(handle)),
+             _ => None,
+         };
+-        let near = held.or_else(|| handles.iter().position(|h| h.distance(hq) < 12.0)).filter(|_| !rotating);
++        let near = held.or_else(|| handles.iter().position(|h| h.distance(hq) < CROP_GRAB)).filter(|_| !rotating);
+         let cursor = match near {
+             Some(0 | 2) => egui::CursorIcon::ResizeNwSe,
+             Some(1 | 3) => egui::CursorIcon::ResizeNeSw,
+@@ -1575,13 +1577,15 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
+     if resp.double_clicked()
+         && let Some(q) = resp.interact_pointer_pos()
+         && inside(q)
+-        && !handles.iter().any(|h| h.distance(q) < 12.0)
++        && !handles.iter().any(|h| h.distance(q) < CROP_GRAB)
+     {
+         let _ = app.run("tool.done", json!({}));
+         return;
+     }
++    // on iPad the handle under the press, not where the finger is once the drag threshold passed
++    let press = if cfg!(target_os = "ios") { ui.input(|i| i.pointer.press_origin()) } else { None };
+     if resp.drag_started()
+-        && let Some(q) = resp.interact_pointer_pos()
++        && let Some(q) = press.or(resp.interact_pointer_pos())
+     {
+         if let Err(e) = app.run("develop.beginInteraction", json!({"label": "Crop"})).and_then(|_| app.begin_crop().map(|_| serde_json::Value::Null))
+         {
+@@ -1590,7 +1594,7 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
+             return;
+         }
+         let d = app.session.develop_of(id).unwrap_or_default();
+-        app.gesture = Some(match handles.iter().position(|h| h.distance(q) < 12.0) {
++        app.gesture = Some(match handles.iter().position(|h| h.distance(q) < CROP_GRAB) {
+             Some(h) => Gesture::CropHandle { handle: h as u8, start: d.crop.geometry.rect, angle: d.crop.geometry.angle },
+             None if inside(q) => Gesture::CropHandle { handle: 8, start: d.crop.geometry.rect, angle: d.crop.geometry.angle },
+             None => {
+@@ -1638,6 +1642,13 @@ fn crop_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
+ 
+ /// The crop handles' names for screen readers, in `crop.drag`'s numbering: 0..3 corners, 4..7
+ /// edges (top, right, bottom, left), 8 the whole box.
++/// How near (in points) a press must land to grab a crop handle, and a mask pin or handle: a
++/// fingertip on iPad is far less precise than a mouse pointer.
++const CROP_GRAB: f32 = if cfg!(target_os = "ios") { 22.0 } else { 12.0 };
++const MASK_GRAB: f32 = if cfg!(target_os = "ios") { 22.0 } else { 10.0 };
++/// iPad: how far (points) the radial mask's rotate knob sits out from its right-edge handle.
++const ROT_KNOB_GAP: f32 = 44.0;
++
+ const CROP_HANDLE_NAMES: [&str; 9] = [
+     "Crop top-left corner",
+     "Crop top-right corner",
+@@ -2038,10 +2049,16 @@ fn mask_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
+ 
+                     let (s, co) = angle.to_radians().sin_cos();
+                     let rot_r = rx + 0.08;
+-                    let rot_q = map.screen(Point::new(center.x + (rot_r * co) * l.0, center.y + (rot_r * s) * l.1));
+                     let h1_q = map.screen(Point::new(center.x + (rx * co) * l.0, center.y + (rx * s) * l.1));
++                    // on iPad the rotate knob sits a finger's width (44 pt) out from the right-edge
++                    // handle and is drawn larger, so the two can't be grabbed for each other
++                    let rot_desk = map.screen(Point::new(center.x + (rot_r * co) * l.0, center.y + (rot_r * s) * l.1));
++                    let rot_q = if cfg!(target_os = "ios") { h1_q + (rot_desk - h1_q).normalized() * ROT_KNOB_GAP } else { rot_desk };
+                     p.line_segment([h1_q, rot_q], Stroke::new(1.0, Color32::from_white_alpha(200)));
+-                    p.circle_stroke(rot_q, 4.0, Stroke::new(1.5, Color32::WHITE));
++                    if cfg!(target_os = "ios") {
++                        p.circle_filled(rot_q, 7.0, Color32::from_black_alpha(90));
++                    }
++                    p.circle_stroke(rot_q, if cfg!(target_os = "ios") { 7.0 } else { 4.0 }, Stroke::new(1.5, Color32::WHITE));
+                     register(ui.ctx(), format!("maskHandle:{}:{ci}:5", m.id), Rect::from_center_size(rot_q, vec2(14.0, 14.0)));
+                     grips.push((m.id, ci, 5, rot_q));
+                 }
+@@ -2143,9 +2160,14 @@ fn mask_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
+                     points.push(n);
+                 }
+                 _ => {
++                    let mut points = stroke_lead_in(ui, resp, map);
+                     let mut pressure = Vec::new();
+-                    record_pressure(&mut pressure, 0, force);
+-                    app.gesture = Some(Gesture::Brush { points: vec![n], pressure });
++                    for i in 0..points.len() {
++                        record_pressure(&mut pressure, i, force);
++                    }
++                    record_pressure(&mut pressure, points.len(), force);
++                    points.push(n);
++                    app.gesture = Some(Gesture::Brush { points, pressure });
+                 }
+             }
+         }
+@@ -2190,7 +2212,7 @@ fn mask_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respons
+     let hit = |q: Pos2| {
+         grips
+             .iter()
+-            .filter(|g| g.3.distance(q) < 10.0)
++            .filter(|g| g.3.distance(q) < MASK_GRAB)
+             .min_by(|a, b| {
+                 (Some(a.0) != active, a.3.distance(q)).partial_cmp(&(Some(b.0) != active, b.3.distance(q))).unwrap_or(std::cmp::Ordering::Equal)
+             })
+@@ -2297,9 +2319,11 @@ fn frame_long_norm(map: &CanvasMap) -> (f64, f64) {
+ }
+ 
+ /// Auto's condition for the Tool Overlay (Shift+H): the pointer is over the photo, or a pin is
+-/// being dragged.
++/// being dragged. RawPad (iPad): always, as a lifted finger leaves no pointer over the photo, so
++/// the pins could never be seen before touching them (UPSTREAM.md).
+ fn pins_live(app: &LightcraftApp, resp: &egui::Response, map: &CanvasMap) -> bool {
+-    resp.hover_pos().is_some_and(|q| map.rect.contains(q))
++    cfg!(target_os = "ios")
++        || resp.hover_pos().is_some_and(|q| map.rect.contains(q))
+         || matches!(app.gesture, Some(Gesture::SpotMove { .. } | Gesture::MaskHandle { .. }))
+         // a handle moved with the keyboard stays shown while it has the focus
+         || crate::canvas_keys::has_focus(&resp.ctx)
+@@ -2418,7 +2442,11 @@ fn remove_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &egui::Respo
+         let n = map.norm(q);
+         match &mut app.gesture {
+             Some(Gesture::Spot { points }) => points.push(n),
+-            _ => app.gesture = Some(Gesture::Spot { points: vec![n] }),
++            _ => {
++                let mut points = stroke_lead_in(ui, resp, map);
++                points.push(n);
++                app.gesture = Some(Gesture::Spot { points });
++            }
+         }
+     }
+     if let Some(Gesture::Spot { points }) = &app.gesture {
+@@ -2660,7 +2688,7 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
+                     // ⌘/Ctrl- and Shift-clicks change the selection; the pair on screen stays (#187)
+                     super::compare::select_with_modifier(app, *id, !m.command)
+                 } else {
+-                    let mode = if m.command {
++                    let mode = if m.command || super::grid::touch_multi(ui.ctx()) {
+                         "toggle"
+                     } else if m.shift {
+                         "range"
+@@ -2677,6 +2705,42 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
+             resp.context_menu(|ui| super::grid::context_menu(app, ui, *id));
+         }
+     });
++    if super::grid::touch_multi(ui.ctx()) {
++        select_several_pill(app, ui.ctx(), r);
++    }
++}
++
++/// iPad: while *Select Several* is on, a pill floats over the loupe just above the filmstrip with
++/// how many photos are picked and a Done button, as the grid's strip does: in the loupe only the
++/// long-press menu's *Done Selecting* said so before (DECISIONS.md 64).
++fn select_several_pill(app: &LightcraftApp, ctx: &egui::Context, strip: Rect) {
++    let t = Tokens::get(ctx);
++    let n = app.session.selection.ids.len();
++    // "Select Several: 2 photos" from messages every language already has (tr_format! takes only
++    // messages listed in the translations)
++    let photos = crate::i18n::tr_format!("{n} photo{}", if n == 1 { "" } else { "s" }, n = n);
++    let text = format!("{}: {photos}", crate::i18n::tr("Select Several"));
++    egui::Area::new(egui::Id::new("film-select-several"))
++        .order(egui::Order::Foreground)
++        .fixed_pos(pos2(strip.left() + 12.0, strip.top() - 52.0))
++        .show(ctx, |ui| {
++            egui::Frame::new()
++                .fill(t.chrome)
++                .stroke(Stroke::new(1.0, t.divider))
++                .corner_radius(18.0)
++                .inner_margin(egui::Margin::symmetric(14, 6))
++                .show(ui, |ui| {
++                    ui.horizontal(|ui| {
++                        let label = ui.label(egui::RichText::new(text).color(t.text).font(t.font(13.0)));
++                        register(ui.ctx(), "filmSelectSeveral", label.rect);
++                        let done = ui.button(crate::i18n::tr("Done"));
++                        register(ui.ctx(), "button:filmSelectSeveralDone", done.rect);
++                        if done.clicked() {
++                            ui.ctx().data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), false));
++                        }
++                    });
++                });
++        });
+ }
+ 
+ /// Rating, flag and edited badges along a filmstrip thumbnail's bottom edge (Settings → Interface).
+@@ -3007,6 +3071,20 @@ pub(crate) fn pen_force(i: &egui::InputState) -> Option<f32> {
+     })
+ }
+ 
++/// RawPad (iOS, and this crate's tests): where a brush or spot stroke that starts with a drag
++/// really began. egui reports the drag only once the finger has moved past its threshold, so
++/// without this the first few millimetres of a finger or Pencil stroke were lost (editing audit,
++/// item 15). Returns the press point when it differs from where the drag was noticed, else nothing.
++fn stroke_lead_in(ui: &egui::Ui, resp: &egui::Response, map: &CanvasMap) -> Vec<Point> {
++    if !(cfg!(target_os = "ios") || cfg!(test)) || !resp.drag_started() {
++        return Vec::new();
++    }
++    let (Some(press), Some(now)) = (ui.input(|i| i.pointer.press_origin()), resp.interact_pointer_pos()) else {
++        return Vec::new();
++    };
++    if press == now { Vec::new() } else { vec![map.norm(press)] }
++}
++
+ /// Record the pressure of the stroke's point `index`: `force` when the pen reported one this frame, else the last
+ /// known one. Points before the first reported force take it too; a stroke without any keeps no pressure list.
+ pub(crate) fn record_pressure(pressure: &mut Vec<f32>, index: usize, force: Option<f32>) {
+diff --git a/crates/ui-egui/src/panels/dialogs.rs b/crates/ui-egui/src/panels/dialogs.rs
+index 5562e94d..1085eefb 100644
+--- a/crates/ui-egui/src/panels/dialogs.rs
++++ b/crates/ui-egui/src/panels/dialogs.rs
+@@ -1043,11 +1043,14 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+                         &mut opts.conflict,
+                     );
+                     // After export: Apple Photos imports the files written (macOS only)
+-                    #[cfg(target_os = "macos")]
++                    #[cfg(any(target_os = "macos", target_os = "ios"))]
+                     {
+                         let r = ui.checkbox(&mut opts.add_to_photos, crate::i18n::tr("Add to Apple Photos"));
+                         crate::widgets::register(ui.ctx(), "exportAddToPhotos", r.rect);
+-                        if opts.add_to_photos {
++                        // RawPad (iPadOS): no albums there, and iPadOS asks for permission itself
++                        if cfg!(target_os = "ios") {
++                            opts.photos_album.clear();
++                        } else if opts.add_to_photos {
+                             field(ui, "Album", |ui| {
+                                 crate::widgets::named(ui.add(egui::TextEdit::singleline(&mut opts.photos_album).hint_text(crate::i18n::tr("none")).desired_width(f32::INFINITY)), crate::i18n::tr("Album"))
+                             });
+@@ -1059,7 +1062,7 @@ pub fn show(app: &mut LightcraftApp, ctx: &egui::Context) {
+                         }
+                     }
+                     // nowhere to add them: a setting carried over from a Mac is dropped, not refused
+-                    #[cfg(not(target_os = "macos"))]
++                    #[cfg(not(any(target_os = "macos", target_os = "ios")))]
+                     {
+                         opts.add_to_photos = false;
+                     }
+diff --git a/crates/ui-egui/src/panels/edit.rs b/crates/ui-egui/src/panels/edit.rs
+index ded1c0bd..bde5be92 100644
+--- a/crates/ui-egui/src/panels/edit.rs
++++ b/crates/ui-egui/src/panels/edit.rs
+@@ -967,7 +967,6 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
+     let resp = ui.interact(r, egui::Id::new(("curve", &ch)), Sense::click_and_drag());
+     crate::widgets::announce(&resp, crate::i18n::tr("Tone Curve"));
+     register(ui.ctx(), "curve", r);
+-    resp.context_menu(|ui| curve_reset_menu(app, ui, &ch));
+     let p = ui.painter();
+     p.rect_filled(r, 2.0, t.canvas);
+     if let Some(hist) = preview_histogram(app, id) {
+@@ -1009,6 +1008,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
+             })
+             .collect();
+         p.add(egui::Shape::line(pts, Stroke::new(2.0, Color32::from_gray(220))));
++        resp.context_menu(|ui| curve_reset_menu(app, ui, &ch));
+         curve_footer(app, ui, d);
+         for c in ["curve.highlights", "curve.lights", "curve.darks", "curve.shadows"] {
+             control(app, ui, d, c, true);
+@@ -1045,7 +1045,38 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
+     // the point being dragged (stored as `Option<usize>` so a stale value can be cleared)
+     let mut dragging: Option<usize> = ui.data(|dd| dd.get_temp::<Option<usize>>(drag_id)).flatten();
+     let nearest = |q: Pos2| pts.iter().enumerate().map(|(i, p)| (i, to_screen(p.x, p.y).distance(q))).min_by(|a, b| a.1.total_cmp(&b.1));
+-    let hovered = resp.hover_pos().and_then(nearest).filter(|(_, dist)| *dist < 10.0).map(|(i, _)| i);
++    let hovered = resp.hover_pos().and_then(nearest).filter(|(_, dist)| *dist < CURVE_POINT_HIT).map(|(i, _)| i);
++    // the curve's menu (a right-click, or a long-press on iPad) offers Delete Point for the inner
++    // point under the press: a finger can't hit the double-click a mouse uses
++    let menu_id = egui::Id::new(("curve-menu-point", &ch));
++    // (iPad only; desktop keeps upstream's menu, and the unit tests see the iPad one)
++    if (cfg!(target_os = "ios") || cfg!(test)) && resp.secondary_clicked() {
++        let under = resp
++            .interact_pointer_pos()
++            .and_then(nearest)
++            .filter(|&(i, dist)| dist < CURVE_POINT_HIT && i != 0 && i + 1 != pts.len())
++            .and_then(|(i, _)| pts.get(i))
++            .map(|q| [q.x, q.y]);
++        ui.data_mut(|dd| dd.insert_temp(menu_id, under));
++    }
++    let menu_point: Option<[f64; 2]> = ui.data(|dd| dd.get_temp::<Option<[f64; 2]>>(menu_id)).flatten();
++    resp.context_menu(|ui| {
++        if let Some(q) = menu_point
++            && let Some(i) = pts.iter().position(|p| (p.x - q[0]).abs() < 1e-12 && (p.y - q[1]).abs() < 1e-12)
++            && i != 0
++            && i + 1 != pts.len()
++        {
++            let b = ui.button(crate::i18n::tr("Delete Point"));
++            register(ui.ctx(), "curveMenu:deletePoint", b.rect);
++            if b.clicked() {
++                let arr: Vec<[f64; 2]> = pts.iter().enumerate().filter(|(j, _)| *j != i).map(|(_, p)| [p.x, p.y]).collect();
++                let _ = app.run("develop.curve", json!({"channel": ch, "points": arr}));
++                ui.close();
++            }
++            ui.separator();
++        }
++        curve_reset_menu(app, ui, &ch);
++    });
+     if dragging.is_some() {
+         ui.ctx().set_cursor_icon(egui::CursorIcon::Grabbing);
+     } else if hovered.is_some() {
+@@ -1074,7 +1105,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
+     if resp.double_clicked()
+         && let Some(q) = resp.interact_pointer_pos()
+         && let Some((i, dist)) = nearest(q)
+-        && dist < 10.0
++        && dist < CURVE_POINT_HIT
+         && i != 0
+         && i != pts.len() - 1
+     {
+@@ -1087,7 +1118,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
+         // pick the point under the press, not where the pointer is once the drag threshold passed
+         let _ = app.run("develop.beginInteraction", json!({"label": "Tone Curve"}));
+         match nearest(q) {
+-            Some((i, dist)) if dist < 10.0 => dragging = Some(i),
++            Some((i, dist)) if dist < CURVE_POINT_HIT => dragging = Some(i),
+             _ => {
+                 let (x, y) = from_screen(q);
+                 let mut v = pts.clone();
+@@ -1130,7 +1161,7 @@ fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, d: &Dev
+         }
+     } else if resp.clicked()
+         && let Some(q) = resp.interact_pointer_pos()
+-        && nearest(q).is_none_or(|(_, dist)| dist >= 10.0)
++        && nearest(q).is_none_or(|(_, dist)| dist >= CURVE_POINT_HIT)
+     {
+         let (x, y) = from_screen(q);
+         let mut v = pts.clone();
+@@ -1221,6 +1252,10 @@ fn curve_footer(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings)
+ }
+ 
+ /// Right-click menu of the curve graph.
++/// How near (in points) a press must land to grab a curve point: a fingertip on iPad is far
++/// less precise than a mouse pointer.
++const CURVE_POINT_HIT: f32 = if cfg!(target_os = "ios") { 22.0 } else { 10.0 };
++
+ fn curve_reset_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, ch: &str) {
+     let label = if ch == "parametric" {
+         crate::i18n::tr("Reset Parametric Curve").to_string()
+@@ -1596,10 +1631,12 @@ fn grading_wheel(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings
+             t.text_label,
+         );
+     }
+-    // the eye: on top of the wheel, shown while hovering or while the wheel is hidden
+-    if hovering || hidden {
++    // the eye: on top of the wheel, shown while hovering or while the wheel is hidden (always on
++    // iPad, where nothing hovers; its touch area there is 28 pt)
++    if hovering || hidden || cfg!(target_os = "ios") {
+         let eye = Rect::from_center_size(r.left_bottom() + vec2(2.0, -2.0), vec2(16.0, 16.0));
+-        let er = ui.interact(eye, egui::Id::new(("wheelEye", key)), Sense::click());
++        let reach = if cfg!(target_os = "ios") { eye.expand(6.0) } else { eye };
++        let er = ui.interact(reach, egui::Id::new(("wheelEye", key)), Sense::click());
+         crate::widgets::announce(&er, crate::i18n::tr("Show / hide"));
+         register(ui.ctx(), format!("wheelEye:{key}"), eye);
+         paint(ui.painter(), eye, if hidden { Icon::EyeOff } else { Icon::Eye }, if hidden { t.text_disabled } else { t.icon });
+diff --git a/crates/ui-egui/src/panels/grid.rs b/crates/ui-egui/src/panels/grid.rs
+index c6365b78..55ab10ec 100644
+--- a/crates/ui-egui/src/panels/grid.rs
++++ b/crates/ui-egui/src/panels/grid.rs
+@@ -169,6 +169,9 @@ fn show_inner(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+             }
+         }
+     }
++    if touch_multi(ui.ctx()) {
++        select_several_bar(app, ui);
++    }
+     super::chips::show(app, ui, &chips);
+     if app.ui.filter_bar {
+         super::filterbar::show(app, ui);
+@@ -772,7 +775,7 @@ fn cell(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, r: Rect, square
+         let m = ui.input(|i| i.modifiers);
+         let mode = if m.shift {
+             "range"
+-        } else if m.command {
++        } else if m.command || touch_multi(ui.ctx()) {
+             "toggle"
+         } else {
+             "replace"
+@@ -1039,10 +1042,66 @@ pub fn stack_badge(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId, sid:
+     }
+ }
+ 
++/// iPad: whether *Select Several* (the photo's long-press menu) is on, where a tap adds a photo to
++/// the selection or takes it out, as a ⌘-click does on the Mac (no modifier keys on a touch screen).
++/// Also in this crate's tests, where only a test that sets the flag turns it on.
++pub(crate) fn touch_multi(ctx: &egui::Context) -> bool {
++    (cfg!(target_os = "ios") || cfg!(test)) && ctx.data(|d| d.get_temp::<bool>(egui::Id::new("rawpad.selectSeveral"))).unwrap_or(false)
++}
++
++/// iPad: the strip under the grid's title while *Select Several* is on, so it's clear that taps
++/// now add or remove photos, with Sync Settings (the active photo's settings to the other selected
++/// photos, as Edit › Sync Settings) and a Done button that turns it off (DECISIONS.md 59, 60).
++fn select_several_bar(app: &mut LightcraftApp, ui: &mut egui::Ui) {
++    let t = Tokens::get(ui.ctx());
++    let (r, _) = ui.allocate_exact_size(vec2(ui.available_width(), 40.0), Sense::hover());
++    ui.painter().rect_filled(r, 0.0, t.canvas);
++    // the count of selected photos is in the title row above ("3 selected · 24 photos")
++    let text = crate::i18n::tr("Tap photos to add or remove them");
++    let done_w = 84.0;
++    let sync_w = 128.0;
++    let room = (r.width() - 52.0 - done_w - sync_w).max(0.0);
++    let shown = crate::widgets::elide_head(text, room, |s| ui.painter().layout_no_wrap(s.to_string(), t.font(13.0), t.text).size().x);
++    let label = ui.painter().text(pos2(r.left() + 20.0, r.center().y), Align2::LEFT_CENTER, &shown, t.font(13.0), t.text);
++    crate::widgets::register(ui.ctx(), "grid:selectSeveralBar", label);
++    let done_rect = Rect::from_min_size(pos2(r.right() - 20.0 - done_w, r.center().y - 16.0), vec2(done_w, 32.0));
++    let sync_rect = Rect::from_min_size(pos2(done_rect.left() - 12.0 - sync_w, r.center().y - 16.0), vec2(sync_w, 32.0));
++    // syncing needs a photo to copy from and at least one other to copy to
++    let can_sync = app.session.selection.ids.len() > 1 && app.session.selection.active.is_some();
++    let sync = ui.add_enabled_ui(can_sync, |ui| ui.put(sync_rect, egui::Button::new(crate::i18n::tr("Sync Settings")))).inner;
++    crate::widgets::register(ui.ctx(), "button:selectSeveralSync", sync.rect);
++    if can_sync && sync.clicked() {
++        match app.run("develop.sync", json!({})) {
++            Ok(v) => {
++                let n = v.get("changed").and_then(serde_json::Value::as_u64).unwrap_or(0);
++                // "Sync Settings: 2 photos" from messages every language already has
++                let photos = crate::i18n::tr_format!("{n} photo{}", if n == 1 { "" } else { "s" }, n = n);
++                // 3 s: it reports on photos that may be off screen (DECISIONS.md 66)
++                app.toast_for(ui.ctx(), format!("{}: {photos}", crate::i18n::tr("Sync Settings")), 3.0);
++            }
++            Err(e) => app.toast(ui.ctx(), e),
++        }
++    }
++    let resp = ui.put(done_rect, egui::Button::new(crate::i18n::tr("Done")));
++    crate::widgets::register(ui.ctx(), "button:selectSeveralDone", resp.rect);
++    if resp.clicked() {
++        ui.ctx().data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), false));
++    }
++}
++
+ pub fn context_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+-    if !app.session.selection.contains(id) {
++    if !app.session.selection.contains(id) && !touch_multi(ui.ctx()) {
+         let _ = app.run("library.select", json!({"ids": [id.0]}));
+     }
++    if cfg!(target_os = "ios") {
++        let on = touch_multi(ui.ctx());
++        let resp = ui.button(crate::i18n::tr(if on { "Done Selecting" } else { "Select Several" }));
++        crate::widgets::register(ui.ctx(), "gridMenu:selectSeveral", resp.rect);
++        if resp.clicked() {
++            ui.ctx().data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), !on));
++        }
++        ui.separator();
++    }
+     if ui.button(crate::i18n::tr("Open in Detail")).clicked() {
+         let _ = app.run("view.detail", json!({}));
+     }
+diff --git a/crates/ui-egui/src/panels/masking.rs b/crates/ui-egui/src/panels/masking.rs
+index e0e9d1a4..78069d58 100644
+--- a/crates/ui-egui/src/panels/masking.rs
++++ b/crates/ui-egui/src/panels/masking.rs
+@@ -105,6 +105,11 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+             ("luminanceRange", "Luminance", Icon::Sliders),
+             ("colorRange", "Color", Icon::Picker),
+         ];
++        // RawPad (iPadOS) ships without the AI models: no Object/Describe/Subject/Sky/Background
++        let tiles: Vec<_> = tiles
++            .into_iter()
++            .filter(|(kind, _, _)| !cfg!(target_os = "ios") || !matches!(*kind, "object" | "prompt" | "subject" | "sky" | "background"))
++            .collect();
+         // four 52 pt tiles a row when they and their labels fit, else fewer (wider for a long label)
+         let widest = |size: f32| {
+             let font = t.font(size);
+@@ -813,15 +818,19 @@ fn describe_field(app: &mut LightcraftApp, ui: &mut egui::Ui, new_mask: bool) {
+ }
+ 
+ fn component_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, op: &str) {
+-    let b = ui.button(crate::i18n::tr("Object"));
+-    register(ui.ctx(), format!("maskComp:{op}:object"), b.rect);
+-    if b.clicked() {
+-        start_object(app, ui.ctx(), op);
+-    }
+-    let b = ui.button(crate::i18n::tr("Describe…"));
+-    register(ui.ctx(), format!("maskComp:{op}:prompt"), b.rect);
+-    if b.clicked() {
+-        start_describe(app, op);
++    // RawPad (iPadOS) ships without the AI models: no Object/Describe/Sky/Subject
++    let ai = !cfg!(target_os = "ios");
++    if ai {
++        let b = ui.button(crate::i18n::tr("Object"));
++        register(ui.ctx(), format!("maskComp:{op}:object"), b.rect);
++        if b.clicked() {
++            start_object(app, ui.ctx(), op);
++        }
++        let b = ui.button(crate::i18n::tr("Describe…"));
++        register(ui.ctx(), format!("maskComp:{op}:prompt"), b.rect);
++        if b.clicked() {
++            start_describe(app, op);
++        }
+     }
+     for (kind, label) in [
+         ("brush", "Brush"),
+@@ -832,7 +841,7 @@ fn component_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, op: &str) {
+         ("luminanceRange", "Luminance Range"),
+     ] {
+         // painting only adds or erases
+-        if kind == "brush" && op == "intersect" {
++        if (kind == "brush" && op == "intersect") || (!ai && matches!(kind, "sky" | "subject")) {
+             continue;
+         }
+         let b = ui.button(menu_label(label));
+diff --git a/crates/ui-egui/src/panels/presets.rs b/crates/ui-egui/src/panels/presets.rs
+index ca0243cc..2e14115f 100644
+--- a/crates/ui-egui/src/panels/presets.rs
++++ b/crates/ui-egui/src/panels/presets.rs
+@@ -206,6 +206,24 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
+                     }
+                     let (builtin, group) = (pr.builtin, pr.group.clone());
+                     resp.context_menu(|ui| {
++                        // iPad: no hover, so while a preset's long-press menu is open the loupe
++                        // shows its look (as resting the pointer on it does on the Mac), and the
++                        // menu's first item applies it (DECISIONS.md 62)
++                        if cfg!(target_os = "ios") || cfg!(test) {
++                            if let Some(s) = current.as_ref().map(|d| pr.apply(d, 1.0)) {
++                                app.hover_preview = Some(HoverPreview { label: crate::i18n::tr_format!("Preset: {name}", name = name), settings: s });
++                            }
++                            let apply = ui.button(crate::i18n::tr("Apply"));
++                            register(ui.ctx(), format!("presetMenu:apply:{pid}"), apply.rect);
++                            if apply.clicked() {
++                                if app.run("preset.apply", json!({"id": pid, "amount": 100})).is_ok() {
++                                    ui.data_mut(|d| d.insert_temp(amt_id, AppliedPreset::new(&app.session, pid.clone(), 100.0)));
++                                    app.toast(ui.ctx(), crate::i18n::tr_format!("Preset: {name}", name = name));
++                                }
++                                ui.close();
++                            }
++                            ui.separator();
++                        }
+                         if ui.button(crate::i18n::tr(if fav { "Remove from Favorites" } else { "Add to Favorites" })).clicked() {
+                             let _ = app.run("preset.favorite", json!({"id": pid}));
+                         }
+diff --git a/crates/ui-egui/src/panels/right.rs b/crates/ui-egui/src/panels/right.rs
+index 53733081..988f35e4 100644
+--- a/crates/ui-egui/src/panels/right.rs
++++ b/crates/ui-egui/src/panels/right.rs
+@@ -257,6 +257,10 @@ fn crop(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+             if text_button(ui, "cropReset", crate::i18n::tr("Reset"), false).clicked() {
+                 let _ = app.run("crop.reset", json!({}));
+             }
++            // iPad: the crop is applied by double-tapping inside it or Return; a finger needs a button
++            if cfg!(target_os = "ios") && text_button(ui, "cropDone", crate::i18n::tr("Done"), true).clicked() {
++                let _ = app.run("tool.done", json!({}));
++            }
+         });
+     });
+     let ang = lightcraft_develop::controls::find("crop.angle").copied();
+@@ -744,6 +748,7 @@ fn info(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+         let mut text: String = ui.data(|d| d.get_temp(gid)).unwrap_or_else(|| gps.clone());
+         let r = ui.add(egui::TextEdit::singleline(&mut text).hint_text(crate::i18n::tr("latitude, longitude")).desired_width(f32::INFINITY));
+         crate::widgets::screen_reader_name(ui.ctx(), r.id, "GPS");
++        crate::text_field::keep_in_view(ui, &r);
+         register(ui.ctx(), "field:gps", r.rect);
+         if r.has_focus() {
+             ui.data_mut(|d| d.insert_temp(gid, text.clone()));
+@@ -1321,7 +1326,15 @@ fn versions(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+             }
+             resp.on_hover_text(crate::i18n::tr(if current { "The photo has these settings" } else { "Click to restore · double-click to rename" }))
+                 .context_menu(|ui| {
+-                    if ui.button(crate::i18n::tr("Restore")).clicked() {
++                    // iPad: no hover, so while a version's long-press menu is open the loupe shows
++                    // it, as resting the pointer on it does on the Mac (DECISIONS.md 63)
++                    if (cfg!(target_os = "ios") || cfg!(test)) && !current {
++                        app.hover_preview =
++                            Some(crate::HoverPreview { label: crate::i18n::tr_format!("Version: {}", v.name), settings: (*v.settings).clone() });
++                    }
++                    let restore = ui.button(crate::i18n::tr("Restore"));
++                    register(ui.ctx(), format!("versionMenu:restore:{i}"), restore.rect);
++                    if restore.clicked() {
+                         let _ = app.run("version.restore", json!({"index": i}));
+                     }
+                     if ui.button(crate::i18n::tr("Update with Current Settings")).clicked() {
+@@ -1410,6 +1423,21 @@ fn activity(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
+                 let _ = app.run("history.restore", json!({"index": i}));
+             }
+             resp.context_menu(|ui| {
++                // iPad: while a step's long-press menu is open the loupe shows the photo as it was
++                // at that step, and the first item goes back to it (DECISIONS.md 63)
++                if (cfg!(target_os = "ios") || cfg!(test)) && row != HistoryRow::Current {
++                    app.hover_preview = Some(crate::HoverPreview {
++                        label: crate::i18n::history_label(&h.label, &app.session.presets),
++                        settings: (*h.settings).clone(),
++                    });
++                    let back = ui.button(crate::i18n::tr("Restore"));
++                    register(ui.ctx(), format!("historyMenu:restore:{i}"), back.rect);
++                    if back.clicked() {
++                        let _ = app.run("history.restore", json!({"index": i}));
++                        ui.close();
++                    }
++                    ui.separator();
++                }
+                 if ui.button(crate::i18n::tr("Copy History Step Settings to Before")).clicked() {
+                     let _ = app.run("beforeAfter.setBefore", json!({"source": "history", "index": i}));
+                 }
+diff --git a/crates/ui-egui/src/tests_curve.rs b/crates/ui-egui/src/tests_curve.rs
+index 4d3b4570..7f2ef2b6 100644
+--- a/crates/ui-egui/src/tests_curve.rs
++++ b/crates/ui-egui/src/tests_curve.rs
+@@ -221,3 +221,330 @@ fn curve_points_from_an_agent_are_stored_in_order() {
+     let c = pts(&develop(&h).curve.green);
+     assert!(c[1].0 < c[2].0, "dragged up to its neighbour, not past it: {c:?}");
+ }
++
++/// A finger can't land the precise double-click that deletes a curve point, so the curve's menu
++/// (right-click, a long-press on iPad) offers Delete Point for the inner point under the press,
++/// and leaves it out for an end point or empty space.
++#[test]
++fn the_curve_menu_deletes_the_point_under_the_press() {
++    let mut h = curve_open("master");
++    exec(&mut h, "develop.curve", json!({"channel": "master", "points": [[0.0, 0.0], [0.5, 0.5], [1.0, 1.0]]}));
++    h.step();
++    let has = |h: &Headless, id: &str| h.app.widgets.iter().any(|(w, _)| w == id);
++    // the middle point
++    let r = h.request("ui.clickWidget", json!({"id": "curve", "fx": 0.5, "fy": 0.5, "button": "right"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    h.step();
++    click_widget(&mut h, "curveMenu:deletePoint", 1);
++    h.step();
++    assert_eq!(pts(&develop(&h).curve.master), vec![(0.0, 0.0), (1.0, 1.0)], "the middle point is gone");
++    // empty space: the menu has only the reset items
++    let r = h.request("ui.clickWidget", json!({"id": "curve", "fx": 0.3, "fy": 0.2, "button": "right"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    h.step();
++    assert!(has(&h, "curveMenu:resetAll"), "the menu opens");
++    assert!(!has(&h, "curveMenu:deletePoint"), "no point under the press");
++}
++
++/// RawPad (iPad): a long-press on a slider's name (a right-click here) opens a menu whose
++/// "Reset Exposure" resets that slider (DECISIONS.md 61). Lives here so CI's `tests_curve` step runs it.
++#[test]
++fn a_sliders_name_menu_resets_it() {
++    let mut h = curve_open("master");
++    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 1.25}));
++    h.step();
++    assert!((develop(&h).light.exposure - 1.25).abs() < 1e-9, "exposure set");
++    let r = h.request("ui.clickWidget", json!({"id": "sliderLabel:light.exposure", "button": "right"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    h.step();
++    click_widget(&mut h, "sliderMenu:reset:light.exposure", 1);
++    h.step();
++    assert!(develop(&h).light.exposure.abs() < 1e-9, "exposure back to 0");
++}
++
++/// iPad: *Select Several*'s strip in the grid has Sync Settings, which copies the active photo's
++/// settings to the other selected photos and says how many (DECISIONS.md 60). Run 54's tour
++/// screenshot showed no toast; this checks the button does the work, whatever the screenshot's timing.
++#[test]
++fn the_select_several_strips_sync_copies_settings_to_the_other_photos() {
++    let services = Services { png: None, ..Default::default() };
++    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
++    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
++    let r = h.request("ui.set", json!({"view": "photoGrid"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    exec(&mut h, "library.select", json!({"ids": [1]}));
++    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 0.75}));
++    exec(&mut h, "library.select", json!({"ids": [1, 2], "active": 1}));
++    // the photo's long-press menu › Select Several turns this on
++    h.view.ctx.data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), true));
++    h.step();
++    h.step();
++    let other = |h: &Headless| h.app.session.develop_of(lightcraft_catalog::PhotoId(2)).map(|d| d.light.exposure).unwrap_or_default();
++    assert!(other(&h).abs() < 1e-9, "photo 2 starts at 0");
++    click_widget(&mut h, "button:selectSeveralSync", 1);
++    h.step();
++    assert!((other(&h) - 0.75).abs() < 1e-9, "photo 2 follows photo 1: {}", other(&h));
++    let toast = h.app.ui.toast.clone().map(|t| t.0).unwrap_or_default();
++    assert!(toast.starts_with("Sync Settings"), "the strip says what happened: {toast:?}");
++}
++
++/// iPad: a preset's long-press menu shows the preset's look in the loupe while it is open (there is
++/// no hover to rest on a preset) and its first item, Apply, applies it (DECISIONS.md 62).
++#[test]
++fn a_presets_long_press_menu_previews_and_applies_it() {
++    let services = Services { png: None, ..Default::default() };
++    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
++    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
++    let r = h.request("ui.set", json!({"view": "detail"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.app.run("panel.presets", json!({})).expect("open the presets column");
++    h.step();
++    h.step();
++    let row = h.app.widgets.iter().map(|(id, _)| id.clone()).find(|id| id.starts_with("preset:")).expect("a preset row on screen");
++    let pid = row.trim_start_matches("preset:").to_string();
++    let undo = h.app.session.undo.len();
++    let r = h.request("ui.clickWidget", json!({"id": row, "button": "right"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    // the finger is gone (no hover left), the menu stays open
++    h.app.synthetic.push(egui::Event::PointerMoved(egui::pos2(5.0, 5.0)));
++    h.step();
++    h.step();
++    let preview = h.app.hover_preview.as_ref().map(|p| p.label.clone()).unwrap_or_default();
++    assert!(preview.starts_with("Preset"), "the loupe previews the preset while its menu is open: {preview:?}");
++    assert_eq!(h.app.session.undo.len(), undo, "previewing changes nothing");
++    click_widget(&mut h, &format!("presetMenu:apply:{pid}"), 1);
++    h.step();
++    let toast = h.app.ui.toast.clone().map(|t| t.0).unwrap_or_default();
++    assert!(toast.starts_with("Preset"), "Apply applied it: {toast:?}");
++}
++
++/// Opens the long-press (right-click) menu of the first on-screen widget whose id starts with
++/// `prefix`, then lifts the finger off it (no hover left) and returns the widget's id.
++fn long_press_first(h: &mut Headless, prefix: &str) -> String {
++    let row = h.app.widgets.iter().map(|(id, _)| id.clone()).find(|id| id.starts_with(prefix)).unwrap_or_else(|| panic!("a {prefix} row on screen"));
++    let r = h.request("ui.clickWidget", json!({"id": row, "button": "right"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    h.app.synthetic.push(egui::Event::PointerMoved(egui::pos2(5.0, 5.0)));
++    h.step();
++    h.step();
++    row
++}
++
++/// iPad: a version's (snapshot's) long-press menu shows it in the loupe while it is open, and its
++/// first item restores it (DECISIONS.md 63).
++#[test]
++fn a_versions_long_press_menu_previews_and_restores_it() {
++    let services = Services { png: None, ..Default::default() };
++    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
++    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
++    let r = h.request("ui.set", json!({"view": "detail"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 0.5}));
++    exec(&mut h, "version.create", json!({"name": "Half"}));
++    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 1.0}));
++    h.app.ui.right = crate::state::RightPanel::Versions;
++    h.step();
++    h.step();
++    let row = long_press_first(&mut h, "version:");
++    let i = row.trim_start_matches("version:").to_string();
++    let preview = h.app.hover_preview.clone().map(|p| (p.label, p.settings.light.exposure));
++    let (label, exposure) = preview.unwrap_or_default();
++    assert!(label.starts_with("Version"), "the loupe previews the version while its menu is open: {label:?}");
++    assert!((exposure - 0.5).abs() < 1e-9, "with the version's settings: {exposure}");
++    assert!((develop(&h).light.exposure - 1.0).abs() < 1e-9, "previewing changes nothing");
++    click_widget(&mut h, &format!("versionMenu:restore:{i}"), 1);
++    h.step();
++    assert!((develop(&h).light.exposure - 0.5).abs() < 1e-9, "Restore restored it: {}", develop(&h).light.exposure);
++}
++
++/// iPad: a History step's long-press menu shows the photo as it was at that step, and its first
++/// item goes back to it (DECISIONS.md 63).
++#[test]
++fn a_history_steps_long_press_menu_previews_and_goes_back_to_it() {
++    let services = Services { png: None, ..Default::default() };
++    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
++    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
++    let r = h.request("ui.set", json!({"view": "detail"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 0.5}));
++    // another control in between, so the two exposure steps can't merge into one
++    exec(&mut h, "develop.set", json!({"control": "light.contrast", "value": 10.0}));
++    exec(&mut h, "develop.set", json!({"control": "light.exposure", "value": 1.0}));
++    h.app.ui.right = crate::state::RightPanel::Activity;
++    h.step();
++    h.step();
++    let id = h.app.session.active().expect("active photo");
++    let steps: Vec<f64> = h.app.session.catalog.photo(id).map(|p| p.history.iter().map(|s| s.settings.light.exposure).collect()).unwrap_or_default();
++    let i = steps.iter().position(|e| (e - 0.5).abs() < 1e-9).unwrap_or_else(|| panic!("a step at exposure 0.5: {steps:?}"));
++    let row = format!("history:{i}");
++    let r = h.request("ui.clickWidget", json!({"id": row, "button": "right"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    h.app.synthetic.push(egui::Event::PointerMoved(egui::pos2(5.0, 5.0)));
++    h.step();
++    h.step();
++    let exposure = h.app.hover_preview.as_ref().map(|p| p.settings.light.exposure);
++    assert_eq!(exposure, Some(0.5), "the loupe previews the step while its menu is open");
++    assert!((develop(&h).light.exposure - 1.0).abs() < 1e-9, "previewing changes nothing");
++    click_widget(&mut h, &format!("historyMenu:restore:{i}"), 1);
++    h.step();
++    assert!((develop(&h).light.exposure - 0.5).abs() < 1e-9, "Restore went back to the step: {}", develop(&h).light.exposure);
++}
++
++/// iPad: with *Select Several* on, the loupe shows a pill above the filmstrip saying how many photos
++/// are picked, and its Done turns Select Several off (DECISIONS.md 64). Lives here so CI runs it.
++#[test]
++fn the_loupe_shows_select_several_above_the_filmstrip_and_done_ends_it() {
++    let services = Services { png: None, ..Default::default() };
++    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
++    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
++    exec(&mut h, "library.select", json!({"ids": [1, 2], "active": 1}));
++    let r = h.request("ui.set", json!({"view": "detail"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    h.step();
++    let has = |h: &Headless, id: &str| h.app.widgets.iter().any(|(w, _)| w == id);
++    assert!(has(&h, "filmstrip"), "the loupe has its filmstrip");
++    assert!(!has(&h, "filmSelectSeveral"), "no pill while Select Several is off");
++    h.view.ctx.data_mut(|d| d.insert_temp(egui::Id::new("rawpad.selectSeveral"), true));
++    h.step();
++    h.step();
++    assert!(has(&h, "filmSelectSeveral"), "the pill shows while Select Several is on");
++    click_widget(&mut h, "button:filmSelectSeveralDone", 1);
++    h.step();
++    h.step();
++    assert!(!crate::panels::grid::touch_multi(&h.view.ctx), "Done turned Select Several off");
++    assert!(!has(&h, "filmSelectSeveral"), "and the pill is gone");
++}
++
++/// iPad: a brush or Remove stroke starts where the finger first touched, not where egui noticed the
++/// drag (past its threshold): the first few millimetres were lost (editing audit, item 15). Lives
++/// here so CI runs it.
++#[test]
++fn a_brush_or_spot_stroke_starts_where_the_finger_touched() {
++    let open = |panel: &str| {
++        let services = Services { png: None, ..Default::default() };
++        let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
++        let mut h = Headless::new(app, [1200.0, 800.0], 1.0);
++        let r = h.request("ui.set", json!({"view": "detail"}), T);
++        assert_eq!(r["ok"], true, "{r}");
++        let r = h.request("engine.execute", json!({"command": panel}), T);
++        assert_eq!(r["ok"], true, "{r}");
++        h.step();
++        h
++    };
++    let stroke = |h: &mut Headless| {
++        let events = json!([
++            {"kind": "down", "x": 0.15, "y": 0.4},
++            {"kind": "drag", "x": 0.3, "y": 0.4},
++            {"kind": "drag", "x": 0.5, "y": 0.4},
++            {"kind": "up", "x": 0.5, "y": 0.4}
++        ]);
++        let r = h.request("ui.pointer", json!({"events": events}), T);
++        assert_eq!(r["ok"], true, "{r}");
++    };
++    let min_x = |v: &[lightcraft_geom::Point]| v.iter().map(|p| p.x).fold(f64::INFINITY, f64::min);
++    // brush
++    let mut h = open("panel.masking");
++    exec(&mut h, "tool.brush", json!({"new": true}));
++    stroke(&mut h);
++    let d = develop(&h);
++    let lightcraft_develop::MaskShape::Brush { strokes } = &d.masks[0].components[0].shape else { panic!("a brush mask") };
++    assert!((min_x(&strokes[0].points) - 0.15).abs() < 0.02, "the brush stroke starts at the press: {:?}", strokes[0].points);
++    // Remove (spot) stroke
++    let mut h = open("panel.remove");
++    stroke(&mut h);
++    let spots = develop(&h).spots;
++    assert_eq!(spots.len(), 1, "one spot");
++    assert!((min_x(&spots[0].points) - 0.15).abs() < 0.02, "the spot stroke starts at the press: {:?}", spots[0].points);
++}
++
++/// iPad: the bottom bar's rating pill ends in a colour-label button whose menu sets and clears the
++/// active photo's label (editing audit, item 30: labels were out of reach by touch; DECISIONS 80).
++/// Lives here so CI runs it.
++#[test]
++fn the_bottom_bars_label_button_sets_and_clears_the_colour_label() {
++    let services = Services { png: None, ..Default::default() };
++    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
++    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
++    let r = h.request("ui.set", json!({"view": "detail"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    h.step();
++    let id = h.app.session.active().expect("active photo");
++    let label = |h: &Headless| h.app.session.catalog.photo(id).and_then(|p| p.label);
++    let rect = |h: &Headless, id: &str| h.app.widgets.iter().find(|(w, _)| w == id).map(|(_, r)| *r);
++    let button = rect(&h, "icon:labelMenu").expect("the pill has the label button");
++    let last_flag = rect(&h, "flag:reject").expect("the pill has its flags");
++    assert!(button.left() >= last_flag.right(), "the label button comes after the flags: {button:?} {last_flag:?}");
++    click_widget(&mut h, "icon:labelMenu", 1);
++    h.step();
++    click_widget(&mut h, "bottomLabel:purple", 1);
++    h.step();
++    assert_eq!(label(&h), Some(lightcraft_catalog::ColorLabel::Purple), "Purple set from the bottom bar");
++    click_widget(&mut h, "icon:labelMenu", 1);
++    h.step();
++    click_widget(&mut h, "bottomLabel:none", 1);
++    h.step();
++    assert_eq!(label(&h), None, "None clears it");
++}
++
++/// iPad: when the bottom bar is too narrow for the full rating pill (portrait with the side
++/// toolbars), a compact pill keeps rating, flag and colour label in reach: a rating button whose
++/// menu holds the stars and flags, then the label button (DECISIONS 81). Lives here so CI runs it.
++#[test]
++fn a_narrow_bottom_bar_shows_the_compact_rating_pill() {
++    let services = Services { png: None, ..Default::default() };
++    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
++    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
++    let r = h.request("ui.set", json!({"view": "detail", "right": "none"}), T);
++    assert_eq!(r["ok"], true, "{r}");
++    h.step();
++    h.step();
++    let has = |h: &Headless, id: &str| h.app.widgets.iter().any(|(w, _)| w == id);
++    assert!(has(&h, "flag:reject") && !has(&h, "icon:ratingMenu"), "a wide bar has the full pill");
++    // narrow the window until the full pill gives way
++    let mut found = false;
++    for w in (500..=1200).rev().step_by(10) {
++        let r = h.request("ui.resize", json!({"width": w, "height": 1400}), T);
++        assert_eq!(r["ok"], true, "{r}");
++        h.step();
++        h.step();
++        assert!(!(has(&h, "flag:reject") && has(&h, "icon:ratingMenu")), "never both pills at {w}");
++        if has(&h, "icon:ratingMenu") {
++            found = true;
++            break;
++        }
++    }
++    assert!(found, "some narrow width shows the compact pill");
++    assert!(has(&h, "icon:labelMenu"), "the compact pill keeps the label button");
++    let id = h.app.session.active().expect("active photo");
++    let photo = |h: &Headless| h.app.session.catalog.photo(id).cloned().expect("photo");
++    click_widget(&mut h, "icon:ratingMenu", 1);
++    h.step();
++    click_widget(&mut h, "star:bottom:4", 1);
++    h.step();
++    assert_eq!(photo(&h).rating, 4, "four stars from the compact pill's menu");
++    if !has(&h, "flag:pick") {
++        click_widget(&mut h, "icon:ratingMenu", 1);
++        h.step();
++    }
++    click_widget(&mut h, "flag:pick", 1);
++    h.step();
++    assert_eq!(photo(&h).flag, lightcraft_catalog::Flag::Pick, "picked from the compact pill's menu");
++    if has(&h, "flag:pick") {
++        // the menu stayed open: close it before the label button
++        let _ = h.request("ui.key", json!({"key": "esc"}), T);
++        h.step();
++    }
++    click_widget(&mut h, "icon:labelMenu", 1);
++    h.step();
++    click_widget(&mut h, "bottomLabel:green", 1);
++    h.step();
++    assert_eq!(photo(&h).label, Some(lightcraft_catalog::ColorLabel::Green), "Green from the compact pill");
++}
+diff --git a/crates/ui-egui/src/text_field.rs b/crates/ui-egui/src/text_field.rs
+index 268242ef..5abe0a23 100644
+--- a/crates/ui-egui/src/text_field.rs
++++ b/crates/ui-egui/src/text_field.rs
+@@ -68,6 +68,20 @@ pub fn id(widget: &str) -> egui::Id {
+     egui::Id::new("lc-text-field").with(widget)
+ }
+ 
++/// Temp-data key (a `bool` under `egui::Id::new(KEEP_IN_VIEW)`) the RawPad iPad host sets for a
++/// moment after it lifts the UI above the on-screen keyboard: the focused field then scrolls
++/// itself back into its panel's view, since the shrunk panel may end above it (CI run 69,
++/// DECISIONS 67). Never set on the desktop.
++pub const KEEP_IN_VIEW: &str = "rawpad-keep-focused-field-in-view";
++
++/// Scrolls a focused text box into view while the host asks for it ([`KEEP_IN_VIEW`]).
++pub fn keep_in_view(ui: &Ui, response: &Response) {
++    let wanted = ui.ctx().data(|d| d.get_temp::<bool>(egui::Id::new(KEEP_IN_VIEW))).unwrap_or(false);
++    if wanted && ui.memory(|m| m.has_focus(response.id)) && !ui.clip_rect().contains_rect(response.rect) {
++        response.scroll_to_me(None);
++    }
++}
++
+ /// Whether the field had an unfinished edit on the immediately preceding egui pass.
+ pub(crate) fn was_editing(ctx: &egui::Context, widget: &str) -> bool {
+     let pass = ctx.cumulative_pass_nr();
+@@ -224,6 +238,7 @@ impl<'a> TextField<'a> {
+         let right = ui.input(|i| i.pointer.button_down(egui::PointerButton::Secondary) || i.pointer.button_released(egui::PointerButton::Secondary));
+         let selection = egui::text_edit::TextEditState::load(ui.ctx(), id).and_then(|s| s.cursor.char_range());
+         let mut response = ui.add(edit);
++        keep_in_view(ui, &response);
+         // screen readers: the field by its caption, even once it holds text (egui names it by
+         // nothing but its contents)
+         if let Some(name) = name.filter(|n| !n.trim().is_empty()) {
+diff --git a/crates/ui-egui/src/widgets.rs b/crates/ui-egui/src/widgets.rs
+index a00bca4b..90e49818 100644
+--- a/crates/ui-egui/src/widgets.rs
++++ b/crates/ui-egui/src/widgets.rs
+@@ -222,6 +222,26 @@ pub(crate) fn shown_value(spec: &ControlSpec, v: f64) -> String {
+ /// scrub rather than a click that types a value.
+ const SCRUB_START: f32 = 3.0;
+ 
++/// RawPad (iPad): whether this drag on a slider's track scrolls the panel instead of moving the
++/// slider, because it set off more up or down than sideways; the panel is scrolled by the drag.
++/// With a finger, scrolling the Edit panel used to change whatever slider the finger started on.
++/// Off the iPad, always false (UPSTREAM.md).
++fn touch_scrolls(ui: &Ui, resp: &Response, id: egui::Id) -> bool {
++    if !cfg!(target_os = "ios") {
++        return false;
++    }
++    let key = id.with("touch-scroll");
++    if resp.drag_started() {
++        let moved = ui.input(|i| i.pointer.press_origin().zip(i.pointer.latest_pos()).map(|(a, b)| b - a)).unwrap_or_default();
++        ui.data_mut(|m| m.insert_temp(key, moved.y.abs() > moved.x.abs()));
++    }
++    let scrolling = (resp.dragged() || resp.drag_stopped()) && ui.data(|m| m.get_temp::<bool>(key)).unwrap_or(false);
++    if scrolling && resp.dragged() {
++        ui.scroll_with_delta(resp.drag_delta());
++    }
++    scrolling
++}
++
+ /// The radius of a slider's hollow ring thumb.
+ const THUMB_RING: f32 = 7.0;
+ 
+@@ -272,6 +292,19 @@ pub fn slider(ui: &mut Ui, spec: &ControlSpec, value: f64, enabled: bool, label_
+     let label_resp = if enabled { label_resp.on_hover_text(reset_hint.as_str()) } else { label_resp };
+     crate::widgets::announce(&label_resp, crate::i18n::tr_format!("Reset {name}", name = label_text.clone()));
+     register(ui.ctx(), format!("sliderLabel:{}", spec.id), label_rect);
++    // RawPad (iPad): a finger can't hover for the hint, so a long-press on the name (a secondary
++    // click) opens a menu with "Reset <name>" (DECISIONS.md 61); the unit tests see it too
++    let mut menu_reset = false;
++    if (cfg!(target_os = "ios") || cfg!(test)) && enabled {
++        label_resp.context_menu(|ui| {
++            let b = ui.button(crate::i18n::tr_format!("Reset {name}", name = label_text.clone()));
++            register(ui.ctx(), format!("sliderMenu:reset:{}", spec.id), b.rect);
++            if b.clicked() {
++                menu_reset = true;
++                ui.close();
++            }
++        });
++    }
+     register(ui.ctx(), format!("slider:{}", spec.id), track_rect);
+     // the value: click it to type an exact one, drag it sideways to scrub (over the label, so it
+     // takes the click)
+@@ -390,10 +423,12 @@ pub fn slider(ui: &mut Ui, spec: &ControlSpec, value: f64, enabled: bool, label_
+             typing = Some((text.clone(), frames, pressed));
+             ui.data_mut(|m| m.insert_temp(typing_id, (text, frames, pressed)));
+         }
+-    } else if resp.double_clicked() || label_resp.double_clicked() {
++    } else if resp.double_clicked() || label_resp.double_clicked() || menu_reset {
+         out.reset = true;
+         out.value = Some(spec.default);
+         v = spec.default;
++    } else if touch_scrolls(ui, &resp, id) {
++        // RawPad (iPad): the drag scrolled the panel, the slider keeps its value
+     } else {
+         if resp.drag_started() {
+             out.drag_started = true;
+@@ -722,6 +757,9 @@ pub fn icon_button(ui: &mut Ui, id: &str, icon: Icon, size: egui::Vec2, active:
+     if !tooltip.is_empty() { resp.on_hover_text(tooltip) } else { resp }
+ }
+ 
++/// iPad: the height of a rating star's touch area (points).
++const STAR_TOUCH_H: f32 = 36.0;
++
+ /// Star rating row (5 stars); returns a new rating when clicked (clicking the current rating clears).
+ pub fn stars(ui: &mut Ui, id: &str, rating: u8, size: f32) -> Option<u8> {
+     let t = Tokens::get(ui.ctx());
+@@ -729,7 +767,12 @@ pub fn stars(ui: &mut Ui, id: &str, rating: u8, size: f32) -> Option<u8> {
+     let mut hover_n = None;
+     let mut rects = [Rect::NOTHING; 5];
+     for (i, slot) in (0..5u8).zip(rects.iter_mut()) {
+-        let (r, resp) = ui.allocate_exact_size(vec2(size, size), Sense::click());
++        let (r, mut resp) = ui.allocate_exact_size(vec2(size, size), if cfg!(target_os = "ios") { Sense::hover() } else { Sense::click() });
++        if cfg!(target_os = "ios") {
++            // a fingertip needs more than the drawn star: the gaps on both sides and 36 pt of height
++            let reach = vec2(ui.spacing().item_spacing.x / 2.0, ((STAR_TOUCH_H - size) / 2.0).max(0.0));
++            resp = ui.interact(r.expand2(reach), resp.id.with("touch"), Sense::click());
++        }
+         crate::widgets::announce_selected(&resp, format!("{} ★", i + 1), i < rating);
+         register(ui.ctx(), format!("star:{id}:{}", i + 1), r);
+         if resp.hovered() {

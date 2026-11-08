@@ -301,9 +301,15 @@ impl Host {
                 let inner = egui::Rect::from_min_max(egui::pos2(rect.min.x + l, rect.min.y + t), egui::pos2(rect.max.x - r, rect.max.y - b - kb));
                 if inner.is_positive() {
                     raw.screen_rect = Some(inner);
+                    // `inner` already leaves the safe area out. egui-winit (0.37) also reports
+                    // UIKit's insets, and egui keeps the last ones it got: left in, egui took them
+                    // off `inner` a second time, so its background layer stopped 20 pt above the
+                    // bottom bar and every press there was refused (CI runs 99–102, DECISIONS 89)
+                    raw.safe_area_insets = Some(egui::SafeAreaInsets::default());
                 }
             } else if let Some(insets) = raw.safe_area_insets {
                 raw.screen_rect = Some(rect - insets);
+                raw.safe_area_insets = Some(egui::SafeAreaInsets::default());
             }
         }
         // Imports copy into the library: picked files are temporary copies, and folders from
@@ -355,14 +361,14 @@ impl Host {
             .unwrap_or_default();
         crate::keys::apply(&mut raw.events, self.logo_key || uikit_cmd);
         raw.events.extend(uikit_events);
-        app.raw_input_hook(&mut raw);
+        app.raw_input_hook(&self.ctx, &mut raw);
         // (after the hook: the CI's pointer events count as taps too)
         if let Some(at) = crate::keys::tap_pos(&raw.events) {
             self.last_tap = Some((Instant::now(), self.frames, at));
         }
         let keep_in_view = self.keep_in_view > 0;
         self.keep_in_view = self.keep_in_view.saturating_sub(1);
-        self.ctx.data_mut(|d| d.insert_temp(egui::Id::new(lightcraft_ui_egui::text_field::KEEP_IN_VIEW), keep_in_view));
+        self.ctx.data_mut(|d| d.insert_temp(egui::Id::unique(lightcraft_ui_egui::text_field::KEEP_IN_VIEW), keep_in_view));
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
         let mut out = self.ctx.run_ui(raw, |ui| {
@@ -379,7 +385,12 @@ impl Host {
             if let Some(shown) =
                 share_offer.show(ctx, egui::pos2(area.center().x, area.bottom() - 90.0), now, lightcraft_ui_egui::i18n::language().code())
             {
-                app.widgets.push((crate::share_offer::WIDGET_ID.to_owned(), shown.rect));
+                // into the widget registry, with its egui hit, like upstream's widgets: the app
+                // publishes it with the next pass, where `ui.clickWidget` looks (a push into
+                // `app.widgets` here was replaced before a click was resolved, CI run 99)
+                if let Some(resp) = ctx.read_response(shown.id) {
+                    lightcraft_ui_egui::widgets::register_response(crate::share_offer::WIDGET_ID, shown.rect, &resp);
+                }
                 if let Some(files) = shown.share {
                     share = Some((files, shown.rect.center()));
                 }

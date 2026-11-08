@@ -54,8 +54,20 @@ pub fn trim_caches(session: &mut Session) -> Trimmed {
 mod tests {
     use super::*;
 
+    /// The process memory budget is computed lazily by whichever thread asks first, and computing
+    /// it resets the GPU pool limit to an eighth of it. Tests run in parallel, so one test's late
+    /// first `budget()` could undo another's iPad limit (run 100). Every test settles it first,
+    /// once, behind a `Once` that makes the other threads wait.
+    fn settle_budget() {
+        static ONCE: std::sync::Once = std::sync::Once::new();
+        ONCE.call_once(|| {
+            let _ = lightcraft_engine::memory::budget();
+        });
+    }
+
     #[test]
     fn a_memory_warning_drops_cached_photos_but_keeps_the_budget() {
+        settle_budget();
         let mut s = Session::with_demo();
         let ids: Vec<_> = s.catalog.photos().map(|p| p.id).take(4).collect();
         assert!(ids.len() >= 3, "demo library has photos");
@@ -73,6 +85,7 @@ mod tests {
 
     #[test]
     fn the_ipad_keeps_at_most_three_loupe_sized_decodes() {
+        settle_budget();
         let mut s = Session::with_demo();
         set_ipad_limits(&mut s);
         let ids: Vec<_> = s.catalog.photos().map(|p| p.id).take(5).collect();
@@ -90,6 +103,7 @@ mod tests {
 
     #[test]
     fn the_ipad_pools_at_most_64_mb_of_gpu_buffers() {
+        settle_budget();
         let mut s = Session::with_demo();
         set_ipad_limits(&mut s);
         let ids: Vec<_> = s.catalog.photos().map(|p| p.id).take(3).collect();
@@ -103,6 +117,7 @@ mod tests {
 
     #[test]
     fn trimming_an_empty_session_is_harmless() {
+        settle_budget();
         let mut s = Session::new();
         let t = trim_caches(&mut s);
         assert_eq!(t, Trimmed { before: 0, after: 0 });
