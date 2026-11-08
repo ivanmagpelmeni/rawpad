@@ -3,31 +3,34 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-08, about 23:35 Berlin, by the scheduled session (22:55–23:40 Berlin).
-- **Upstream:** **v0.19.0** (2026-11-06) is the newest tag and is now **merged on main**
-  (a0de4dbb, from branch `upstream-0.19.0`; UPSTREAM.md updated). Branch `upstream-0.19.0` can
-  be deleted some time.
-- **Main:** 80906a2d (merge + UPSTREAM.md) started **main run 104**
-  (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42527682613), which also builds release
-  1.104. At handoff (23:34 Berlin) it had passed fmt, both unit-test steps and the simulator build (slow: about 30 minutes, cache rebuilt after the merge) and was in clippy; tour, device build and release still to come. **Don't push code to main until it ends.**
+- **Written:** 2026-11-09, about 00:30 Berlin, by the scheduled session (23:54–00:40 Berlin).
+- **Upstream:** **v0.19.0** (2026-11-06) is merged on main and released (1.104).
+- **Main:** 0969f8b3 = merge of `p7-reset-hints` (long-press reset menus for curve channel
+  buttons and colour wheels, DECISIONS 90). It started **main run 107**
+  (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42534895184), which builds the next
+  release. Main runs take ~45–90 minutes now (the device build alone took ~30 min in run 104).
+  **Don't push code to main until it ends.**
 - **Done this session:**
-  - Checked branch run 103: success, `tour.log` 0 ERR/FAIL, `08-rating-menu`, `08-split`,
-    `13-raw-edited` screenshots correct. Merged into main (only UPSTREAM.md conflicted: took the
-    branch's version).
-  - Branch **`p7-reset-hints`** (027a9c17 + docs): on iOS / in unit tests a long-press on a curve
-    channel button opens the curve reset menu for that channel; a long-press on a colour wheel
-    opens "Reset <wheel>" (`wheelMenu:reset:<key>`). DECISIONS 90, UPSTREAM rows, tests
-    `a_curve_channels_long_press_menu_resets_it`, `a_colour_wheels_long_press_menu_resets_it`.
-  - **Branch run 105** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42527881509):
-    fmt, both unit-test steps (with the two new tests), simulator build and clippy green; the tour was running at handoff. Report lands in `runs/105/`.
+  - Main run 104: success, `runs/104/tour.log` 0 ERR/FAIL, **release v1.104** published
+    (23:21 UTC). Branch run 105: success, 0 ERR, `08-before-after-menu.jpg` shows the ⌄ menu.
+  - Merged `p7-reset-hints` into main (no conflicts).
+  - Went through every `double_clicked()` / hover hint left in `crates/ui-egui/src`: crop's
+    straighten (Auto button exists), History versions (Rename… in their menu), masks,
+    components, keywords (long-press menus), histogram (double-tap works). One gap: **branch
+    `p7-effect-select`** (bf98d1d1 + docs): Manage Effect Presets' long-press on a row =
+    Add to / Remove from Selection (`effectMenu:toggle:<name>`), test
+    `an_effect_presets_long_press_menu_adds_it_to_the_selection`, DECISIONS 91, UPSTREAM row.
+    It is based on `p7-reset-hints`, so it merges cleanly onto main.
+  - **Branch run 106** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42532729438):
+    fmt and both unit-test steps (with the new test) green; simulator build/tour running at
+    handoff. Report lands in `runs/106/`.
 - **Very next step:**
-  1. Check main run 104's conclusion and `runs/104/tour.log` (grep ERR) on `ci-artifacts`, and
-     that release 1.104 exists (`…/releases?per_page=2`). If red: fix on main first (or revert
-     the merge with `git revert -m 1 a0de4dbb` if it can't be fixed in the session).
-  2. Check `runs/105/tour.log` (no ERR) and the `11-*.jpg` screenshots. If clean and no main
-     run is going: `git checkout main; git merge --ff-only origin/main; git merge --no-ff
-     origin/p7-reset-hints`, push, watch the main run.
-  3. Then PROGRESS › Next 3 tasks › 2 (the other hover-only hints: crop straighten Auto, History).
+  1. Check main run 107's conclusion, `runs/107/tour.log` (grep ERR) and the new release
+     (`…/releases?per_page=2`). If red: fix on main, or `git revert -m 1 0969f8b3`.
+  2. Check run 106 (`runs/106/tour.log` no ERR). If clean and no main run is going:
+     `git checkout main; git merge --ff-only origin/main; git merge --no-ff
+     origin/p7-effect-select`, push, watch the main run.
+  3. Then PROGRESS › Next 3 tasks › 2 (small touch targets left: mask handles, radial rotate knob).
 - **Open problems:**
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
     ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
@@ -44,7 +47,7 @@ end. The next session reads it **first**.
   - The upstream merge (now on main) took ten releases at once; upstream tests that measure the bottom-bar pill
     (`bottombar.rs` tests) may fail under `cfg(test)` because the label button is on in tests.
     CI doesn't run them; fix if they get in the way.
-  - Merged branches to delete on GitHub some time: `p7-label-pill`, `audit-2026-10-19`, `p4-curve-touch`,
+  - Merged branches to delete on GitHub some time: `p7-reset-hints`, `upstream-0.19.0`, `p7-label-pill`, `audit-2026-10-19`, `p4-curve-touch`,
     `p4-touch-all`, `p4-touch-2`, `p4-select-several`, `p4-select-bar`, `p4-select-sync`,
     `p4-reset-menu`, `p4-sync-test`, `p4-preset-preview`, `p4-snapshot-preview`,
     `p4-film-select`, `p4-keyboard-check`, `p4-rotate`, `p4-raw24`, `p6-memtrim`, `p6-relaunch`,

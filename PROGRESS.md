@@ -56,7 +56,8 @@ the program (no screenshot yet). Statuses are for 1.38, the version on Ivan's iP
 3. Sync to several photos: no way to pick several photos by touch.
 4. Removing a tone-curve point needs a precise double-tap.
 5. Crop has no Done button (double-tap inside the crop, or Return).
-6. Hover-only things: preset preview, snapshot preview, the colour wheels' eye, the reset hints.
+6. ~~Hover-only things: preset preview, snapshot preview, the colour wheels' eye, the reset hints~~
+   (long-press menus and always-drawn eye, DECISIONS 61–63, 90, 91; 91 on branch `p7-effect-select`).
 7. ~~The on-screen keyboard covers the bottom of the screen~~ (keyboard avoidance, 2026-10-20
    morning, DECISIONS.md 45).
 
@@ -65,6 +66,13 @@ three-finger redo; up/down drags on sliders scroll the panel; mask pins always v
 Classic setup steps and source fix.
 
 ## Latest session summary
+
+**2026-11-08 (23:54–00:40 Berlin, unattended)**
+1. Main run 104 green (0 tour ERR): **release 1.104** is out (upstream LightCraft 0.19.0 on the iPad).
+2. Branch run 105 green (0 tour ERR, menus on the screenshots), so **`p7-reset-hints` is merged into main** (0969f8b3); main run 107 builds the next release.
+3. Went through every other hover-only hint: crop straighten and History already have touch ways (Auto button, Rename… in the long-press menu). One real gap fixed on branch `p7-effect-select`: Manage Effect Presets picked several presets only with ⌘/Shift; a long-press on a row now adds/removes it (DECISIONS 91).
+4. Branch run 106: unit tests (with the new test) green; tour still running at handoff.
+5. Next session: check main run 107 and branch run 106, then merge `p7-effect-select`.
 
 **2026-11-08 (22:55–23:40 Berlin, unattended)**
 1. Branch run 103 was clean (0 failed taps, menus and split views on the screenshots), so **upstream LightCraft 0.19.0 is merged into main** (a0de4dbb). Main run 104 builds release **1.104** (see HANDOFF for its result).
@@ -374,11 +382,11 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check main run 104** (merge of 0.19.0 + release 1.104) and **branch run 105**; if 105 is
-   clean, merge `p7-reset-hints` into main (only when no main run is going).
-2. **Phase 7, touch polish:** go through the other hover-only hints (`grep -rn on_hover_text
-   crates/ui-egui/src | grep -i double`): crop's straighten tool "double-click for Auto"
-   (`panels/right/crop.rs`), History's double-click (`panels/right/history.rs`).
+1. **Check main run 107** (merge of `p7-reset-hints`, next release) and **branch run 106**
+   (`p7-effect-select`); if 106 is clean and no main run is going, merge `p7-effect-select`.
+2. **Phase 7, touch polish:** the remaining items of the audit's "still broken" list: small touch
+   targets (mask handles, the radial mask's rotate knob) — check what the 2026-10-25 touch-target
+   work left, from the screenshots `03-masking.jpg`/`03-brush.jpg`.
 3. **Delete the 0.19 leftovers:** `lightcraft-sysmem` in `apps/rawpad-ios/Cargo.toml` once a
    Cargo.lock can be regenerated in CI; the merged branches list in HANDOFF.
 
