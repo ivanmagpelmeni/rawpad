@@ -1,9 +1,8 @@
 # Upstream (storytold/lightcraft)
 
-- **Last merged upstream commit:** on `main`: `4f0b110b`, Release 0.9.1 (2026-10-17, the fork
-  point). **In progress on branch `upstream-0.19.0`:** `16636c45`, Release 0.19.0 (2026-11-06),
-  merged with v0.9.1 as the explicit base (DECISIONS 83). Once merged, normal `git merge <tag>`
-  works for later releases.
+- **Last merged upstream commit:** on `main`: `16636c45`, Release 0.19.0 (2026-11-06), merged
+  2026-11-08 from branch `upstream-0.19.0` with v0.9.1 as the explicit base (DECISIONS 83). From
+  now on a normal `git merge <tag>` works for later releases.
 - **Last checked:** 2026-11-08 (newest upstream tag `v0.19.0`). `git ls-remote --tags
   https://github.com/storytold/lightcraft | sort -V` works from the sandbox when the releases API
   doesn't. **Use `sort -V`:** plain `sort` puts v0.9.1 after v0.19.0 (that hid ten releases).
@@ -71,4 +70,4 @@
 | Date | Upstream | Conflicts | Notes |
 |---|---|---|---|
 | 2026-10-18 | 0.9.1 (`4f0b110`) | n/a | Fork point |
-| 2026-11-08 (branch) | 0.19.0 (`16636c45`) | 21 files: 9 workflows deleted, CLAUDE.md, ATTRIBUTION, .gitignore, 13 patched UI/engine files (upstream taken, patches re-applied) | No common history: explicit base v0.9.1 (DECISIONS 83); egui 0.37 fork |
+| 2026-11-08 | 0.19.0 (`16636c45`) | 21 files: 9 workflows deleted, CLAUDE.md, ATTRIBUTION, .gitignore, 13 patched UI/engine files (upstream taken, patches re-applied) | No common history: explicit base v0.9.1 (DECISIONS 83); egui 0.37 fork; on main after branch run 103 (0 tour ERR) |
