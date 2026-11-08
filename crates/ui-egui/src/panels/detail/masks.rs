@@ -458,10 +458,16 @@ fn component_outline(
 
                 let (s, co) = angle.to_radians().sin_cos();
                 let rot_r = rx + 0.08;
-                let rot_q = map.screen(Point::new(center.x + (rot_r * co) * l.0, center.y + (rot_r * s) * l.1));
                 let h1_q = map.screen(Point::new(center.x + (rx * co) * l.0, center.y + (rx * s) * l.1));
+                // RawPad: on iPad the rotate knob sits a finger's width (44 pt) out from the
+                // right-edge handle and is drawn larger, so the two can't be grabbed for each other
+                let rot_desk = map.screen(Point::new(center.x + (rot_r * co) * l.0, center.y + (rot_r * s) * l.1));
+                let rot_q = if cfg!(target_os = "ios") { h1_q + (rot_desk - h1_q).normalized() * ROT_KNOB_GAP } else { rot_desk };
                 p.line_segment([h1_q, rot_q], Stroke::new(1.0, Color32::from_white_alpha(200)));
-                p.circle_stroke(rot_q, 4.0, Stroke::new(1.5, Color32::WHITE));
+                if cfg!(target_os = "ios") {
+                    p.circle_filled(rot_q, 7.0, Color32::from_black_alpha(90));
+                }
+                p.circle_stroke(rot_q, if cfg!(target_os = "ios") { 7.0 } else { 4.0 }, Stroke::new(1.5, Color32::WHITE));
                 register(ui, format!("maskHandle:{}:{ci}:5", mask), Rect::from_center_size(rot_q, vec2(14.0, 14.0)));
                 grips.push((mask, ci, 5, rot_q));
             }
@@ -594,19 +600,25 @@ fn object_marks(app: &LightcraftApp, p: &egui::Painter, map: &CanvasMap, d: &Dev
     }
 }
 
+/// RawPad: how near (in points) a press must land to grab a mask pin or handle: a fingertip on
+/// iPad is far less precise than a mouse pointer (UPSTREAM.md).
+const MASK_GRAB: f32 = if cfg!(target_os = "ios") { 22.0 } else { 10.0 };
+/// RawPad (iPad): how far (points) the radial mask's rotate knob sits out from its right-edge handle.
+const ROT_KNOB_GAP: f32 = 44.0;
+
 /// The mask whose pin is under `q` (within the 10 px [`grip_gestures`] grabs at), not counting
 /// the `active` mask's own pins.
 fn other_pin_at(grips: &[(u32, usize, u8, Pos2)], active: Option<u32>, q: Pos2) -> Option<u32> {
     grips
         .iter()
-        .filter(|g| Some(g.0) != active && g.2 == 0 && g.3.distance(q) < 10.0)
+        .filter(|g| Some(g.0) != active && g.2 == 0 && g.3.distance(q) < MASK_GRAB)
         .min_by(|a, b| a.3.distance(q).total_cmp(&b.3.distance(q)))
         .map(|g| g.0)
 }
 
 /// Whether `q` is on one of the `active` mask's own pins (within the same 10 px).
 fn own_pin_at(grips: &[(u32, usize, u8, Pos2)], active: Option<u32>, q: Pos2) -> bool {
-    active.is_some_and(|a| grips.iter().any(|g| g.0 == a && g.2 == 0 && g.3.distance(q) < 10.0))
+    active.is_some_and(|a| grips.iter().any(|g| g.0 == a && g.2 == 0 && g.3.distance(q) < MASK_GRAB))
 }
 
 /// Object tool: a click includes what's under it, ⌥-click leaves it out. A click on another
@@ -687,9 +699,15 @@ fn brush_tool(
                 points.push(n);
             }
             _ => {
+                // RawPad: the stroke starts where the finger or Pencil touched (DECISIONS 79)
+                let mut points = stroke_lead_in(ui, resp, map);
                 let mut pressure = Vec::new();
-                record_pressure(&mut pressure, 0, force);
-                app.gesture = Some(Gesture::Brush { points: vec![n], pressure });
+                for i in 0..points.len() {
+                    record_pressure(&mut pressure, i, force);
+                }
+                record_pressure(&mut pressure, points.len(), force);
+                points.push(n);
+                app.gesture = Some(Gesture::Brush { points, pressure });
             }
         }
     }
@@ -755,7 +773,7 @@ fn grip_gestures(
     let hit = |q: Pos2| {
         grips
             .iter()
-            .filter(|g| g.3.distance(q) < 10.0)
+            .filter(|g| g.3.distance(q) < MASK_GRAB)
             .min_by(|a, b| {
                 (Some(a.0) != active, a.3.distance(q)).partial_cmp(&(Some(b.0) != active, b.3.distance(q))).unwrap_or(std::cmp::Ordering::Equal)
             })
@@ -891,9 +909,11 @@ fn frame_long_norm(map: &CanvasMap) -> (f64, f64) {
 }
 
 /// Auto's condition for the Tool Overlay (Shift+H): the pointer is over the photo, or a pin is
-/// being dragged.
+/// being dragged. RawPad (iPad): always, as a lifted finger leaves no pointer over the photo, so
+/// the pins could never be seen before touching them (UPSTREAM.md).
 pub(super) fn pins_live(app: &LightcraftApp, resp: &egui::Response, map: &CanvasMap) -> bool {
-    resp.hover_pos().is_some_and(|q| map.rect.contains(q))
+    cfg!(target_os = "ios")
+        || resp.hover_pos().is_some_and(|q| map.rect.contains(q))
         || matches!(app.gesture, Some(Gesture::SpotMove { .. } | Gesture::MaskHandle { .. }))
         // a handle moved with the keyboard stays shown while it has the focus
         || crate::canvas_keys::has_focus(&resp.ctx)
@@ -911,6 +931,20 @@ pub(crate) fn pen_force(i: &egui::InputState) -> Option<f32> {
         egui::Event::Touch { force: Some(f), .. } if f.is_finite() => Some(f.clamp(0.0, 1.0)),
         _ => None,
     })
+}
+
+/// RawPad (iOS, and this crate's tests): where a brush or spot stroke that starts with a drag
+/// really began. egui reports the drag only once the finger has moved past its threshold, so
+/// without this the first few millimetres of a finger or Pencil stroke were lost (editing audit,
+/// item 15). Returns the press point when it differs from where the drag was noticed, else nothing.
+pub(super) fn stroke_lead_in(ui: &egui::Ui, resp: &egui::Response, map: &CanvasMap) -> Vec<Point> {
+    if !(cfg!(target_os = "ios") || cfg!(test)) || !resp.drag_started() {
+        return Vec::new();
+    }
+    let (Some(press), Some(now)) = (ui.input(|i| i.pointer.press_origin()), resp.interact_pointer_pos()) else {
+        return Vec::new();
+    };
+    if press == now { Vec::new() } else { vec![map.norm(press)] }
 }
 
 /// Record the pressure of the stroke's point `index`: `force` when the pen reported one this frame, else the last

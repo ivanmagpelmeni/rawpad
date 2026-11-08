@@ -110,7 +110,12 @@ pub(super) fn remove_overlay(app: &mut LightcraftApp, ui: &mut egui::Ui, resp: &
         let n = map.norm(q);
         match &mut app.gesture {
             Some(Gesture::Spot { points }) => points.push(n),
-            _ => app.gesture = Some(Gesture::Spot { points: vec![n] }),
+            _ => {
+                // RawPad: the stroke starts where the finger or Pencil touched (DECISIONS 79)
+                let mut points = super::masks::stroke_lead_in(ui, resp, map);
+                points.push(n);
+                app.gesture = Some(Gesture::Spot { points });
+            }
         }
     }
     if let Some(Gesture::Spot { points }) = &app.gesture {

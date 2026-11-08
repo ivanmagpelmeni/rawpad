@@ -172,7 +172,7 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
                     // ⌘/Ctrl- and Shift-clicks change the selection; the pair on screen stays (#187)
                     crate::panels::compare::select_with_modifier(app, *id, !m.command)
                 } else {
-                    let mode = if m.command {
+                    let mode = if m.command || crate::panels::grid::touch_multi(ui.ctx()) {
                         "toggle"
                     } else if m.shift {
                         "range"
@@ -199,6 +199,42 @@ pub(crate) fn filmstrip(app: &mut LightcraftApp, ui: &mut egui::Ui, r: Rect) {
             crate::widgets::context_menu(&resp, |ui| crate::panels::grid::context_menu(app, ui, *id));
         }
     });
+    if crate::panels::grid::touch_multi(ui.ctx()) {
+        select_several_pill(app, ui.ctx(), r);
+    }
+}
+
+/// RawPad (iPad): while *Select Several* is on, a pill floats over the loupe just above the
+/// filmstrip with how many photos are picked and a Done button, as the grid's strip does: in the
+/// loupe only the long-press menu's *Done Selecting* said so before (DECISIONS.md 64).
+fn select_several_pill(app: &LightcraftApp, ctx: &egui::Context, strip: Rect) {
+    let t = Tokens::get(ctx);
+    let n = app.session.selection.ids.len();
+    // "Select Several: 2 photos" from messages every language already has (tr_format! takes only
+    // messages listed in the translations)
+    let photos = crate::i18n::tr_format!("{n} photo{}", if n == 1 { "" } else { "s" }, n = n);
+    let text = format!("{}: {photos}", crate::i18n::tr("Select Several"));
+    egui::Area::new(egui::Id::unique("film-select-several"))
+        .order(egui::Order::Foreground)
+        .fixed_pos(pos2(strip.left() + 12.0, strip.top() - 52.0))
+        .show(ctx, |ui| {
+            egui::Frame::new()
+                .fill(t.chrome)
+                .stroke(Stroke::new(1.0, t.divider))
+                .corner_radius(18.0)
+                .inner_margin(egui::Margin::symmetric(14, 6))
+                .show(ui, |ui| {
+                    ui.horizontal(|ui| {
+                        let label = ui.label(egui::RichText::new(text).color(t.text).font(t.font(13.0)));
+                        register(ui, "filmSelectSeveral", label.rect);
+                        let done = ui.button(crate::i18n::tr("Done"));
+                        register(ui, "button:filmSelectSeveralDone", done.rect);
+                        if done.clicked() {
+                            ui.ctx().data_mut(|d| d.insert_temp(egui::Id::unique(crate::panels::grid::SELECT_SEVERAL), false));
+                        }
+                    });
+                });
+        });
 }
 
 /// What a screen reader says for a filmstrip thumbnail: the file, and why there is no picture

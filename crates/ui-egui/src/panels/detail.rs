@@ -1122,8 +1122,11 @@ pub fn prep_mode(app: &LightcraftApp) -> lightcraft_engine::prep::Mode {
 /// the colour-mixer bands under the press point (`develop.targeted`, one call per whole step, all
 /// in one interaction = one undo step).
 fn targeted_drag(app: &mut LightcraftApp, resp: &egui::Response, map: &CanvasMap, target: &str) {
+    // RawPad: on iPad the sample point is where the finger landed, not where it is once egui calls
+    // it a drag (UPSTREAM.md)
+    let press = if cfg!(target_os = "ios") { resp.ctx.input(|i| i.pointer.press_origin()) } else { None };
     if resp.drag_started()
-        && let Some(q) = resp.interact_pointer_pos()
+        && let Some(q) = press.or(resp.interact_pointer_pos())
     {
         let _ = app.run("develop.beginInteraction", json!({"label": "Targeted Adjustment"}));
         app.gesture = Some(Gesture::Targeted { at: map.norm(q), acc: 0.0 });
