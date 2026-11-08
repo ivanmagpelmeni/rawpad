@@ -577,3 +577,18 @@ morning session, which had taken 45 and 46.
     added craft-update (download a newer desktop build). RawPad is installed and updated through
     SideStore, so on iOS the Help › Check for Updates item is hidden and the command answers with
     a SideStore hint; the startup check stays off (the iOS host never turns it on).
+
+## 2026-11-08: Upstream 0.19.0 tour (scheduled session, 20:55 Berlin)
+
+87. **2026-11-08: No LightCraft startup dialogs on the iPad.** Run 99's 24 failed tour taps all
+    had one cause: upstream 0.19's first-run *Welcome to LightCraft* walkthrough (a modal) sat
+    over the app, so every press was refused (`08-before-after-menu.jpg`). Its pages and *What's
+    New* describe the desktop (keyboard shortcuts, File menu), and RawPad's release notes are in
+    SideStore, so `startup::open_at_startup` returns nothing on iOS.
+88. **2026-11-08: The memtrim tests settle the process memory budget once before they start.**
+    Run 100 failed `the_ipad_pools_at_most_64_mb_of_gpu_buffers` (165 MB pooled) though run 99
+    passed it: the budget is computed lazily by the first thread that asks, and computing it
+    resets the GPU pool limit to an eighth of it, so a parallel test's late first `budget()`
+    undid the iPad limit. A `Once` in the test module makes every test wait for one settled
+    budget. On the iPad the host sets the limits once at launch, before any render.
+

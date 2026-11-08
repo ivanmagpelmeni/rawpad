@@ -3,52 +3,38 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-08, about 20:40 Berlin, by the scheduled session (19:55–20:40 Berlin).
+- **Written:** 2026-11-08, about 21:32 Berlin, by the scheduled session (20:55–21:35 Berlin).
 - **Upstream:** **v0.19.0** (2026-11-06) is the newest tag; main is still on v0.9.1. The merge
-  lives in branch `upstream-0.19.0` (DECISIONS 83–85).
-- **Main:** green. Main run 96 (a20dd94a, `p7-label-pill`) released **1.96** (not 1.97);
-  CI then pushed `SideStore source: RawPad 1.96` (6ae8ec86). Nothing was pushed to main's code
-  this session.
+  lives in branch `upstream-0.19.0` (DECISIONS 83–88).
+- **Main:** green, untouched (last code run 96, release 1.96).
 - **Done this session (branch `upstream-0.19.0`):**
-  - Run 98 had failed in "Build for the simulator" with two things: the desktop `logging.rs`
-    (shared into the host via `#[path]`) now uses **chrono**, and `raw_input_hook` takes
-    `(&ctx, &mut raw)`. Fixed in 11524b9a (chrono added to the host's iOS dependencies).
-  - **Branch run 99** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42512460453) on
-    11524b9a: fmt, both unit-test steps, **the simulator build and clippy are green**: upstream
-    0.19.0 + the iPad patches compile for iOS. The app launches and the tour ran (128 steps
-    ok), but **24 tour steps failed** (report `runs/99/` on `ci-artifacts`; `tour.log`).
-  - f857f1a1: craft-update (upstream's
-    self-updater) is off on the iPad: Help › Check for Updates is hidden on iOS
-    (`menubar.rs` › `host_supports`) and the command returns "RawPad updates through
-    SideStore…" (`dialogs/updates_ui.rs` › `check`). Not yet in a CI run (it was pushed after
-    run 99 was triggered).
-- **The tour failures in run 99** (all `ui.clickWidget`):
-  - Bottom bar: `icon:beforeAfterModes`, `icon:beforeAfter`, `icon:ratingMenu`,
-    `icon:labelMenu` fail with **"canceled: widget … is no longer visible before its press;
-    nothing was retargeted"**. The items of the menus they open (`beforeAfterMode:*`,
-    `star:bottom:*`, `bottomLabel:*`) then fail with "no widget on screen" as a consequence.
-    The message comes from upstream's new press-time check in `crates/ui-egui/src/app/control.rs`
-    (around line 250: `control::widget_target_visible(ctx, latest_hit, target.at)`). Guess:
-    the bottom bar's iPad buttons are registered with `register(ui, id, rect)` but egui's hit
-    test at that point finds another layer/widget (or nothing) on top, e.g. the pill's child
-    `Ui`, or a rect that is off by the safe-area inset. Look at what upstream widgets do to
-    pass this check (search `widget_target_visible` and `check_visible`), and at the bottom-bar
-    screenshots in `runs/99/`.
-  - `gridMenu:selectSeveral`, `button:selectSeveralSync`, `button:selectSeveralDone` (Select
-    Several, the grid's long-press menu), `sliderMenu:reset:light.exposure` (slider long-press
-    menu) and `button:rawpadShareExport` (the host's Share offer): "no widget on screen". Either
-    the menus didn't open (long-press timing/ids changed upstream) or the patches don't register
-    these ids any more: check `ui.widgets` replies in `runs/99/replies.jsonl` around those steps.
+  - Run 100 (previous session's handoff commit) failed one unit test,
+    `memtrim::the_ipad_pools_at_most_64_mb_of_gpu_buffers` (165 MB pooled): a race between
+    parallel tests over the lazily computed memory budget. Fixed in bb1bbd34 (DECISIONS 88).
+  - **Cause of run 99's 24 failed tour taps:** upstream 0.19's first-run *Welcome to
+    LightCraft* modal covered the app (`runs/99/08-before-after-menu.jpg`,
+    `10-select-several-menu.jpg`). 81657d61: no Welcome / What's New on iOS
+    (`startup::open_at_startup`, DECISIONS 87, UPSTREAM.md row).
+  - `button:rawpadShareExport` was listed by `ui.widgets` but `ui.clickWidget` said "no widget":
+    upstream now publishes `app.widgets` from a registry at the end of each pass, so the host's
+    push after `app.ui` was gone when the click was resolved. 0981ebed: the host registers the
+    button with `widgets::register_response` (needs `Shown.id`; `ios.rs`, `share_offer.rs`).
+  - **Branch run 102** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42517809756) on
+    0981ebed: fmt, both unit-test steps, simulator build and clippy **green**; the tour was
+    still running when this session ended (it ran > 10 minutes, longer than run 99's, which
+    suggests the taps now go through). Its report lands in `runs/102/` on `ci-artifacts`.
 - **Very next step:**
-  1. Trigger `ipad.yml` on `upstream-0.19.0` with `{"release": false}` (GitHub MCP
-     `actions_run_trigger`, owner `ivanmagpelmeni`) so the craft-update commit gets a run, and
-     meanwhile read `runs/99/tour.log`, `replies.jsonl` and the screenshots.
-  2. Fix the press-time visibility failure of the bottom-bar buttons (one cause, most failures),
-     then the missing long-press-menu and share ids. Push, re-run, repeat until 0 tour ERR and
-     the shots look right.
-  3. Merge into main **at the start of a session** (`git checkout main; git merge --ff-only
-     origin/main; git merge --no-ff origin/upstream-0.19.0`), push, watch the main run to the
-     end.
+  1. Read run 102's result and `runs/102/tour.log` (`grep -n ERR`), then look at the 08-*, 10-*,
+     11-* and 05-share-offer / 06-share-sheet screenshots.
+  2. If 0 ERR and the shots look right: merge into main **at the start of a session**
+     (`git checkout main; git merge --ff-only origin/main; git merge --no-ff
+     origin/upstream-0.19.0`), push, watch the main run to the end (about 40 minutes with the
+     release). Then tell Ivan in PROGRESS (Needs Ivan) that the next SideStore update is the big
+     upstream 0.19 one.
+  3. If taps still fail: the press-time check is `control::widget_target_visible`
+     (`crates/ui-egui/src/control.rs` ~309): a target needs a registered egui hit (`register`
+     or `register_response`) on the top layer at the point. Fix, push, trigger `ipad.yml` on
+     the branch with `{"release": false}`, repeat.
 - **Open problems:**
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
     ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
