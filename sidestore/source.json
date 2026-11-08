@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.104",
+          "buildVersion": "104",
+          "date": "2026-11-08T23:21:24Z",
+          "localizedDescription": "RawPad 1.104 (build 104, 46077bf): P8: handoff and progress after the 2026-11-08 22:55 session (docs only; upstream 0.19.0 on main, p7-reset-hints on its branch)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.104/RawPad.ipa",
+          "size": 23704259,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.96",
           "buildVersion": "96",
           "date": "2026-11-08T18:36:59Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.72/RawPad.ipa",
           "size": 19859891,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.70",
-          "buildVersion": "70",
-          "date": "2026-10-26T01:47:42Z",
-          "localizedDescription": "RawPad 1.70 (build 70, c5e24db): P4: handoff: run 69 found a keyboard flicker for low text fields (not merged)",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.70/RawPad.ipa",
-          "size": 19860757,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.96",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.96/RawPad.ipa",
-      "size": 19897535,
-      "versionDate": "2026-11-08T18:36:59Z",
-      "versionDescription": "RawPad 1.96 (build 96, 132dbd1): P8: handoff and progress after the 2026-11-08 18:56 session (upstream 0.19.0 merge in branch upstream-0.19.0)"
+      "version": "1.104",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.104/RawPad.ipa",
+      "size": 23704259,
+      "versionDate": "2026-11-08T23:21:24Z",
+      "versionDescription": "RawPad 1.104 (build 104, 46077bf): P8: handoff and progress after the 2026-11-08 22:55 session (docs only; upstream 0.19.0 on main, p7-reset-hints on its branch)"
     }
   ],
   "news": []
