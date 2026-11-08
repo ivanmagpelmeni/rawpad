@@ -592,3 +592,15 @@ morning session, which had taken 45 and 46.
     undid the iPad limit. A `Once` in the test module makes every test wait for one settled
     budget. On the iPad the host sets the limits once at launch, before any render.
 
+
+## 2026-11-08: Safe-area insets (scheduled session, 21:55 Berlin)
+
+89. **2026-11-08: The host gives egui zero safe-area insets once it has inset the screen itself.**
+    Runs 99–102 refused every press on the bottom bar (Before/After, its ⌄ menu, the compact
+    rating pill, the label button) as "no longer visible", though headless tests passed. Cause:
+    the host shrinks `RawInput::screen_rect` to UIKit's safe area (since run 8), and egui-winit
+    0.37 now also reports those insets, which egui keeps. egui's background layer is
+    `viewport_rect - safe_area_insets`, so the insets came off twice and the layer ended about
+    20 pt above the screen's bottom: `layer_id_at` found no layer under the bar (also for real
+    touches, probably). The host now sends `safe_area_insets = 0` with its inset rect; the
+    rect stays our own (it also carries the keyboard lift and the minimum top inset).

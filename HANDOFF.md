@@ -3,43 +3,33 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-08, about 21:32 Berlin, by the scheduled session (20:55–21:35 Berlin).
+- **Written:** 2026-11-08, about 22:30 Berlin, by the scheduled session (21:54–22:35 Berlin).
 - **Upstream:** **v0.19.0** (2026-11-06) is the newest tag; main is still on v0.9.1. The merge
-  lives in branch `upstream-0.19.0` (DECISIONS 83–88).
+  lives in branch `upstream-0.19.0` (DECISIONS 83–89).
 - **Main:** green, untouched (last code run 96, release 1.96).
 - **Done this session (branch `upstream-0.19.0`):**
-  - Run 100 (previous session's handoff commit) failed one unit test,
-    `memtrim::the_ipad_pools_at_most_64_mb_of_gpu_buffers` (165 MB pooled): a race between
-    parallel tests over the lazily computed memory budget. Fixed in bb1bbd34 (DECISIONS 88).
-  - **Cause of run 99's 24 failed tour taps:** upstream 0.19's first-run *Welcome to
-    LightCraft* modal covered the app (`runs/99/08-before-after-menu.jpg`,
-    `10-select-several-menu.jpg`). 81657d61: no Welcome / What's New on iOS
-    (`startup::open_at_startup`, DECISIONS 87, UPSTREAM.md row).
-  - `button:rawpadShareExport` was listed by `ui.widgets` but `ui.clickWidget` said "no widget":
-    upstream now publishes `app.widgets` from a registry at the end of each pass, so the host's
-    push after `app.ui` was gone when the click was resolved. 0981ebed: the host registers the
-    button with `widgets::register_response` (needs `Shown.id`; `ios.rs`, `share_offer.rs`).
-  - **Branch run 102** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42517809756) on
-    0981ebed: fmt, both unit-test steps, simulator build and clippy **green**; tour **18 ERR**
-    (was 24). The Welcome window is gone, and Select Several, the slider name menu and the Share
-    button pass now. **Left: only the bottom-bar buttons** (`icon:beforeAfterModes`,
-    `icon:beforeAfter`, `icon:ratingMenu`, `icon:labelMenu`: "is no longer visible before its
-    press", and the items of their menus as a consequence). `runs/102/08-before-after-menu.jpg`
-    shows the hover tooltip "Before/After views" over the chevron, so the pointer gets there;
-    the press-time check refuses it.
+  - **Cause of run 102's 18 failed bottom-bar taps:** the safe-area insets came off twice. The
+    host shrinks `raw.screen_rect` to UIKit's safe area; egui-winit 0.37 now also reports the
+    insets (`safe_area_insets`, kept by egui), and egui's background layer is
+    `viewport_rect - safe_area_insets`, so it ended ~20 pt above the screen bottom and
+    `ctx.layer_id_at` found no layer under the bar (`control::widget_target_visible` → false).
+    d5fc483d: the host sends zero insets with its own rect (`ios.rs` › `frame`, DECISIONS 89).
+    Probably real touches on the bar were dead too on 0.19.
+  - UPSTREAM.md's patch table now names the 0.19.0 files row by row (+ a row for the updater
+    switched off on iOS).
+  - **Branch run 103** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42522720374) on
+    d5fc483d: fmt, both unit-test steps, simulator build, clippy **and the tour step green**
+    (run 102's tour step was red). At writing, the device build and the report were still
+    running: **look at `runs/103/tour.log` (grep ERR) and `runs/103/08-*.jpg` first.**
 - **Very next step:**
-  1. Find why `control::widget_target_visible` (`crates/ui-egui/src/control.rs` ~309) refuses
-     the bottom-bar buttons: `ctx.layer_id_at(at)` must be the button's layer. Suspects: the
-     right panel (it reaches the screen bottom under the bar in the shot: "Blacks" shows below
-     the bar) or the iPad bottom bar's child `Ui` in another layer than its widgets' hit; a
-     tooltip layer (egui shows one on hover) at the point. Write a `tests::ipad` unit test that
-     `ui.clickWidget`s `icon:beforeAfter` in Detail (the module has helpers; DECISIONS 84) so
-     CI's unit step shows it before the tour. Check how upstream's own bottom-bar buttons pass
-     in upstream tests (`grep -rn clickWidget crates/ui-egui/src/tests/ | grep icon:`).
-  2. Push, trigger `ipad.yml` on the branch with `{"release": false}`, repeat until 0 tour ERR.
-  3. Then merge into main **at the start of a session** (`git checkout main; git merge
+  1. `git fetch --depth 1 origin ci-artifacts`; check `runs/103/tour.log` has no `ERR`/`FAIL`
+     and that `08-split.jpg`, `08-rating-menu.jpg`, `08-label-menu.jpg` show the menus/views.
+     Check the run's overall conclusion (device build) too.
+  2. If clean: merge into main **at the start of the session** (`git checkout main; git merge
      --ff-only origin/main; git merge --no-ff origin/upstream-0.19.0`), push, watch the main
-     run to the end (about 40 minutes with the release).
+     run to the end (about 40 minutes with the release). Update UPSTREAM.md's "Last merged"
+     line and merge log, and the release number in PROGRESS.md › Needs Ivan (what to test).
+  3. If not clean: fix on the branch, trigger `ipad.yml` with `{"release": false}`, repeat.
 - **Open problems:**
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
     ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
