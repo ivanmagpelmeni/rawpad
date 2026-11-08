@@ -431,3 +431,39 @@ fn a_colour_wheels_long_press_menu_resets_it() {
     let w = develop(&h).grading.midtones;
     assert!(w.hue.abs() < 1e-9 && w.sat.abs() < 1e-9, "wheel back to 0: {w:?}");
 }
+
+/// iPad: the Manage Effect Presets window picks several presets with ⌘ or Shift, which a finger
+/// doesn't have, so a row's long-press menu adds it to the selection or takes it out
+/// (DECISIONS.md 91).
+#[test]
+fn an_effect_presets_long_press_menu_adds_it_to_the_selection() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 900.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    exec(&mut h, "panel.masking", json!({}));
+    exec(&mut h, "mask.add", json!({"kind": "radial"}));
+    for name in ["01 Dodge", "02 Burn"] {
+        exec(&mut h, "mask.adjust", json!({"values": {"exposure": 0.5}}));
+        exec(&mut h, "mask.saveEffect", json!({"name": name, "group": ""}));
+    }
+    exec(&mut h, "dialog.manageMaskEffects", json!({}));
+    h.step();
+    let selected = |h: &Headless| match &h.app.ui.dialog {
+        Some(crate::state::Dialog::ManageEffects { selected, .. }) => selected.clone(),
+        _ => Vec::new(),
+    };
+    click_widget(&mut h, "effectRow:01 Dodge", 1);
+    h.step();
+    assert_eq!(selected(&h), vec!["01 Dodge".to_string()]);
+    for (name, want) in [("02 Burn", vec!["01 Dodge", "02 Burn"]), ("01 Dodge", vec!["02 Burn"])] {
+        let r = h.request("ui.clickWidget", json!({"id": format!("effectRow:{name}"), "button": "right"}), T);
+        assert_eq!(r["ok"], true, "{r}");
+        h.step();
+        h.step();
+        click_widget(&mut h, &format!("effectMenu:toggle:{name}"), 1);
+        h.step();
+        assert_eq!(selected(&h), want.iter().map(|s| s.to_string()).collect::<Vec<_>>(), "after the menu on {name}");
+    }
+}
