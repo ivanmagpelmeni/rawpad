@@ -160,7 +160,20 @@ fn grading_wheel(app: &mut LightcraftApp, ui: &mut egui::Ui, d: &DevelopSettings
     {
         give_pointer_back(ui.ctx(), held.origin);
     }
-    if resp.double_clicked() {
+    // RawPad (iPad): the "Double-click to reset" hint needs hover; a long-press on the wheel opens a
+    // menu with "Reset <wheel>" (`wheelMenu:reset:<key>`, DECISIONS.md 90); the unit tests see it too
+    let mut menu_reset = false;
+    if cfg!(target_os = "ios") || cfg!(test) {
+        crate::widgets::context_menu(&resp, |ui| {
+            let b = ui.button(crate::i18n::tr_format!("Reset {name}", name = crate::i18n::tr(label).to_string()));
+            register(ui, format!("wheelMenu:reset:{key}"), b.rect);
+            if b.clicked() {
+                menu_reset = true;
+                ui.close();
+            }
+        });
+    }
+    if resp.double_clicked() || menu_reset {
         let _ = app.run("develop.set", json!({"values": {format!("grading.{key}.hue"): 0, format!("grading.{key}.sat"): 0}}));
     }
     // hue and saturation readout: centred above the wheel, shown like the eye (no fade)

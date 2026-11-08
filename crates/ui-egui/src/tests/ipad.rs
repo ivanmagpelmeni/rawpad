@@ -377,3 +377,57 @@ fn a_narrow_bottom_bar_shows_the_compact_rating_pill() {
     h.step();
     assert_eq!(photo(&h).label, Some(lightcraft_catalog::ColorLabel::Green), "Green from the compact pill");
 }
+
+/// iPad: the curve channel buttons' "double-click to reset" is a hover hint a finger never sees, so
+/// a long-press on a channel button opens the reset menu for that channel (DECISIONS.md 90).
+#[test]
+fn a_curve_channels_long_press_menu_resets_it() {
+    let mut h = curve_open("master");
+    let bent = json!({"points": [[0.0, 0.0], [0.5, 0.7], [1.0, 1.0]]});
+    for ch in ["master", "red"] {
+        let mut p = bent.clone();
+        p["channel"] = json!(ch);
+        exec(&mut h, "develop.curve", p);
+    }
+    h.step();
+    assert_eq!(develop(&h).curve.red.len(), 3, "red bent");
+    let r = h.request("ui.clickWidget", json!({"id": "curveChannel:red", "button": "right"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    click_widget(&mut h, "curveMenu:resetChannel", 1);
+    h.step();
+    let d = develop(&h);
+    assert!(d.curve.red.len() != 3, "red back to straight: {:?}", d.curve.red);
+    assert_eq!(d.curve.master.len(), 3, "the menu resets only the channel pressed");
+}
+
+/// iPad: a colour wheel's long-press menu has "Reset <wheel>", which sets its hue and saturation
+/// back to 0 (the double-click reset's hint needs hover, DECISIONS.md 90).
+#[test]
+fn a_colour_wheels_long_press_menu_resets_it() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1400.0, 2400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail", "right": "edit"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    if !h.app.ui.section_open("color") {
+        h.app.ui.toggle_section("color");
+    }
+    if !h.app.ui.flyout_open("grading") {
+        h.app.ui.toggle_flyout("grading");
+    }
+    h.step();
+    h.step();
+    exec(&mut h, "develop.set", json!({"values": {"grading.midtones.hue": 120, "grading.midtones.sat": 40}}));
+    h.step();
+    assert!((develop(&h).grading.midtones.sat - 40.0).abs() < 1e-9, "wheel set");
+    let r = h.request("ui.clickWidget", json!({"id": "wheel:midtones", "button": "right"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    click_widget(&mut h, "wheelMenu:reset:midtones", 1);
+    h.step();
+    let w = develop(&h).grading.midtones;
+    assert!(w.hue.abs() < 1e-9 && w.sat.abs() < 1e-9, "wheel back to 0: {w:?}");
+}
