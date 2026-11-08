@@ -1792,8 +1792,17 @@ fn export_apple_photos_rows(ui: &mut egui::Ui, t: &Tokens, opts: &mut ExportOpti
     }
 }
 
+/// RawPad (iPadOS): the host installs a Photos runner; no albums there, and iPadOS asks for
+/// permission itself, so only the checkbox.
+#[cfg(target_os = "ios")]
+fn export_apple_photos_rows(ui: &mut egui::Ui, _t: &Tokens, opts: &mut ExportOptions) {
+    let r = ui.checkbox(&mut opts.add_to_photos, crate::i18n::tr("Add to Apple Photos"));
+    crate::widgets::register(ui, "exportAddToPhotos", r.rect);
+    opts.photos_album.clear();
+}
+
 /// Nowhere to add them: a setting carried over from a Mac is dropped, not refused.
-#[cfg(not(target_os = "macos"))]
+#[cfg(not(any(target_os = "macos", target_os = "ios")))]
 fn export_apple_photos_rows(_ui: &mut egui::Ui, _t: &Tokens, opts: &mut ExportOptions) {
     opts.add_to_photos = false;
 }

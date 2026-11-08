@@ -105,6 +105,11 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui, id: PhotoId) {
             ("luminanceRange", "Luminance", Icon::Sliders),
             ("colorRange", "Color", Icon::Picker),
         ];
+        // RawPad (iPadOS) ships without the AI models: no Object/Describe/Subject/Sky/Background
+        let tiles: Vec<_> = tiles
+            .into_iter()
+            .filter(|(kind, _, _)| !cfg!(target_os = "ios") || !matches!(*kind, "object" | "prompt" | "subject" | "sky" | "background"))
+            .collect();
         // four 52 pt tiles a row when they and their labels fit, else fewer (wider for a long label)
         let widest = |size: f32| {
             let font = t.font(size);
@@ -839,15 +844,19 @@ fn describe_field(app: &mut LightcraftApp, ui: &mut egui::Ui, new_mask: bool) {
 }
 
 fn component_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, op: &str) {
-    let b = ui.button(crate::i18n::tr("Object"));
-    register(ui, format!("maskComp:{op}:object"), b.rect);
-    if b.clicked() {
-        start_object(app, ui.ctx(), op);
-    }
-    let b = ui.button(crate::i18n::tr("Describe…"));
-    register(ui, format!("maskComp:{op}:prompt"), b.rect);
-    if b.clicked() {
-        start_describe(app, op);
+    // RawPad (iPadOS) ships without the AI models: no Object/Describe/Sky/Subject
+    let ai = !cfg!(target_os = "ios");
+    if ai {
+        let b = ui.button(crate::i18n::tr("Object"));
+        register(ui, format!("maskComp:{op}:object"), b.rect);
+        if b.clicked() {
+            start_object(app, ui.ctx(), op);
+        }
+        let b = ui.button(crate::i18n::tr("Describe…"));
+        register(ui, format!("maskComp:{op}:prompt"), b.rect);
+        if b.clicked() {
+            start_describe(app, op);
+        }
     }
     for (kind, label) in [
         ("brush", "Brush"),
@@ -858,7 +867,7 @@ fn component_menu(app: &mut LightcraftApp, ui: &mut egui::Ui, op: &str) {
         ("luminanceRange", "Luminance Range"),
     ] {
         // painting only adds or erases
-        if kind == "brush" && op == "intersect" {
+        if (kind == "brush" && op == "intersect") || (!ai && matches!(kind, "sky" | "subject")) {
             continue;
         }
         let b = ui.button(menu_label(label));
