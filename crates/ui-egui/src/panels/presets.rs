@@ -259,6 +259,25 @@ pub fn show(app: &mut LightcraftApp, ui: &mut egui::Ui) {
                     }
                     let (builtin, group) = (pr.builtin, pr.group.clone());
                     crate::widgets::context_menu(&resp, |ui| {
+                        // RawPad (iPad): no hover, so while a preset's long-press menu is open the
+                        // loupe shows its look (as resting the pointer on it does on the Mac), and
+                        // the menu's first item applies it (DECISIONS.md 62)
+                        if cfg!(target_os = "ios") || cfg!(test) {
+                            if let Some(s) = active.and_then(|id| app.session.preset_applied(id, &pr, 1.0)) {
+                                app.hover_preview = Some(HoverPreview { label: crate::i18n::tr_format!("Preset: {name}", name = name), settings: s });
+                            }
+                            let apply = ui.button(crate::i18n::tr("Apply"));
+                            register(ui, format!("presetMenu:apply:{pid}"), apply.rect);
+                            if apply.clicked() {
+                                if app.run("preset.apply", json!({"id": pid, "amount": 100})).is_ok() {
+                                    AppliedByPhoto::remember(ui.ctx(), &app.session, &pid);
+                                    ui.data_mut(|d| d.insert_temp(amt_id, AppliedPreset::new(&app.session, pid.clone(), 100.0)));
+                                    app.toast(ui.ctx(), crate::i18n::tr_format!("Preset: {name}", name = name));
+                                }
+                                ui.close();
+                            }
+                            ui.separator();
+                        }
                         if ui.button(crate::i18n::tr(if fav { "Remove from Favorites" } else { "Add to Favorites" })).clicked() {
                             let _ = app.run("preset.favorite", json!({"id": pid}));
                         }
