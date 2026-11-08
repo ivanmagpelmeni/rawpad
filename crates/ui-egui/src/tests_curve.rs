@@ -463,3 +463,88 @@ fn a_brush_or_spot_stroke_starts_where_the_finger_touched() {
     assert_eq!(spots.len(), 1, "one spot");
     assert!((min_x(&spots[0].points) - 0.15).abs() < 0.02, "the spot stroke starts at the press: {:?}", spots[0].points);
 }
+
+/// iPad: the bottom bar's rating pill ends in a colour-label button whose menu sets and clears the
+/// active photo's label (editing audit, item 30: labels were out of reach by touch; DECISIONS 80).
+/// Lives here so CI runs it.
+#[test]
+fn the_bottom_bars_label_button_sets_and_clears_the_colour_label() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    let id = h.app.session.active().expect("active photo");
+    let label = |h: &Headless| h.app.session.catalog.photo(id).and_then(|p| p.label);
+    let rect = |h: &Headless, id: &str| h.app.widgets.iter().find(|(w, _)| w == id).map(|(_, r)| *r);
+    let button = rect(&h, "icon:labelMenu").expect("the pill has the label button");
+    let last_flag = rect(&h, "flag:reject").expect("the pill has its flags");
+    assert!(button.left() >= last_flag.right(), "the label button comes after the flags: {button:?} {last_flag:?}");
+    click_widget(&mut h, "icon:labelMenu", 1);
+    h.step();
+    click_widget(&mut h, "bottomLabel:purple", 1);
+    h.step();
+    assert_eq!(label(&h), Some(lightcraft_catalog::ColorLabel::Purple), "Purple set from the bottom bar");
+    click_widget(&mut h, "icon:labelMenu", 1);
+    h.step();
+    click_widget(&mut h, "bottomLabel:none", 1);
+    h.step();
+    assert_eq!(label(&h), None, "None clears it");
+}
+
+/// iPad: when the bottom bar is too narrow for the full rating pill (portrait with the side
+/// toolbars), a compact pill keeps rating, flag and colour label in reach: a rating button whose
+/// menu holds the stars and flags, then the label button (DECISIONS 81). Lives here so CI runs it.
+#[test]
+fn a_narrow_bottom_bar_shows_the_compact_rating_pill() {
+    let services = Services { png: None, ..Default::default() };
+    let app = LightcraftApp::new(lightcraft_engine::Session::with_demo(), services);
+    let mut h = Headless::new(app, [1200.0, 1400.0], 1.0);
+    let r = h.request("ui.set", json!({"view": "detail", "right": "none"}), T);
+    assert_eq!(r["ok"], true, "{r}");
+    h.step();
+    h.step();
+    let has = |h: &Headless, id: &str| h.app.widgets.iter().any(|(w, _)| w == id);
+    assert!(has(&h, "flag:reject") && !has(&h, "icon:ratingMenu"), "a wide bar has the full pill");
+    // narrow the window until the full pill gives way
+    let mut found = false;
+    for w in (500..=1200).rev().step_by(10) {
+        let r = h.request("ui.resize", json!({"width": w, "height": 1400}), T);
+        assert_eq!(r["ok"], true, "{r}");
+        h.step();
+        h.step();
+        assert!(!(has(&h, "flag:reject") && has(&h, "icon:ratingMenu")), "never both pills at {w}");
+        if has(&h, "icon:ratingMenu") {
+            found = true;
+            break;
+        }
+    }
+    assert!(found, "some narrow width shows the compact pill");
+    assert!(has(&h, "icon:labelMenu"), "the compact pill keeps the label button");
+    let id = h.app.session.active().expect("active photo");
+    let photo = |h: &Headless| h.app.session.catalog.photo(id).cloned().expect("photo");
+    click_widget(&mut h, "icon:ratingMenu", 1);
+    h.step();
+    click_widget(&mut h, "star:bottom:4", 1);
+    h.step();
+    assert_eq!(photo(&h).rating, 4, "four stars from the compact pill's menu");
+    if !has(&h, "flag:pick") {
+        click_widget(&mut h, "icon:ratingMenu", 1);
+        h.step();
+    }
+    click_widget(&mut h, "flag:pick", 1);
+    h.step();
+    assert_eq!(photo(&h).flag, lightcraft_catalog::Flag::Pick, "picked from the compact pill's menu");
+    if has(&h, "flag:pick") {
+        // the menu stayed open: close it before the label button
+        let _ = h.request("ui.key", json!({"key": "esc"}), T);
+        h.step();
+    }
+    click_widget(&mut h, "icon:labelMenu", 1);
+    h.step();
+    click_widget(&mut h, "bottomLabel:green", 1);
+    h.step();
+    assert_eq!(photo(&h).label, Some(lightcraft_catalog::ColorLabel::Green), "Green from the compact pill");
+}

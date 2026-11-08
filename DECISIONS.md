@@ -525,3 +525,26 @@ morning session, which had taken 45 and 46.
     unit tests, `detail.rs › stroke_lead_in` puts the press point in front of the first sample
     when a new stroke starts with a drag (clicks and still holds are unchanged; pressure is
     copied to the extra point). Desktop behaviour is untouched. Unit test in `tests_curve.rs`.
+80. **2026-11-02: Colour labels in the bottom bar on the iPad.** Labels were reachable only
+    through the Info panel, the Photo menu or the 6–9 keys (editing audit, item 30). On iOS (and
+    in unit tests) the rating pill ends with a 22-point label button (`icon:labelMenu`): a dot in
+    the photo's label colour, a ring when it has none. It opens the same label menu as the grid's
+    context menu (ids `bottomLabel:<colour>`, `bottomLabel:none`) and runs `photo.label` with the
+    Compare/Survey target like the stars. The pill grows 28 points; when the bar is too narrow
+    the button goes first (before the pill itself), so the stars and flags never disappear because
+    of it; Copy/Paste Settings may hide 28 points sooner (they are in the Edit menu too). Desktop
+    unchanged. Unit test in `tests_curve.rs`, tour shots `08-label-menu` and `08-label-green`.
+81. **2026-11-02: A compact rating pill on a narrow iPad bottom bar.** In portrait (820 pt) the
+    bottom bar's room between the view modes and the zoom group is about 205 pt, less than the
+    full pill (208 pt, 236 with the label button), so the iPad showed no stars, flags or label
+    there at all (CI run 93). On iOS (and in unit tests), when the full pill doesn't fit but 98 pt
+    do, a compact pill stands in: a 50-point rating button (`icon:ratingMenu`: a star, the
+    count, and the pick/reject flag if set) whose menu holds the same stars and flags
+    (`star:bottom:<n>`, `flag:<id>`), then the label button. The stars/flags code moved to one
+    helper (`rate_and_flag`) shared by both pills. Desktop unchanged (the pill still just hides).
+    Unit test `a_narrow_bottom_bar_shows_the_compact_rating_pill`; tour shots `08-compact-pill`,
+    `08-rating-menu`, `08-rated-4`.
+82. **2026-11-02: The last run of the night doesn't merge code.** A main run takes about 40
+    minutes with the release, longer than what is left of a session after a branch run (25–35
+    minutes). The last run of the night (02:54 Berlin) must leave main green, so it leaves a
+    green branch unmerged and the next session merges it at its start and watches the main run.

@@ -67,6 +67,35 @@
 {"shot":"08-side-by-side"}
 {"method":"ui.clickWidget","params":{"id":"icon:beforeAfter"},"expectOk":true}
 {"sleep":2}
+# colour label by touch: the button at the end of the rating pill (iPad only) opens the label menu.
+# In portrait the bar is too narrow for the full pill: the compact pill (rating button + label
+# button) stands in. Close the Edit panel first so the bar has room for even that.
+{"method":"ui.set","params":{"right":"none"},"expectOk":true}
+{"sleep":2}
+{"shot":"08-compact-pill"}
+{"method":"ui.clickWidget","params":{"id":"icon:ratingMenu"},"expectOk":true}
+{"sleep":2}
+{"shot":"08-rating-menu"}
+# star 4 (tapping the current rating would clear it); then back to 3, which the ⌘Z check expects
+{"method":"ui.clickWidget","params":{"id":"star:bottom:4"},"expectOk":true}
+{"sleep":2}
+{"shot":"08-rated-4"}
+{"method":"ui.clickWidget","params":{"id":"icon:ratingMenu"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"star:bottom:3"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"icon:labelMenu"},"expectOk":true}
+{"sleep":2}
+{"shot":"08-label-menu"}
+{"method":"ui.clickWidget","params":{"id":"bottomLabel:green"},"expectOk":true}
+{"sleep":2}
+{"shot":"08-label-green"}
+{"method":"ui.clickWidget","params":{"id":"icon:labelMenu"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.clickWidget","params":{"id":"bottomLabel:none"},"expectOk":true}
+{"sleep":1}
+{"method":"ui.set","params":{"right":"edit"},"expectOk":true}
+{"sleep":2}
 # crop by touch: the Crop panel's Done button (iPad only) applies the crop and goes back to Edit
 {"method":"engine.execute","params":{"command":"panel.crop"},"expectOk":true}
 {"sleep":6}
