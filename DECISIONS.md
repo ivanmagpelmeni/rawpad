@@ -604,3 +604,12 @@ morning session, which had taken 45 and 46.
     20 pt above the screen's bottom: `layer_id_at` found no layer under the bar (also for real
     touches, probably). The host now sends `safe_area_insets = 0` with its inset rect; the
     rect stays our own (it also carries the keyboard lift and the minimum top inset).
+
+## 2026-11-08: Reset by long-press (scheduled session, 22:55 Berlin)
+
+90. **2026-11-08: The curve channel buttons and the colour wheels get long-press reset menus.**
+    Both reset on a double-click that only a hover tooltip mentions (audit item 6, "the reset
+    hints"); a finger never sees the tooltip. As with the slider names (61): on iOS (and in unit
+    tests) a long-press on a curve channel button opens the curve's existing reset menu for that
+    channel (`curveMenu:resetChannel`, `curveMenu:resetAll`); a long-press on a colour wheel opens
+    "Reset <wheel>" (`wheelMenu:reset:<key>`). The double-tap still works. Tests in `tests/ipad.rs`.
