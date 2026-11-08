@@ -362,7 +362,7 @@ impl Host {
         }
         let keep_in_view = self.keep_in_view > 0;
         self.keep_in_view = self.keep_in_view.saturating_sub(1);
-        self.ctx.data_mut(|d| d.insert_temp(egui::Id::new(lightcraft_ui_egui::text_field::KEEP_IN_VIEW), keep_in_view));
+        self.ctx.data_mut(|d| d.insert_temp(egui::Id::unique(lightcraft_ui_egui::text_field::KEEP_IN_VIEW), keep_in_view));
         let share_offer = &mut self.share_offer;
         let mut share: Option<(Vec<String>, egui::Pos2)> = None;
         let mut out = self.ctx.run_ui(raw, |ui| {

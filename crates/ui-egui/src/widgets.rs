@@ -365,6 +365,26 @@ pub(crate) fn shown_value(spec: &ControlSpec, v: f64) -> String {
 /// scrub rather than a click that types a value.
 const SCRUB_START: f32 = 3.0;
 
+/// RawPad (iPad): whether this drag on a slider's track scrolls the panel instead of moving the
+/// slider, because it set off more up or down than sideways; the panel is scrolled by the drag.
+/// With a finger, scrolling the Edit panel used to change whatever slider the finger started on.
+/// Off the iPad, always false (UPSTREAM.md).
+fn touch_scrolls(ui: &Ui, resp: &Response, id: egui::Id) -> bool {
+    if !cfg!(target_os = "ios") {
+        return false;
+    }
+    let key = id.with("touch-scroll");
+    if resp.drag_started() {
+        let moved = ui.input(|i| i.pointer.press_origin().zip(i.pointer.latest_pos()).map(|(a, b)| b - a)).unwrap_or_default();
+        ui.data_mut(|m| m.insert_temp(key, moved.y.abs() > moved.x.abs()));
+    }
+    let scrolling = (resp.dragged() || resp.drag_stopped()) && ui.data(|m| m.get_temp::<bool>(key)).unwrap_or(false);
+    if scrolling && resp.dragged() {
+        ui.scroll_with_delta(resp.drag_delta());
+    }
+    scrolling
+}
+
 /// Which slider the vertical wheel edits: clicking or dragging a slider arms it (and disarms the others), leaving
 /// its row or its focus disarms it. Returns whether this slider is armed, and whether the pointer is in its row.
 fn update_wheel_arming(ui: &mut Ui, id: egui::Id, resp: &egui::Response, row: Rect, enabled: bool) -> (bool, bool) {
@@ -442,6 +462,19 @@ pub fn slider(ui: &mut Ui, spec: &ControlSpec, value: f64, enabled: bool, label_
     let label_resp = if enabled { label_resp.on_hover_text(reset_hint.as_str()) } else { label_resp };
     crate::widgets::announce(&label_resp, crate::i18n::tr_format!("Reset {name}", name = label_text.clone()));
     register(ui, format!("sliderLabel:{}", spec.id), label_rect);
+    // RawPad (iPad): a finger can't hover for the hint, so a long-press on the name (a secondary
+    // click) opens a menu with "Reset <name>" (DECISIONS.md 61); the unit tests see it too
+    let mut menu_reset = false;
+    if (cfg!(target_os = "ios") || cfg!(test)) && enabled {
+        crate::widgets::context_menu(&label_resp, |ui| {
+            let b = ui.button(crate::i18n::tr_format!("Reset {name}", name = label_text.clone()));
+            register(ui, format!("sliderMenu:reset:{}", spec.id), b.rect);
+            if b.clicked() {
+                menu_reset = true;
+                ui.close();
+            }
+        });
+    }
     register(ui, format!("slider:{}", spec.id), track_rect);
     // the value: click it to type an exact one, drag it sideways to scrub (over the label, so it
     // takes the click)
@@ -471,9 +504,11 @@ pub fn slider(ui: &mut Ui, spec: &ControlSpec, value: f64, enabled: bool, label_
         scrub_value(ui, &g, &value_resp, pos, scrub_started, &mut out);
     } else if let Some(draft) = typing.take() {
         typing = edit_value(ui, &t, &g, draft, &mut out);
-    } else if resp.double_clicked() || label_resp.double_clicked() {
+    } else if resp.double_clicked() || label_resp.double_clicked() || menu_reset {
         out.reset = true;
         out.value = Some(spec.default);
+    } else if touch_scrolls(ui, &resp, id) {
+        // RawPad (iPad): the drag scrolled the panel, the slider keeps its value
     } else {
         pointer_edit(ui, &g, &resp, &mut out);
         nudge_edit(ui, &g, &resp, pointer_in_row, &mut out);

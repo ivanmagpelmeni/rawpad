@@ -241,7 +241,7 @@ mod tests {
 
     #[test]
     fn a_focused_field_out_of_view_keeps_the_keyboard() {
-        let id = egui::Id::new("location");
+        let id = egui::Id::unique("location");
         let rect = egui::Rect::from_min_size(egui::pos2(900.0, 960.0), egui::vec2(200.0, 26.0));
         // drawn: held as it is
         let held = hold_field(Some(rect), Some(id), false, None);
@@ -253,7 +253,7 @@ mod tests {
         // the keyboard was down: nothing to hold (a slider's focus never raises it)
         assert_eq!(hold_field(None, Some(id), false, held), None);
         // the focus moved on or ended: the keyboard goes down
-        assert_eq!(hold_field(None, Some(egui::Id::new("slider")), true, held), None);
+        assert_eq!(hold_field(None, Some(egui::Id::unique("slider")), true, held), None);
         assert_eq!(hold_field(None, None, true, held), None);
     }
 

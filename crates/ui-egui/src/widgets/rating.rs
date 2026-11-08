@@ -57,6 +57,9 @@ impl RatingSize {
     }
 }
 
+/// RawPad (iPad): the height of a rating star's touch area (points).
+const STAR_TOUCH_H: f32 = 36.0;
+
 /// Paint one star (outline or filled) centred in `rect`.
 pub fn paint_star(painter: &Painter, rect: Rect, filled: bool, color: Color32) {
     paint(painter, rect, if filled { Icon::StarFilled } else { Icon::Star }, color);
@@ -140,7 +143,14 @@ impl Rating {
             let id = self.star_id(ui, i);
             let (r, _) = ui.allocate_exact_size(vec2(cell, cell), Sense::hover());
             let sense = if i == stop || ui.memory(|m| m.has_focus(id)) { Sense::click() } else { Sense::CLICK };
-            let resp = ui.interact(r, id, sense);
+            // RawPad (iPad): a fingertip needs more than the drawn star: the gaps on both sides and
+            // 36 pt of height (UPSTREAM.md)
+            let reach = if cfg!(target_os = "ios") {
+                vec2(ui.spacing().item_spacing.x / 2.0, ((STAR_TOUCH_H - cell) / 2.0).max(0.0))
+            } else {
+                vec2(0.0, 0.0)
+            };
+            let resp = ui.interact(r.expand2(reach), id, sense);
             announce_selected(&resp, format!("{} ★", i + 1), i < self.rating);
             register(ui, self.widget_id(i + 1), r);
             if resp.hovered() {

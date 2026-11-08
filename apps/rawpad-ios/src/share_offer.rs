@@ -94,7 +94,7 @@ impl ShareOffer {
             return None;
         }
         let label = label(language, n);
-        let (share, close) = egui::Area::new(egui::Id::new("rawpad-share-export"))
+        let (share, close) = egui::Area::new(egui::Id::unique("rawpad-share-export"))
             .order(egui::Order::Foreground)
             .pivot(egui::Align2::CENTER_BOTTOM)
             .fixed_pos(bottom_center)

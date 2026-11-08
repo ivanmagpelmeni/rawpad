@@ -52,7 +52,7 @@ mod tests {
     use super::*;
 
     fn id(n: u64) -> Option<egui::Id> {
-        Some(egui::Id::new(n))
+        Some(egui::Id::unique(n))
     }
 
     #[test]
