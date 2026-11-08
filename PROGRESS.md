@@ -66,6 +66,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-08 (21:54–22:35 Berlin, unattended)**
+1. Found why the bottom-bar buttons (Before/After and its menu, rating pill, colour label) refused every tap on upstream 0.19: the screen's safe-area margins were taken off twice, so egui thought nothing was under the bar (DECISIONS 89). Fixed in the iPad host.
+2. Branch run 103: build, clippy, all unit tests **and the simulator tour step green** for the first time on upstream 0.19.0.
+3. UPSTREAM.md's patch list now names the new 0.19.0 file paths.
+4. Main untouched (1.96).
+5. Next session: confirm run 103's report (no failed taps, screenshots), then merge upstream 0.19.0 into main.
+
 **2026-11-08 (20:55–21:35 Berlin, unattended)**
 1. Found why run 99's tour failed 24 taps: upstream 0.19's *Welcome to LightCraft* first-run window covered the app. RawPad now skips it and *What's New* on the iPad (DECISIONS 87).
 2. Fixed a flaky memory unit test that failed run 100 (DECISIONS 88).
@@ -352,7 +359,7 @@ Classic setup steps and source fix.
 Main: `p7-label-pill` merged 2026-11-08, main run 96 green, **released 1.96**. Branch
 `upstream-0.19.0`: the upstream v0.19.0 merge with every iPad patch re-applied; since branch run
 99 it builds for iOS, passes clippy and the unit tests and launches; run 99's 24 failed tour taps
-were upstream's Welcome window (off on iOS since 81657d61); run 102 is down to 18, all on the bottom bar.
+were upstream's Welcome window (off on iOS since 81657d61); run 102's 18 bottom-bar failures were doubled safe-area insets (fixed d5fc483d); run 103's tour step is green.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -361,11 +368,12 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Fix the bottom-bar taps in branch `upstream-0.19.0`** (run 102: 18 tour ERR, all bottom
-   bar; HANDOFF has the suspects); when the tour is clean, merge `upstream-0.19.0` into main at the start of a session and watch the main run.
-2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5).
-3. **Update UPSTREAM.md's patch table** to the new 0.19.0 paths row by row (the paths note on top
-   lists them for now).
+1. **Merge `upstream-0.19.0` into main** once `runs/103` shows a clean tour (HANDOFF), at the
+   start of a session, and watch the main run and release.
+2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5;
+   the slider name's long-press menu already has Reset).
+3. **Delete the 0.19 leftovers:** `lightcraft-sysmem` in `apps/rawpad-ios/Cargo.toml` once a
+   Cargo.lock can be regenerated in CI; the merged branches list in HANDOFF.
 
 Also queued:
 - Delete merged branches (no tool for it from the sandbox).
