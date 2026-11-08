@@ -203,6 +203,11 @@ pub(super) fn curve_editor(app: &mut LightcraftApp, ui: &mut egui::Ui, id: Photo
                 } else if resp.clicked() {
                     app.ui.curve_channel = ch.into();
                 }
+                // RawPad (iPad): the double-click hint above needs hover; a long-press on a
+                // channel button opens the curve's reset menu for that channel (DECISIONS.md 90)
+                if cfg!(target_os = "ios") || cfg!(test) {
+                    crate::widgets::context_menu(&resp, |ui| curve_reset_menu(app, ui, ch));
+                }
             }
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 tat_button(app, ui, "tat:curve", "Targeted adjustment: drag up/down on the photo to adjust the curve there");
