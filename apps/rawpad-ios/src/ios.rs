@@ -379,7 +379,12 @@ impl Host {
             if let Some(shown) =
                 share_offer.show(ctx, egui::pos2(area.center().x, area.bottom() - 90.0), now, lightcraft_ui_egui::i18n::language().code())
             {
-                app.widgets.push((crate::share_offer::WIDGET_ID.to_owned(), shown.rect));
+                // into the widget registry, with its egui hit, like upstream's widgets: the app
+                // publishes it with the next pass, where `ui.clickWidget` looks (a push into
+                // `app.widgets` here was replaced before a click was resolved, CI run 99)
+                if let Some(resp) = ctx.read_response(shown.id) {
+                    lightcraft_ui_egui::widgets::register_response(crate::share_offer::WIDGET_ID, shown.rect, &resp);
+                }
                 if let Some(files) = shown.share {
                     share = Some((files, shown.rect.center()));
                 }
