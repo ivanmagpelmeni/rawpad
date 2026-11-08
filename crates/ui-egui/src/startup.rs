@@ -87,7 +87,9 @@ pub fn startup_dialog(seen: Option<&str>, current: &str) -> Option<StartupDialog
 /// seen. A headless host (snapshots, scripted runs, tests: their UI state is session-local, with
 /// no stored version behind it) never gains a modal.
 pub fn open_at_startup(seen: Option<&str>, headless: bool) -> Option<Dialog> {
-    if headless {
+    // RawPad (iPad): no LightCraft welcome tour or What's New. Their text is the desktop's
+    // (keyboard shortcuts, menus) and RawPad's release notes are in SideStore (DECISIONS 87).
+    if headless || cfg!(target_os = "ios") {
         return None;
     }
     match startup_dialog(seen, env!("CARGO_PKG_VERSION")) {
