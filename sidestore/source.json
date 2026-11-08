@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.107",
+          "buildVersion": "107",
+          "date": "2026-11-08T23:58:54Z",
+          "localizedDescription": "RawPad 1.107 (build 107, 8852150): P7: handoff and progress after the 2026-11-08 23:54 session (docs only; p7-reset-hints on main, p7-effect-select on its branch)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.107/RawPad.ipa",
+          "size": 23713456,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.104",
           "buildVersion": "104",
           "date": "2026-11-08T23:21:24Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.74/RawPad.ipa",
           "size": 19858890,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.72",
-          "buildVersion": "72",
-          "date": "2026-10-26T03:10:25Z",
-          "localizedDescription": "RawPad 1.72 (build 72, d07fb2a): P4: low-field keyboard tour steps are hard checks (run 71: shot and log right)",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.72/RawPad.ipa",
-          "size": 19859891,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.104",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.104/RawPad.ipa",
-      "size": 23704259,
-      "versionDate": "2026-11-08T23:21:24Z",
-      "versionDescription": "RawPad 1.104 (build 104, 46077bf): P8: handoff and progress after the 2026-11-08 22:55 session (docs only; upstream 0.19.0 on main, p7-reset-hints on its branch)"
+      "version": "1.107",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.107/RawPad.ipa",
+      "size": 23713456,
+      "versionDate": "2026-11-08T23:58:54Z",
+      "versionDescription": "RawPad 1.107 (build 107, 8852150): P7: handoff and progress after the 2026-11-08 23:54 session (docs only; p7-reset-hints on main, p7-effect-select on its branch)"
     }
   ],
   "news": []
