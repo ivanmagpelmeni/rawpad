@@ -301,9 +301,15 @@ impl Host {
                 let inner = egui::Rect::from_min_max(egui::pos2(rect.min.x + l, rect.min.y + t), egui::pos2(rect.max.x - r, rect.max.y - b - kb));
                 if inner.is_positive() {
                     raw.screen_rect = Some(inner);
+                    // `inner` already leaves the safe area out. egui-winit (0.37) also reports
+                    // UIKit's insets, and egui keeps the last ones it got: left in, egui took them
+                    // off `inner` a second time, so its background layer stopped 20 pt above the
+                    // bottom bar and every press there was refused (CI runs 99–102, DECISIONS 89)
+                    raw.safe_area_insets = Some(egui::SafeAreaInsets::default());
                 }
             } else if let Some(insets) = raw.safe_area_insets {
                 raw.screen_rect = Some(rect - insets);
+                raw.safe_area_insets = Some(egui::SafeAreaInsets::default());
             }
         }
         // Imports copy into the library: picked files are temporary copies, and folders from
