@@ -44,6 +44,7 @@ mod import_recipe;
 mod import_scan_note;
 mod import_thumbnails;
 mod info_dialogs;
+mod ipad;
 mod keymap;
 mod keyword_files;
 mod keyword_list;
