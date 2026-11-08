@@ -66,6 +66,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-08 (20:55–21:35 Berlin, unattended)**
+1. Found why run 99's tour failed 24 taps: upstream 0.19's *Welcome to LightCraft* first-run window covered the app. RawPad now skips it and *What's New* on the iPad (DECISIONS 87).
+2. Fixed a flaky memory unit test that failed run 100 (DECISIONS 88).
+3. The Share Exported Photo… button is registered the new upstream way, so the tour can tap it again.
+4. Branch run 102: builds, clippy and all unit tests green; the simulator tour was still running at the end of the session.
+5. Main untouched (1.96). Next session: read run 102's tour and, if clean, merge upstream 0.19.0 into main.
+
 **2026-11-08 (19:55–20:40 Berlin, unattended)**
 1. Main green: main run 96 released **1.96** (compact rating pill + colour-label button).
 2. Branch `upstream-0.19.0`: fixed the two iOS build errors of run 98 (chrono for the shared logger, new `raw_input_hook` signature).
@@ -344,7 +351,8 @@ Classic setup steps and source fix.
 
 Main: `p7-label-pill` merged 2026-11-08, main run 96 green, **released 1.96**. Branch
 `upstream-0.19.0`: the upstream v0.19.0 merge with every iPad patch re-applied; since branch run
-99 it builds for iOS, passes clippy and the unit tests and launches; the tour still fails 24 taps.
+99 it builds for iOS, passes clippy and the unit tests and launches; run 99's 24 failed tour taps
+were upstream's Welcome window (off on iOS since 81657d61); run 102 checks the tour again.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -353,9 +361,8 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Get branch `upstream-0.19.0`'s tour clean** (it compiles and launches since run 99;
-   HANDOFF lists the 24 failing taps and where to look), then merge it into main at the start of
-   a session and watch the main run.
+1. **Check branch run 102's tour** (the Welcome window that blocked run 99 is off on iOS); if
+   clean, merge `upstream-0.19.0` into main at the start of a session and watch the main run.
 2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5).
 3. **Update UPSTREAM.md's patch table** to the new 0.19.0 paths row by row (the paths note on top
    lists them for now).
