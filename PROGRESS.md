@@ -66,6 +66,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-08 (22:55–23:40 Berlin, unattended)**
+1. Branch run 103 was clean (0 failed taps, menus and split views on the screenshots), so **upstream LightCraft 0.19.0 is merged into main** (a0de4dbb). Main run 104 builds release **1.104** (see HANDOFF for its result).
+2. New branch `p7-reset-hints`: a long-press on a curve channel button or a colour wheel now opens a Reset menu (their double-click hints only showed on hover), DECISIONS 90.
+3. Branch run 105: unit tests (with the two new ones) green; the tour was still running at handoff.
+4. UPSTREAM.md: "Last merged" is now 0.19.0; patch table has the new rows.
+5. Next session: check run 104 (main + release) and run 105, then merge `p7-reset-hints`.
+
 **2026-11-08 (21:54–22:35 Berlin, unattended)**
 1. Found why the bottom-bar buttons (Before/After and its menu, rating pill, colour label) refused every tap on upstream 0.19: the screen's safe-area margins were taken off twice, so egui thought nothing was under the bar (DECISIONS 89). Fixed in the iPad host.
 2. Branch run 103: build, clippy, all unit tests **and the simulator tour step green** for the first time on upstream 0.19.0.
@@ -356,10 +363,9 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main: `p7-label-pill` merged 2026-11-08, main run 96 green, **released 1.96**. Branch
-`upstream-0.19.0`: the upstream v0.19.0 merge with every iPad patch re-applied; since branch run
-99 it builds for iOS, passes clippy and the unit tests and launches; run 99's 24 failed tour taps
-were upstream's Welcome window (off on iOS since 81657d61); run 102's 18 bottom-bar failures were doubled safe-area insets (fixed d5fc483d); run 103's tour step is green.
+Main: **upstream LightCraft v0.19.0 merged** 2026-11-08 (a0de4dbb; branch run 103 green with 0
+failed tour taps); main run 104 builds release 1.104. Branch `p7-reset-hints` (DECISIONS 90):
+long-press reset menus for the curve channel buttons and the colour wheels; branch run 105.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -368,10 +374,11 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `upstream-0.19.0` into main** once `runs/103` shows a clean tour (HANDOFF), at the
-   start of a session, and watch the main run and release.
-2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5;
-   the slider name's long-press menu already has Reset).
+1. **Check main run 104** (merge of 0.19.0 + release 1.104) and **branch run 105**; if 105 is
+   clean, merge `p7-reset-hints` into main (only when no main run is going).
+2. **Phase 7, touch polish:** go through the other hover-only hints (`grep -rn on_hover_text
+   crates/ui-egui/src | grep -i double`): crop's straighten tool "double-click for Auto"
+   (`panels/right/crop.rs`), History's double-click (`panels/right/history.rs`).
 3. **Delete the 0.19 leftovers:** `lightcraft-sysmem` in `apps/rawpad-ios/Cargo.toml` once a
    Cargo.lock can be regenerated in CI; the merged branches list in HANDOFF.
 
@@ -384,7 +391,7 @@ Also queued:
 ### This week: what to test on the iPad (start here)
 
 First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
-**My Apps** › **Update** next to RawPad (pick the newest: 1.91 or later). Then try
+**My Apps** › **Update** next to RawPad (pick the newest: 1.104 or later; it brings ten upstream LightCraft releases at once, up to 0.19.0). Then try
 these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
 
 1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several
@@ -414,9 +421,13 @@ these and tell Claude in chat what you see (a sentence per item is plenty; "work
    divider between the two apps: does RawPad stay usable at each size? Say if anything is cut
    off or squashed.
 
-9. **Stars in portrait (new in about 1.97):** hold the iPad upright with a photo open. At the
+9. **Stars in portrait (new in 1.96):** hold the iPad upright with a photo open. At the
    bottom there is now a small **★ 0** button: tap it, pick a star count and a flag. The small
    circle right of it sets a colour label (red, yellow, green …). Did the photo get them?
+
+10. **After updating to 1.104 (big update):** RawPad now carries LightCraft 0.19.0. Open a
+   few photos, edit one, export it. Does anything look broken, missing or slower than before?
+   The buttons at the very bottom (stars, ⌄ next to Before/After) must react to taps.
 
 If anything crashes or freezes: Files › On My iPad › RawPad › Logs › press and hold
 **lightcraft.log** › Share, and send it to Claude in chat.
