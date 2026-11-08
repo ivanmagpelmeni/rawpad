@@ -66,6 +66,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-08 (18:56–19:40 Berlin, unattended, first run of the night)**
+1. Branch run 95 was green (the pill says 4 in `runs/95/08-rated-4.jpg`): **`p7-label-pill` merged into main** (compact rating pill + colour-label button); main run 96 releases about 1.97.
+2. **Upstream was ten releases ahead** (v0.10 … v0.19.0, not v0.9.1: a text sort hid them, DECISIONS 85). Started the merge of **v0.19.0** in branch `upstream-0.19.0` (DECISIONS 83): no shared history, so v0.9.1 is the explicit merge base.
+3. Upstream reorganised the UI files; took upstream's versions and **re-applied every iPad patch** by hand (Photos export, Share, no AI masks, crop Done, sliders, stars, curve, wheels, masks, strokes, Select Several, presets/versions/history menus, bottom-bar pill, Before/After menu). egui moves to 0.37 (storytold fork).
+4. iPad UI tests now live in their own module `tests::ipad` (DECISIONS 84).
+5. Branch run 98 checks it all; main is untouched by the merge until a branch run is green with a clean tour.
+
 **2026-11-02 (night 9, 02:54–03:40 Berlin, unattended, last run of the night)**
 1. Main run 91 (the `p7-stroke-start` merge) green, **released 1.91**: brush and Remove strokes start where the finger or Pencil touched.
 2. Branch run 93 showed why the label button was missing: in portrait the bottom bar has about 205 pt for the pill, the full pill needs 208 (236 with the label), so the iPad showed **no stars, flags or label at all** in portrait.
@@ -324,13 +331,13 @@ Classic setup steps and source fix.
   - ~~hide the AI mask tiles~~ and ~~AI items in mask menus~~ (done); ArtCraft links kept
     (DECISIONS.md 26)
   - craft-fonts in release builds
-  - routine upstream merges
+  - routine upstream merges: 0.19.0 in progress (branch `upstream-0.19.0`, DECISIONS 83)
 
 ## Current status
 
-Main is green: main run 91 (the `p7-stroke-start` merge) released 1.91. Branch `p7-label-pill`
-(colour-label button and compact rating pill in the bottom bar) waits for a merge; branch run 95
-is its check (HANDOFF has the details).
+Main: `p7-label-pill` merged 2026-11-08 (main run 96, releases about 1.97; HANDOFF says whether it
+finished green). Branch `upstream-0.19.0`: the upstream v0.19.0 merge with every iPad patch
+re-applied, being fixed through branch runs (98 and on) before it can go to main.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -339,12 +346,12 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge `p7-label-pill`** if branch run 95 is green (HANDOFF has the steps), at the start of
-   a session so its main run (about 40 minutes) can be watched to the end.
-2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5),
-   then the hover-only colour wheels' eye (item 10).
-3. **Phase 7, routine upstream merge**: needs the upstream repo attached to the session
-   (`storytold/lightcraft`, read access); check its releases first.
+1. **Get branch `upstream-0.19.0` green** (HANDOFF has the run and the steps): fix compile errors
+   from egui 0.37 / the reorganised UI in the host and the patches, then the tour (widget ids may
+   have changed upstream). Then merge it into main at the start of a session and watch the main run.
+2. **Phase 7, touch polish** (audit list, remaining): the hover-only reset hints (audit item 5).
+3. **Update UPSTREAM.md's patch table** to the new 0.19.0 paths row by row (the paths note on top
+   lists them for now).
 
 Also queued:
 - Delete merged branches (no tool for it from the sandbox).
@@ -384,6 +391,10 @@ these and tell Claude in chat what you see (a sentence per item is plenty; "work
    **•••** at the top middle of the screen › **Split View**, pick e.g. Files) and drag the black
    divider between the two apps: does RawPad stay usable at each size? Say if anything is cut
    off or squashed.
+
+9. **Stars in portrait (new in about 1.97):** hold the iPad upright with a photo open. At the
+   bottom there is now a small **★ 0** button: tap it, pick a star count and a flag. The small
+   circle right of it sets a colour label (red, yellow, green …). Did the photo get them?
 
 If anything crashes or freezes: Files › On My iPad › RawPad › Logs › press and hold
 **lightcraft.log** › Share, and send it to Claude in chat.

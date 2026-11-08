@@ -548,3 +548,28 @@ morning session, which had taken 45 and 46.
     minutes with the release, longer than what is left of a session after a branch run (25–35
     minutes). The last run of the night (02:54 Berlin) must leave main green, so it leaves a
     green branch unmerged and the next session merges it at its start and watches the main run.
+
+## 2026-11-08: Upstream 0.19.0 (scheduled session, 18:56 Berlin)
+
+83. **2026-11-08: Merge upstream v0.19.0 now, in a branch, with v0.9.1 as the explicit base.**
+    Earlier checks reported "newest tag still v0.9.1" because `sort` put `v0.9.1` after
+    `v0.19.0` as text; upstream had released 0.10 through 0.19 (latest 2026-11-06). The fork
+    was a snapshot without upstream history (no merge base), so `git merge` can't work: the
+    branch `upstream-0.19.0` merges with `git merge-recursive v0.9.1 -- HEAD v0.19.0` and
+    records v0.19.0 as the second parent, so future upstream merges have a normal merge base.
+    Ten releases at once breaks the weekly policy, but merging them one at a time would mean ten
+    rounds of the same conflicts. Upstream moved most patched files (`panels/dialogs.rs` →
+    `dialogs.rs`, `panels/detail.rs` → `panels/detail/*.rs`, `panels/right.rs` → `right/*.rs`,
+    `panels/edit.rs` → `edit/*.rs`, `text_field.rs` → `widgets/text_field.rs`, stars →
+    `widgets/rating.rs`, `menus.rs` → `menus/files.rs`, `export.rs` → `export/params.rs`):
+    upstream's version of each conflicting file was taken and every iPad patch re-applied by
+    hand (old patches saved in `ios/upstream-patches-v0.9.1.diff`). egui moves to 0.37 on
+    storytold's fork (`Id::new` is `Id::unique` there); the host's `egui-winit`/`egui-wgpu`
+    follow. The upstream workflows (old and new: `ci.yml`, `ci-windows.yml`, `house-rules.yml`,
+    `sonarcloud.yml`) stay deleted, as in DECISIONS 10. Main gets the merge only after a green
+    branch run with a clean tour.
+84. **2026-11-08: iPad UI tests live in `crates/ui-egui/src/tests/ipad.rs`.** Upstream moved
+    `tests_curve.rs` to `tests/curve.rs`; our tests (and copies of its five small helpers) now
+    have a file of their own that upstream never touches. CI runs `--lib tests::ipad`.
+85. **2026-11-08: Check upstream tags with `sort -V`.** `git ls-remote --tags
+    https://github.com/storytold/lightcraft | grep -v '\^{}' | awk '{print $2}' | sort -V | tail -3`.
