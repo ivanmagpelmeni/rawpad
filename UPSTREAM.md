@@ -1,9 +1,19 @@
 # Upstream (storytold/lightcraft)
 
-- **Last merged upstream commit:** `4f0b110bcbd2e350c6d97b47f1d824c2222295c4`, Release 0.9.1
-  (2026-10-17). This is the fork point.
-- **Last checked:** 2026-11-01 (newest upstream tag still `v0.9.1`; `git ls-remote --tags
-  https://github.com/storytold/lightcraft` works from the sandbox when the releases API doesn't).
+- **Last merged upstream commit:** on `main`: `4f0b110b`, Release 0.9.1 (2026-10-17, the fork
+  point). **In progress on branch `upstream-0.19.0`:** `16636c45`, Release 0.19.0 (2026-11-06),
+  merged with v0.9.1 as the explicit base (DECISIONS 83). Once merged, normal `git merge <tag>`
+  works for later releases.
+- **Last checked:** 2026-11-08 (newest upstream tag `v0.19.0`). `git ls-remote --tags
+  https://github.com/storytold/lightcraft | sort -V` works from the sandbox when the releases API
+  doesn't. **Use `sort -V`:** plain `sort` puts v0.9.1 after v0.19.0 (that hid ten releases).
+- **Paths after 0.19.0:** the patch table below still names the 0.9.1 files. Where they moved:
+  `export.rs` → `export/params.rs`; `menus.rs` → `menus/files.rs`; `panels/dialogs.rs` →
+  `dialogs.rs` (`export_apple_photos_rows`); `panels/right.rs` → `panels/right/{crop,history}.rs`;
+  `panels/edit.rs` → `panels/edit/{curve,grading}.rs`; `panels/detail.rs` → `panels/detail.rs`
+  (targeted) + `panels/detail/{crop,masks,retouch,filmstrip}.rs`; `widgets.rs` `stars` →
+  `widgets/rating.rs`; `text_field.rs` → `widgets/text_field.rs`; `tests_curve.rs` → our own
+  `tests/ipad.rs`. Every patch carries a `RawPad` comment: `grep -rn RawPad crates/`.
 - **Merge policy:** merge each upstream release tag, at most once a week (decided 2026-10-18). To
   merge:
   1. `git remote add upstream https://github.com/storytold/lightcraft` (once).
@@ -64,3 +74,4 @@
 | Date | Upstream | Conflicts | Notes |
 |---|---|---|---|
 | 2026-10-18 | 0.9.1 (`4f0b110`) | n/a | Fork point |
+| 2026-11-08 (branch) | 0.19.0 (`16636c45`) | 21 files: 9 workflows deleted, CLAUDE.md, ATTRIBUTION, .gitignore, 13 patched UI/engine files (upstream taken, patches re-applied) | No common history: explicit base v0.9.1 (DECISIONS 83); egui 0.37 fork |
