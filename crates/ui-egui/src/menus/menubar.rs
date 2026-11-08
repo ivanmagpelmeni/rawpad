@@ -371,6 +371,8 @@ fn host_supports(app: &LightcraftApp, id: &str) -> bool {
         "album.removePhotos" => in_normal_album(app) && !selection_deleted(app),
         // only where the trash is on screen
         "library.emptyRecentlyDeleted" => app.session.source == lightcraft_engine::LibrarySource::RecentlyDeleted,
+        // RawPad: the iPad app updates through SideStore; craft-update would offer desktop downloads
+        "app.checkForUpdates" => !cfg!(target_os = "ios"),
         _ => true,
     }
 }

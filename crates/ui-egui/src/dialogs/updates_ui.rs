@@ -66,6 +66,10 @@ pub(crate) fn blocks_input(app: &LightcraftApp) -> bool {
 }
 
 pub(crate) fn check(app: &mut LightcraftApp) -> Result<Value, String> {
+    // RawPad: updates come through SideStore, not craft-update's desktop downloads
+    if cfg!(target_os = "ios") {
+        return Err("RawPad updates through SideStore: open SideStore and refresh RawPad.".into());
+    }
     #[cfg(not(target_arch = "wasm32"))]
     {
         app.updates_rt.check_requested = true;
