@@ -20,21 +20,26 @@ end. The next session reads it **first**.
     push after `app.ui` was gone when the click was resolved. 0981ebed: the host registers the
     button with `widgets::register_response` (needs `Shown.id`; `ios.rs`, `share_offer.rs`).
   - **Branch run 102** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42517809756) on
-    0981ebed: fmt, both unit-test steps, simulator build and clippy **green**; the tour was
-    still running when this session ended (it ran > 10 minutes, longer than run 99's, which
-    suggests the taps now go through). Its report lands in `runs/102/` on `ci-artifacts`.
+    0981ebed: fmt, both unit-test steps, simulator build and clippy **green**; tour **18 ERR**
+    (was 24). The Welcome window is gone, and Select Several, the slider name menu and the Share
+    button pass now. **Left: only the bottom-bar buttons** (`icon:beforeAfterModes`,
+    `icon:beforeAfter`, `icon:ratingMenu`, `icon:labelMenu`: "is no longer visible before its
+    press", and the items of their menus as a consequence). `runs/102/08-before-after-menu.jpg`
+    shows the hover tooltip "Before/After views" over the chevron, so the pointer gets there;
+    the press-time check refuses it.
 - **Very next step:**
-  1. Read run 102's result and `runs/102/tour.log` (`grep -n ERR`), then look at the 08-*, 10-*,
-     11-* and 05-share-offer / 06-share-sheet screenshots.
-  2. If 0 ERR and the shots look right: merge into main **at the start of a session**
-     (`git checkout main; git merge --ff-only origin/main; git merge --no-ff
-     origin/upstream-0.19.0`), push, watch the main run to the end (about 40 minutes with the
-     release). Then tell Ivan in PROGRESS (Needs Ivan) that the next SideStore update is the big
-     upstream 0.19 one.
-  3. If taps still fail: the press-time check is `control::widget_target_visible`
-     (`crates/ui-egui/src/control.rs` ~309): a target needs a registered egui hit (`register`
-     or `register_response`) on the top layer at the point. Fix, push, trigger `ipad.yml` on
-     the branch with `{"release": false}`, repeat.
+  1. Find why `control::widget_target_visible` (`crates/ui-egui/src/control.rs` ~309) refuses
+     the bottom-bar buttons: `ctx.layer_id_at(at)` must be the button's layer. Suspects: the
+     right panel (it reaches the screen bottom under the bar in the shot: "Blacks" shows below
+     the bar) or the iPad bottom bar's child `Ui` in another layer than its widgets' hit; a
+     tooltip layer (egui shows one on hover) at the point. Write a `tests::ipad` unit test that
+     `ui.clickWidget`s `icon:beforeAfter` in Detail (the module has helpers; DECISIONS 84) so
+     CI's unit step shows it before the tour. Check how upstream's own bottom-bar buttons pass
+     in upstream tests (`grep -rn clickWidget crates/ui-egui/src/tests/ | grep icon:`).
+  2. Push, trigger `ipad.yml` on the branch with `{"release": false}`, repeat until 0 tour ERR.
+  3. Then merge into main **at the start of a session** (`git checkout main; git merge
+     --ff-only origin/main; git merge --no-ff origin/upstream-0.19.0`), push, watch the main
+     run to the end (about 40 minutes with the release).
 - **Open problems:**
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
     ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
