@@ -19,6 +19,15 @@
       "screenshots": [],
       "versions": [
         {
+          "version": "1.112",
+          "buildVersion": "112",
+          "date": "2026-11-09T02:31:17Z",
+          "localizedDescription": "RawPad 1.112 (build 112, 536a3e7): P1: merge p1-gpu-check (GPU-against-CPU export comparison is a hard tour check; branch run 110 green, max diff 1/255)",
+          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.112/RawPad.ipa",
+          "size": 23704517,
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "1.109",
           "buildVersion": "109",
           "date": "2026-11-09T00:56:23Z",
@@ -98,15 +107,6 @@
           "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.81/RawPad.ipa",
           "size": 19862184,
           "minOSVersion": "17.0"
-        },
-        {
-          "version": "1.79",
-          "buildVersion": "79",
-          "date": "2026-11-01T20:17:33Z",
-          "localizedDescription": "RawPad 1.79 (build 79, 27da14b): P6: handoff after merging p4-raw24 (run 75 memory numbers)",
-          "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.79/RawPad.ipa",
-          "size": 19858891,
-          "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
@@ -115,11 +115,11 @@
           "NSPhotoLibraryAddUsageDescription": "RawPad adds the photos you export to your library when you tick Add to Apple Photos."
         }
       },
-      "version": "1.109",
-      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.109/RawPad.ipa",
-      "size": 23704516,
-      "versionDate": "2026-11-09T00:56:23Z",
-      "versionDescription": "RawPad 1.109 (build 109, df09e15): P1: handoff and progress after the 2026-11-09 00:54 session (docs only; p7-effect-select on main, p1-gpu-check on its branch)"
+      "version": "1.112",
+      "downloadURL": "https://github.com/Ivanmagpelmeni/rawpad/releases/download/v1.112/RawPad.ipa",
+      "size": 23704517,
+      "versionDate": "2026-11-09T02:31:17Z",
+      "versionDescription": "RawPad 1.112 (build 112, 536a3e7): P1: merge p1-gpu-check (GPU-against-CPU export comparison is a hard tour check; branch run 110 green, max diff 1/255)"
     }
   ],
   "news": []
