@@ -626,3 +626,24 @@ morning session, which had taken 45 and 46.
     *Add to Selection* / *Remove from Selection* (`effectMenu:toggle:<name>`); a tap still
     selects just that row, and a group heading still selects the group. No new mode or strip
     (unlike the grid's Select Several, 58): the window is small and rarely used.
+
+## 2026-11-09: GPU against CPU in the tour (scheduled session, 00:54 Berlin)
+
+92. **2026-11-09: The tour compares a Metal export with a CPU export of the same photo** (Phase 1's
+    open "pixel comparison against the CPU reference"). It exports photo 1 as a 1200 px PNG with
+    GPU rendering on, again with `app.gpu {"enabled": false}`, turns the GPU back on, and
+    `compareImages` in `ios/sim_test.py` (a pure-Python PNG reader: the CI Mac has no imaging
+    library) reports the mean and the 99.9th-percentile difference per sample (0–255). Limits
+    to start: mean ≤ 2, 99.9 % ≤ 24. **Soft** until a run shows the real numbers and that the
+    first export didn't fall back to the CPU (run 105's full-size 6000×4000 export did: it needs
+    275 MiB of buffers, over the simulator's 256 MiB limit, hence the small export).
+
+93. **2026-11-09: The GPU-against-CPU check is now hard** (scheduled session, 01:54 Berlin). Run
+    108 saw mean 0.000, 99.9 % 0, max 1 (of 255); the GPU export had no `gpuFallback` and its
+    PNG differed from the CPU one by a few bytes, so Metal really ran. New limits: mean ≤ 0.5,
+    99.9 % ≤ 4 (room for rounding, tight enough to catch a wrong stage). Two generic reply
+    checks in `ios/sim_test.py` make sure the comparison isn't CPU against CPU:
+    `expectEquals {"result.available": true}` on `app.gpu`, and
+    `expectAbsent ["result.files.0.gpuFallback"]` on the GPU export. Both fail the tour.
+    Only the simulator's Metal is checked; a real iPad's GPU is the same code, but if Ivan ever
+    sees colours differ between the photo on screen and an export, this is where to look.

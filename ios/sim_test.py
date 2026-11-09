@@ -11,6 +11,7 @@ import socket
 import subprocess
 import sys
 import time
+import zlib
 
 BUNDLE = "io.github.ivanmagpelmeni.rawpad"
 # the app's log, written by simctl launch: app-stderr.log, then app-stderr-2.log after a relaunch
@@ -93,6 +94,76 @@ def relaunch(out_dir, port, n):
     )
     print(f"relaunch: terminate left the app {'gone' if gone else 'RUNNING'}; launch rc={r.returncode} {r.stdout.strip()[:120]} {r.stderr.strip()[:200]}")
     return gone, name
+
+
+def read_png(path):
+    """(width, height, channels, rows) of an 8- or 16-bit RGB/RGBA PNG, rows as lists of 8-bit
+    values (16-bit samples keep their high byte). Pure Python: the CI Mac has no imaging library."""
+    with open(path, "rb") as f:
+        data = f.read()
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise ValueError("not a PNG")
+    pos, idat, width = 8, [], None
+    while pos + 8 <= len(data):
+        n = int.from_bytes(data[pos:pos + 4], "big")
+        kind = data[pos + 4:pos + 8]
+        body = data[pos + 8:pos + 8 + n]
+        pos += 12 + n
+        if kind == b"IHDR":
+            width, height = int.from_bytes(body[0:4], "big"), int.from_bytes(body[4:8], "big")
+            depth, color, interlace = body[8], body[9], body[12]
+        elif kind == b"IDAT":
+            idat.append(body)
+        elif kind == b"IEND":
+            break
+    if width is None or depth not in (8, 16) or color not in (2, 6) or interlace:
+        raise ValueError("only non-interlaced 8/16-bit RGB(A) PNGs")
+    channels = 3 if color == 2 else 4
+    bpp = channels * depth // 8
+    stride = width * bpp
+    raw = zlib.decompress(b"".join(idat))
+    prev, rows = bytearray(stride), []
+    for y in range(height):
+        start = y * (stride + 1)
+        ftype, line = raw[start], bytearray(raw[start + 1:start + 1 + stride])
+        for i in range(stride):
+            a = line[i - bpp] if i >= bpp else 0
+            b = prev[i]
+            if ftype == 1:
+                line[i] = (line[i] + a) & 255
+            elif ftype == 2:
+                line[i] = (line[i] + b) & 255
+            elif ftype == 3:
+                line[i] = (line[i] + ((a + b) >> 1)) & 255
+            elif ftype == 4:
+                c = prev[i - bpp] if i >= bpp else 0
+                pa, pb, pc = abs(b - c), abs(a - c), abs(a + b - 2 * c)
+                line[i] = (line[i] + (a if pa <= pb and pa <= pc else (b if pb <= pc else c))) & 255
+        rows.append(line if depth == 8 else line[0::2])
+        prev = line
+    return width, height, channels, rows
+
+
+def compare_images(a, b):
+    """Mean and 99.9th-percentile absolute difference (0..255) over the RGB samples of two PNGs."""
+    wa, ha, ca, ra = read_png(a)
+    wb, hb, cb, rb = read_png(b)
+    if (wa, ha) != (wb, hb):
+        raise ValueError(f"sizes differ: {wa}x{ha} vs {wb}x{hb}")
+    hist = [0] * 256
+    for la, lb in zip(ra, rb):
+        for x in range(wa):
+            for k in range(3):
+                hist[abs(la[x * ca + k] - lb[x * cb + k])] += 1
+    total = sum(hist)
+    mean = sum(d * n for d, n in enumerate(hist)) / max(total, 1)
+    seen, p999 = 0, 0
+    for d, n in enumerate(hist):
+        seen += n
+        if seen >= total * 0.999:
+            p999 = d
+            break
+    return mean, p999, max(d for d, n in enumerate(hist) if n) if total else 0
 
 
 def substitute(value, names):
@@ -334,6 +405,21 @@ def main():
                     log.write(json.dumps({"request": {"method": "ui.clickWidget", "params": params}, "reply": r}) + "\n")
                     time.sleep(step.get("pause", 1))
                 continue
+            if "compareImages" in step:
+                # {"compareImages": ["$a", "$b"], "maxMean": 2.0, "maxP999": 24}: two exported PNGs
+                # must look the same (the GPU render against the CPU reference, DECISIONS 92)
+                a, b = substitute(step["compareImages"], names)
+                what = f"compareImages {os.path.basename(str(a))} vs {os.path.basename(str(b))}"
+                try:
+                    mean, p999, peak = compare_images(a, b)
+                    good = mean <= step.get("maxMean", 2.0) and p999 <= step.get("maxP999", 24)
+                    detail = f"mean {mean:.3f}, 99.9% {p999}, max {peak} (of 255)"
+                except (OSError, ValueError, zlib.error, TypeError) as e:
+                    good, detail = False, f"could not compare: {e}"
+                print(f"{'ok ' if good else ('WARN' if step.get('soft') else 'ERR')} {what}: {detail}")
+                if not good:
+                    (warnings if step.get("soft") else failures).append(f"{what}: {detail}")
+                continue
             if "shot" in step:
                 path = f"{out_dir}/{step['shot']}.png"
                 subprocess.run(["xcrun", "simctl", "io", "booted", "screenshot", path], check=True)
@@ -351,6 +437,20 @@ def main():
                 print(f"    captured {name} = {json.dumps(names[name])[:80]}")
                 if names[name] is None:
                     failures.append(f"{step['method']}: nothing at {path} to capture as {name}: {json.dumps(reply)[:300]}")
+            for path, want_value in step.get("expectEquals", {}).items():
+                # {"expectEquals": {"result.available": true}}: a field of the reply must be this
+                got_value = dig(reply, path) if ok else None
+                if got_value != want_value:
+                    msg = f"{step['method']}: {path} is {json.dumps(got_value)[:200]}, expected {json.dumps(want_value)}"
+                    print(f"ERR {msg}")
+                    (warnings if step.get("soft") else failures).append(msg)
+            for path in step.get("expectAbsent", []):
+                # {"expectAbsent": ["result.files.0.gpuFallback"]}: the reply must not have it
+                # (the GPU export really ran on the GPU, DECISIONS 92)
+                if ok and dig(reply, path) is not None:
+                    msg = f"{step['method']}: {path} should be absent: {json.dumps(dig(reply, path))[:200]}"
+                    print(f"ERR {msg}")
+                    (warnings if step.get("soft") else failures).append(msg)
             if step.get("expectOk") and not ok:
                 failures.append(f"{step['method']} {json.dumps(step.get('params', {}))[:120]} failed: {json.dumps(reply)[:300]}")
             want = step.get("expectPhotosAtLeast")
