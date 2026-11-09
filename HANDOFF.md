@@ -3,35 +3,36 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-09, about 02:35 Berlin, by the scheduled session (01:54–02:40 Berlin).
+- **Written:** 2026-11-09, about 03:30 Berlin, by the scheduled session (02:54–03:40 Berlin,
+  the last run of the night).
 - **Upstream:** **v0.19.0** (2026-11-06) is still the newest.
-- **Main:** unchanged code since 28048beb (merge of `p7-effect-select`). **Main run 109**
-  (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42538830192): success,
-  `runs/109/tour.log` 0 ERR/FAIL, `08-split.jpg` looked at (split before/after fine),
-  **release v1.109** out. Only docs pushed to main this session.
+- **Main:** **`p1-gpu-check` merged** (536a3e7e: the GPU-against-CPU export comparison is a
+  hard tour check, DECISIONS 93). **Main run 112**
+  (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42548144345): **success**, **release
+  v1.112** out (SideStore source a77ee959). Report: `runs/112/` on `ci-artifacts` (not published yet at handoff).
 - **Done this session:**
-  - Run 108's GPU check read: GPU export had **no** `gpuFallback`, its PNG differed from the
-    CPU one by a few bytes (so Metal really ran), `compareImages`: mean 0.000, 99.9 % 0, max 1.
-  - **`p1-gpu-check`** (4a99796e): the check is hard, limits mean ≤ 0.5 / 99.9 % ≤ 4, plus two
-    new generic step keys in `ios/sim_test.py`: `expectEquals {"result.available": true}` on
-    `app.gpu` and `expectAbsent ["result.files.0.gpuFallback"]` on the GPU export (DECISIONS 93).
-    **Branch run 110** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42542856854):
-    the tour step **passed** (so the hard check passed); the device build was still going at
-    handoff. Report: `runs/110/`.
-  - **New branch `p7-drop-sysmem`** (from main): removes `lightcraft-sysmem` from
-    `apps/rawpad-ios/Cargo.toml` (DECISIONS 94; the committed Cargo.lock has no `rawpad-ios`
-    entry at all, CI adds it each build, so no lock edit is needed). **Branch run 111**
-    (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42542925912): unit tests, iOS build
-    and clippy green; the tour was still running at handoff.
+  - Branch run 110 (`p1-gpu-check`) read: 0 ERR, `compareImages … mean 0.000, 99.9% 0, max 1`.
+  - Branch run 111 (`p7-drop-sysmem`) **failed only in the tour**: the share sheet froze the
+    app's frames, so the crash-safety steps after it were refused ("the app drew no frame for
+    5 s"), same as runs 48/49. Not caused by the branch. Re-ran it: **branch run 113**
+    (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42548152481): tour **passed**.
+  - **New branch `p1-share-last`** (0c835c15, DECISIONS 95): the tour's background export,
+    Share button, share sheet and soft Add to Photos step move to the very end, so that freeze
+    can't fail later hard steps. **Branch run 114**
+    (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42548286494): tour **passed**.
 - **Very next step:**
-  1. Check runs 110 and 111 finished green; `runs/110/tour.log`: `grep compareImages` (expect
-     `ok … max 1`), no ERR; `runs/111/tour.log` no ERR.
-  2. Merge `p1-gpu-check` into main (`git merge --no-ff origin/p1-gpu-check`; DECISIONS.md and
-     docs conflict: keep main's HANDOFF/PROGRESS, keep entry 93). Push, wait for that main run
-     (~40 min, release), then merge `p7-drop-sysmem` (DECISIONS conflict: keep 93 and 94, in
-     order). Don't push code to main while a main run is going.
-  3. Then PROGRESS › Next 3 tasks › 2 (measure before tiling).
+  1. Read `runs/112/tour.log` (0 ERR expected; run 112 was green) and look at `08-split.jpg`.
+  2. Check runs 113 and 114 finished (device build) green; `runs/113/` and `runs/114/` tour
+     logs: no ERR. In `runs/114/`, `05-share-offer.jpg` and `06-share-sheet.jpg` should still
+     show the Share button and the sheet (now taken in the square grid after the relaunch).
+  3. Merge `p7-drop-sysmem` into main (`git merge --no-ff origin/p7-drop-sysmem`; DECISIONS.md
+     conflict: keep 93, then 94). Push, wait for the main run (~40 min). Then merge
+     `p1-share-last` (DECISIONS: keep 94, then 95). Never push code while a main run is going.
+  4. Then PROGRESS › Next 3 tasks (tiling: measure first; craft-fonts).
 - **Open problems:**
+  - The share sheet sometimes stops the app drawing frames in the simulator (runs 48, 49,
+    111). Worked around in the tour (`p1-share-last`); on the iPad it shouldn't matter (RawPad
+    redraws when the sheet closes), but if Ivan says the screen freezes after sharing, look here.
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
     ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
   - A full-size 6000×4000 render needs 275 MiB of GPU buffers, over the simulator's 256 MiB
@@ -51,7 +52,7 @@ end. The next session reads it **first**.
     `p4-select-several`, `p4-select-bar`, `p4-select-sync`, `p4-reset-menu`, `p4-sync-test`,
     `p4-preset-preview`, `p4-snapshot-preview`, `p4-film-select`, `p4-keyboard-check`,
     `p4-rotate`, `p4-raw24`, `p6-memtrim`, `p6-relaunch`, `p6-hard-checks`, `p6-preview-cap`,
-    `p6-gpu-pool`, `p7-stroke-start`, `p7-effect-select`.
+    `p6-gpu-pool`, `p7-stroke-start`, `p7-effect-select`, `p1-gpu-check`.
   - The artifact zip URL (blob.core.windows.net) is blocked from the sandbox: use `ci-artifacts`.
   - Landscape `simctl` screenshots look turned sideways (portrait framebuffer).
   - `ci-artifacts` `LATEST` can name a cancelled run: list `runs/` and pick the folder yourself.

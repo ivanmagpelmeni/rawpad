@@ -67,6 +67,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-09 (02:54–03:40 Berlin, unattended, last run of the night)**
+1. Branch run 110 clean, so **`p1-gpu-check` is merged into main**: a Metal export must match a CPU export (max diff 1 of 255 seen). Main run 112 green: **release 1.112**.
+2. Branch run 111 (`p7-drop-sysmem`) failed only because the share sheet froze the simulator's frames; re-run 113 passed its tour.
+3. New branch `p1-share-last` moves the share sheet to the end of the tour so that freeze can't fail later checks (DECISIONS 95); branch run 114 passed its tour.
+4. Next: merge `p7-drop-sysmem`, then `p1-share-last` (one main run each). See HANDOFF.md.
+5. Upstream still at 0.19.0. **Ivan: update to 1.112 and try the "This week" list.**
+
 **2026-11-09 (01:54–02:40 Berlin, unattended)**
 1. Main run 109 green (0 tour ERR; split view on the screenshot): **release 1.109** (long-press on a Manage Effect Presets row).
 2. Run 108's GPU-against-CPU numbers: mean 0.000, max 1 of 255, and the export really ran on Metal. Branch `p1-gpu-check` makes it a hard check with tighter limits and two new reply checks (DECISIONS 93); branch run 110.
@@ -356,7 +363,7 @@ Classic setup steps and source fix.
 
 - [x] **0. Kickoff:** brief, public fork, docs, CI, SideStore steps (`SETUP.md`)
 - [x] **1. Engine compiles for iOS** (sim + device) in CI. Pixel comparison of a Metal export against
-      the CPU reference in the tour (run 108: max diff 1/255; hard on branch `p1-gpu-check`, DECISIONS 92, 93)
+      the CPU reference in the tour (run 108: max diff 1/255; a hard check on main since 2026-11-09, DECISIONS 92, 93)
 - [x] **2. App shell** launches on the iPad simulator with the LightCraft UI on Metal and the demo
       library; CI screenshots
 - [ ] **3. First install on Ivan's iPad via SideStore**: release 1.8 is ready, waiting for Ivan
@@ -385,9 +392,9 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main: upstream LightCraft v0.19.0 (merged 2026-11-08) plus the long-press reset menus
-(release 1.107) and the effect-preset long-press (merged 2026-11-09, main run 109). Branch
-`p1-gpu-check` (DECISIONS 92): GPU vs CPU export comparison in the tour; branch run 108.
+Main: upstream LightCraft v0.19.0 (merged 2026-11-08) plus the long-press menus and the hard
+GPU-against-CPU export check (merged 2026-11-09, main run 112, release 1.112). Branches waiting
+to merge: `p7-drop-sysmem` (DECISIONS 94, run 113) and `p1-share-last` (DECISIONS 95, run 114).
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -396,9 +403,9 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Merge the two branches** if their runs are clean and no main run is going (one at a time,
-   each needs a main run of ~40 minutes): `p1-gpu-check` (run 110, `compareImages` hard),
-   `p7-drop-sysmem` (run 111). DECISIONS.md conflicts are just both new entries: keep both.
+1. **Merge the two branches**, one at a time, each with its own main run (~40 minutes):
+   `p7-drop-sysmem` (run 113), then `p1-share-last` (run 114). DECISIONS.md conflicts are just
+   new entries: keep 93, 94, 95 in order.
 2. **Phase 6, tiling:** the last open Phase 6 item. First measure: does a full-size export or
    a zoomed raw ever fail on the iPad? (`lastFallback` says the simulator's Metal can't take a
    6000×4000 render in one piece; the CPU takes over, so it's slower, not broken.) Decide
@@ -415,7 +422,7 @@ Also queued:
 ### This week: what to test on the iPad (start here)
 
 First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
-**My Apps** › **Update** next to RawPad (pick the newest: 1.109 or later; it brings ten upstream LightCraft releases at once, up to 0.19.0). Then try
+**My Apps** › **Update** next to RawPad (pick the newest: 1.112 or later; it brings ten upstream LightCraft releases at once, up to 0.19.0). Then try
 these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
 
 1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several
