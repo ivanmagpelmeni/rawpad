@@ -571,6 +571,27 @@ pub fn manage_body(
                     if r.double_clicked() {
                         *rename = Some((e.name.clone(), e.name.clone()));
                     }
+                    // RawPad (iPad): picking several presets needs ⌘ or Shift, which a finger
+                    // doesn't have; a long-press on a row adds it to the selection or takes it out
+                    // (`effectMenu:toggle:<name>`, DECISIONS.md 91); the unit tests see it too
+                    if cfg!(target_os = "ios") || cfg!(test) {
+                        let mut toggle = false;
+                        crate::widgets::context_menu(&r, |ui| {
+                            let b = ui.button(crate::i18n::tr(if sel { "Remove from Selection" } else { "Add to Selection" }));
+                            register(ui, format!("effectMenu:toggle:{}", e.name), b.rect);
+                            if b.clicked() {
+                                toggle = true;
+                                ui.close();
+                            }
+                        });
+                        if toggle {
+                            if sel {
+                                selected.retain(|n| n != &e.name);
+                            } else {
+                                selected.push(e.name.clone());
+                            }
+                        }
+                    }
                     let mut info = summary(e);
                     if !e.extra.is_empty() {
                         info += &crate::i18n::tr_format!(" · kept, not applied: {}", e.extra.keys().cloned().collect::<Vec<_>>().join(", "));
