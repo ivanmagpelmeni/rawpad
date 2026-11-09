@@ -626,3 +626,11 @@ morning session, which had taken 45 and 46.
     *Add to Selection* / *Remove from Selection* (`effectMenu:toggle:<name>`); a tap still
     selects just that row, and a group heading still selects the group. No new mode or strip
     (unlike the grid's Select Several, 58): the window is small and rarely used.
+
+94. **2026-11-09: `lightcraft-sysmem` is dropped from `apps/rawpad-ios/Cargo.toml`** (scheduled
+    session, 01:54 Berlin). Nothing on iOS uses it since DECISIONS 77 (our own
+    `native::release_free_memory`); neither shared desktop file (`control_server.rs`,
+    `logging.rs`) mentions it. The earlier worry that Cargo.lock can't be regenerated here was
+    wrong: the committed Cargo.lock has no `rawpad-ios` entry at all (CI adds it on every build,
+    without `--locked`), and `lightcraft-sysmem` stays in it for the desktop app, so the lock
+    needs no edit.
