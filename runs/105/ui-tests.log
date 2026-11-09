@@ -1,0 +1,346 @@
+[1m[33mwarning[0m: patch `egui_demo_lib v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[33mwarning[0m: patch `egui_inspection v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[33mwarning[0m: patch `egui_system_font_provider v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[96mhelp[0m: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+[1m[92m Downloading[0m crates ...
+[1m[92m  Downloaded[0m byteorder v1.5.0
+[1m[92m  Downloaded[0m block2 v0.5.1
+[1m[92m  Downloaded[0m cobs v0.3.0
+[1m[92m  Downloaded[0m bytes v1.12.1
+[1m[92m  Downloaded[0m bitflags v1.3.2
+[1m[92m  Downloaded[0m accesskit_consumer v0.39.1
+[1m[92m  Downloaded[0m base64 v0.23.1
+[1m[92m  Downloaded[0m colored v2.2.0
+[1m[92m  Downloaded[0m cursor-icon v1.2.0
+[1m[92m  Downloaded[0m coe-rs v0.1.2
+[1m[92m  Downloaded[0m core-foundation v0.10.1
+[1m[92m  Downloaded[0m core-foundation v0.9.4
+[1m[92m  Downloaded[0m core-foundation-sys v0.8.7
+[1m[92m  Downloaded[0m core-graphics v0.23.2
+[1m[92m  Downloaded[0m core-graphics-types v0.1.3
+[1m[92m  Downloaded[0m deranged v0.5.9
+[1m[92m  Downloaded[0m dify v0.8.0
+[1m[92m  Downloaded[0m dispatch v0.2.0
+[1m[92m  Downloaded[0m displaydoc v0.2.7
+[1m[92m  Downloaded[0m dyn-stack v0.10.0
+[1m[92m  Downloaded[0m dpi v0.1.2
+[1m[92m  Downloaded[0m enum-as-inner v0.6.1
+[1m[92m  Downloaded[0m equator-macro v0.1.9
+[1m[92m  Downloaded[0m enum-map v3.1.0
+[1m[92m  Downloaded[0m enum-map-derive v1.0.1
+[1m[92m  Downloaded[0m filetime v0.2.29
+[1m[92m  Downloaded[0m equator v0.1.10
+[1m[92m  Downloaded[0m foreign-types v0.5.0
+[1m[92m  Downloaded[0m faer-entity v0.17.0
+[1m[92m  Downloaded[0m fastrand v2.5.0
+[1m[92m  Downloaded[0m fixed_decimal v0.7.3
+[1m[92m  Downloaded[0m foreign-types-shared v0.3.1
+[1m[92m  Downloaded[0m foreign-types-macros v0.2.4
+[1m[92m  Downloaded[0m faer-core v0.17.1
+[1m[92m  Downloaded[0m gemm-c32 v0.17.1
+[1m[92m  Downloaded[0m getopts v0.2.24
+[1m[92m  Downloaded[0m getrandom v0.4.3
+[1m[92m  Downloaded[0m glow v0.17.0
+[1m[92m  Downloaded[0m gemm-f32 v0.17.1
+[1m[92m  Downloaded[0m gemm-c64 v0.17.1
+[1m[92m  Downloaded[0m gemm-f64 v0.17.1
+[1m[92m  Downloaded[0m gemm v0.17.1
+[1m[92m  Downloaded[0m getrandom v0.3.4
+[1m[92m  Downloaded[0m gemm-common v0.17.1
+[1m[92m  Downloaded[0m gemm-f16 v0.17.1
+[1m[92m  Downloaded[0m dlib v0.5.3
+[1m[92m  Downloaded[0m heck v0.5.0
+[1m[92m  Downloaded[0m http v1.5.0
+[1m[92m  Downloaded[0m icu_normalizer_data v2.3.0
+[1m[92m  Downloaded[0m icu_decimal v2.3.0
+[1m[92m  Downloaded[0m icu_provider v2.3.1
+[1m[92m  Downloaded[0m icu_provider_adapters v2.3.0
+[1m[92m  Downloaded[0m icu_plurals v2.3.0
+[1m[92m  Downloaded[0m icu_properties_data v2.3.0
+[1m[92m  Downloaded[0m httparse v1.10.1
+[1m[92m  Downloaded[0m icu_locale_fallback_data v2.3.0
+[1m[92m  Downloaded[0m icu_properties v2.3.0
+[1m[92m  Downloaded[0m icu_collections v2.3.0
+[1m[92m  Downloaded[0m icu_locale_fallback v2.3.0
+[1m[92m  Downloaded[0m icu_provider_blob v2.3.0
+[1m[92m  Downloaded[0m icu_locale_core v2.3.0
+[1m[92m  Downloaded[0m icu_normalizer v2.3.0
+[1m[92m  Downloaded[0m icu_pattern v0.5.0
+[1m[92m  Downloaded[0m khronos-egl v6.0.0
+[1m[92m  Downloaded[0m kittest v0.5.0
+[1m[92m  Downloaded[0m litemap v0.8.3
+[1m[92m  Downloaded[0m matrixcompare-core v0.1.0
+[1m[92m  Downloaded[0m num-conv v0.2.2
+[1m[92m  Downloaded[0m objc-sys v0.3.5
+[1m[92m  Downloaded[0m objc2 v0.5.2
+[1m[92m  Downloaded[0m objc2-core-image v0.2.2
+[1m[92m  Downloaded[0m objc2-quartz-core v0.2.2
+[1m[92m  Downloaded[0m objc2-core-data v0.2.2
+[1m[92m  Downloaded[0m objc2-metal v0.2.2
+[1m[92m  Downloaded[0m objc2-app-kit v0.2.2
+[1m[92m  Downloaded[0m objc2-foundation v0.2.2
+[1m[92m  Downloaded[0m objc2-app-kit v0.3.2
+[1m[92m  Downloaded[0m open v5.4.4
+[1m[92m  Downloaded[0m percent-encoding v2.3.2
+[1m[92m  Downloaded[0m postcard v1.1.3
+[1m[92m  Downloaded[0m powerfmt v0.2.1
+[1m[92m  Downloaded[0m pkg-config v0.3.34
+[1m[92m  Downloaded[0m potential_utf v0.1.6
+[1m[92m  Downloaded[0m plist v1.10.3
+[1m[92m  Downloaded[0m pulp v0.18.22
+[1m[92m  Downloaded[0m reborrow v0.5.5
+[1m[92m  Downloaded[0m quick-xml v0.42.0
+[1m[92m  Downloaded[0m raw-cpuid v10.7.0
+[1m[92m  Downloaded[0m rustc-hash v2.1.3
+[1m[92m  Downloaded[0m rustls-platform-verifier v0.7.1
+[1m[92m  Downloaded[0m seq-macro v0.3.6
+[1m[92m  Downloaded[0m security-framework v3.7.0
+[1m[92m  Downloaded[0m security-framework-sys v2.17.0
+[1m[92m  Downloaded[0m serde_spanned v1.1.1
+[1m[92m  Downloaded[0m smol_str v0.2.2
+[1m[92m  Downloaded[0m time-macros v0.2.32
+[1m[92m  Downloaded[0m tempfile v3.27.0
+[1m[92m  Downloaded[0m time-core v0.1.9
+[1m[92m  Downloaded[0m sys-locale v0.3.2
+[1m[92m  Downloaded[0m termcolor v1.4.1
+[1m[92m  Downloaded[0m thiserror v1.0.69
+[1m[92m  Downloaded[0m tinystr v0.8.4
+[1m[92m  Downloaded[0m synstructure v0.14.0
+[1m[92m  Downloaded[0m tar v0.4.46
+[1m[92m  Downloaded[0m time v0.3.55
+[1m[92m  Downloaded[0m thiserror-impl v1.0.69
+[1m[92m  Downloaded[0m utf16_iter v1.0.5
+[1m[92m  Downloaded[0m sysctl v0.5.5
+[1m[92m  Downloaded[0m wayland-sys v0.31.11
+[1m[92m  Downloaded[0m writeable v0.6.4
+[1m[92m  Downloaded[0m utf8_iter v1.0.4
+[1m[92m  Downloaded[0m type-map v0.5.1
+[1m[92m  Downloaded[0m toml_datetime v1.1.1+spec-1.1.0
+[1m[92m  Downloaded[0m yoke v0.8.3
+[1m[92m  Downloaded[0m zerotrie v0.2.5
+[1m[92m  Downloaded[0m toml v1.1.6+spec-1.1.0
+[1m[92m  Downloaded[0m toml_parser v1.1.3+spec-1.1.0
+[1m[92m  Downloaded[0m toml_writer v1.1.2+spec-1.1.0
+[1m[92m  Downloaded[0m utf8-zero v0.8.1
+[1m[92m  Downloaded[0m yoke-derive v0.8.4
+[1m[92m  Downloaded[0m zerofrom-derive v0.1.8
+[1m[92m  Downloaded[0m ureq v3.4.2
+[1m[92m  Downloaded[0m zerovec v0.11.8
+[1m[92m  Downloaded[0m winnow v1.0.4
+[1m[92m  Downloaded[0m write16 v1.0.0
+[1m[92m  Downloaded[0m zerovec-derive v0.11.7
+[1m[92m  Downloaded[0m zerofrom v0.1.8
+[1m[92m  Downloaded[0m ureq-proto v0.6.5
+[1m[92m   Compiling[0m syn v3.0.6
+[1m[92m   Compiling[0m serde_core v1.0.229
+[1m[92m   Compiling[0m serde v1.0.229
+[1m[92m   Compiling[0m stable_deref_trait v1.2.1
+[1m[92m   Compiling[0m objc2-foundation v0.3.2
+[1m[92m   Compiling[0m synstructure v0.14.0
+[1m[92m   Compiling[0m indexmap v2.14.2
+[1m[92m   Compiling[0m writeable v0.6.4
+[1m[92m   Compiling[0m find-msvc-tools v0.1.14
+[1m[92m   Compiling[0m reborrow v0.5.5
+[1m[92m   Compiling[0m thiserror v1.0.69
+[1m[92m   Compiling[0m shlex v2.0.1
+[1m[92m   Compiling[0m cc v1.5.1
+[1m[92m   Compiling[0m litemap v0.8.3
+[1m[92m   Compiling[0m thiserror-impl v1.0.69
+[1m[92m   Compiling[0m heck v0.5.0
+[1m[92m   Compiling[0m enum-as-inner v0.6.1
+[1m[92m   Compiling[0m bytemuck_derive v1.12.1
+[1m[92m   Compiling[0m thiserror-impl v2.0.21
+[1m[92m   Compiling[0m serde_derive v1.0.229
+[1m[92m   Compiling[0m bytemuck v1.25.2
+[1m[92m   Compiling[0m zerofrom-derive v0.1.8
+[1m[92m   Compiling[0m thiserror v2.0.21
+[1m[92m   Compiling[0m yoke-derive v0.8.4
+[1m[92m   Compiling[0m zerofrom v0.1.8
+[1m[92m   Compiling[0m zerovec-derive v0.11.7
+[1m[92m   Compiling[0m lightcraft-geom v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/geom)
+[1m[92m   Compiling[0m lightcraft-color v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/color)
+[1m[92m   Compiling[0m displaydoc v0.2.7
+[1m[92m   Compiling[0m yoke v0.8.3
+[1m[92m   Compiling[0m num-complex v0.4.6
+[1m[92m   Compiling[0m font-types v0.12.5
+[1m[92m   Compiling[0m lightcraft-raster v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/raster)
+[1m[92m   Compiling[0m zerovec v0.11.8
+[1m[92m   Compiling[0m pulp v0.18.22
+[1m[92m   Compiling[0m cobs v0.3.0
+[1m[92m   Compiling[0m naga-types v30.0.1
+[1m[92m   Compiling[0m color v0.3.3
+[1m[92m   Compiling[0m tinystr v0.8.4
+[1m[92m   Compiling[0m ring v0.17.14
+[1m[92m   Compiling[0m serde_json v1.0.154
+[1m[92m   Compiling[0m bitflags v1.3.2
+[1m[92m   Compiling[0m byteorder v1.5.0
+[1m[92m   Compiling[0m sysctl v0.5.5
+[1m[92m   Compiling[0m peniko v0.6.1
+[1m[92m   Compiling[0m raw-cpuid v10.7.0
+[1m[92m   Compiling[0m objc2-metal v0.3.2
+[1m[92m   Compiling[0m icu_locale_core v2.3.0
+[1m[92m   Compiling[0m zerotrie v0.2.5
+[1m[92m   Compiling[0m postcard v1.1.3
+[1m[92m   Compiling[0m read-fonts v0.41.0
+[1m[92m   Compiling[0m dyn-stack v0.10.0
+[1m[92m   Compiling[0m seq-macro v0.3.6
+[1m[92m   Compiling[0m wgpu-types v30.0.1
+[1m[92m   Compiling[0m gemm-common v0.17.1
+[1m[92m   Compiling[0m vello_common v0.2.0
+[1m[92m   Compiling[0m objc2-quartz-core v0.3.2
+[1m[92m   Compiling[0m naga v30.0.1
+[1m[92m   Compiling[0m icu_provider v2.3.1
+[1m[92m   Compiling[0m emath v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)
+[1m[92m   Compiling[0m unicode-bidi v0.3.18
+[1m[92m   Compiling[0m jxl-render v0.12.4
+[1m[92m   Compiling[0m wgpu-naga-bridge v30.0.1
+[1m[92m   Compiling[0m ecolor v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)
+[1m[92m   Compiling[0m harfrust v0.12.0
+[1m[92m   Compiling[0m skrifa v0.44.0
+[1m[92m   Compiling[0m raw-window-metal v1.1.0
+[1m[92m   Compiling[0m vello_cpu v0.2.0
+[1m[92m   Compiling[0m rustls v0.23.46
+[1m[92m   Compiling[0m epaint v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)
+[1m[92m   Compiling[0m wgpu-hal v30.0.1
+[1m[92m   Compiling[0m rustls-webpki v0.103.16
+[1m[92m   Compiling[0m jxl-oxide v0.12.6
+[1m[92m   Compiling[0m potential_utf v0.1.6
+[1m[92m   Compiling[0m lightcraft-tiff v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/tiff)
+[1m[92m   Compiling[0m wgpu-core v30.0.1
+[1m[92m   Compiling[0m as-slice v0.2.1
+[1m[92m   Compiling[0m winnow v1.0.4
+[1m[92m   Compiling[0m aligned v0.4.3
+[1m[92m   Compiling[0m lightcraft-meta v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/meta)
+[1m[92m   Compiling[0m image v0.25.10
+[1m[92m   Compiling[0m wgpu-core-deps-apple v30.0.1
+[1m[92m   Compiling[0m craft-crw v0.1.0 (https://github.com/storytold/craft-libs?rev=f3b62ec61f45534392376492fc5ad33047375205#f3b62ec6)
+[1m[92m   Compiling[0m wgpu v30.0.1
+[1m[92m   Compiling[0m icu_locale_fallback_data v2.3.0
+[1m[92m   Compiling[0m core-foundation-sys v0.8.7
+[1m[92m   Compiling[0m av-scenechange v0.14.1
+[1m[92m   Compiling[0m egui v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)
+[1m[92m   Compiling[0m lightcraft-raw v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/raw)
+[1m[92m   Compiling[0m gemm-f32 v0.17.1
+[1m[92m   Compiling[0m gemm-c32 v0.17.1
+[1m[92m   Compiling[0m gemm-f64 v0.17.1
+[1m[92m   Compiling[0m gemm-c64 v0.17.1
+[1m[92m   Compiling[0m lightcraft-develop v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/develop)
+[1m[92m   Compiling[0m equator-macro v0.1.9
+[1m[92m   Compiling[0m getrandom v0.4.3
+[1m[92m   Compiling[0m icu_properties_data v2.3.0
+[1m[92m   Compiling[0m coe-rs v0.1.2
+[1m[92m   Compiling[0m icu_normalizer_data v2.3.0
+[1m[92m   Compiling[0m utf8_iter v1.0.4
+[1m[92m   Compiling[0m httparse v1.10.1
+[1m[92m   Compiling[0m rav1e v0.8.1
+[1m[92m   Compiling[0m equator v0.1.10
+[1m[92m   Compiling[0m icu_collections v2.3.0
+[1m[92m   Compiling[0m faer-entity v0.17.0
+[1m[92m   Compiling[0m gemm v0.17.1
+[1m[92m   Compiling[0m security-framework-sys v2.17.0
+[1m[92m   Compiling[0m core-foundation v0.10.1
+[1m[92m   Compiling[0m fixed_decimal v0.7.3
+[1m[92m   Compiling[0m bytes v1.12.1
+[1m[92m   Compiling[0m matrixcompare-core v0.1.0
+[1m[92m   Compiling[0m base64 v0.23.1
+[1m[92m   Compiling[0m http v1.5.0
+[1m[92m   Compiling[0m ravif v0.13.0
+[1m[92m   Compiling[0m faer-core v0.17.1
+[1m[92m   Compiling[0m security-framework v3.7.0
+[1m[92m   Compiling[0m icu_locale_fallback v2.3.0
+[1m[92m   Compiling[0m ndarray v0.17.2
+[1m[92m   Compiling[0m toml_datetime v1.1.1+spec-1.1.0
+[1m[92m   Compiling[0m serde_spanned v1.1.1
+[1m[92m   Compiling[0m toml_parser v1.1.3+spec-1.1.0
+[1m[92m   Compiling[0m lightcraft-denoise-core v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/denoise-core)
+[1m[92m   Compiling[0m rustc-hash v2.1.3
+[1m[92m   Compiling[0m powerfmt v0.2.1
+[1m[92m   Compiling[0m fastrand v2.5.0
+[1m[92m   Compiling[0m deranged v0.5.9
+[1m[92m   Compiling[0m time-core v0.1.9
+[1m[92m   Compiling[0m utf16_iter v1.0.5
+[1m[92m   Compiling[0m num-conv v0.2.2
+[1m[92m   Compiling[0m toml_writer v1.1.2+spec-1.1.0
+[1m[92m   Compiling[0m memchr v2.8.3
+[1m[92m   Compiling[0m write16 v1.0.0
+[1m[92m   Compiling[0m getrandom v0.3.4
+[1m[92m   Compiling[0m icu_normalizer v2.3.0
+[1m[92m   Compiling[0m toml v1.1.6+spec-1.1.0
+[1m[92m   Compiling[0m time v0.3.55
+[1m[92m   Compiling[0m tempfile v3.27.0
+[1m[92m   Compiling[0m lightcraft-codecs v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/codecs)
+[1m[92m   Compiling[0m type-map v0.5.1
+[1m[92m   Compiling[0m lightcraft-pipeline v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/pipeline)
+[1m[92m   Compiling[0m rustls-rustcrypto v0.0.2-alpha
+[1m[92m   Compiling[0m lightcraft-faces v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/faces)
+[1m[92m   Compiling[0m lightcraft-denoise v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/denoise)
+[1m[92m   Compiling[0m ureq-proto v0.6.5
+[1m[92m   Compiling[0m icu_properties v2.3.0
+[1m[92m   Compiling[0m icu_provider_adapters v2.3.0
+[1m[92m   Compiling[0m rustls-platform-verifier v0.7.1
+[1m[92m   Compiling[0m icu_plurals v2.3.0
+[1m[92m   Compiling[0m icu_decimal v2.3.0
+[1m[92m   Compiling[0m colored v2.2.0
+[1m[92m   Compiling[0m accesskit_consumer v0.39.1
+[1m[92m   Compiling[0m icu_provider_blob v2.3.0
+[1m[92m   Compiling[0m lightcraft-scenes v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/scenes)
+[1m[92m   Compiling[0m read-fonts v0.43.3
+[1m[92m   Compiling[0m enum-map-derive v1.0.1
+[1m[92m   Compiling[0m getopts v0.2.24
+[1m[92m   Compiling[0m objc2-app-kit v0.3.2
+[1m[92m   Compiling[0m quick-xml v0.42.0
+[1m[92m   Compiling[0m filetime v0.2.29
+[1m[92m   Compiling[0m percent-encoding v2.3.2
+[1m[92m   Compiling[0m lightcraft-engine v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/engine)
+[1m[92m   Compiling[0m utf8-zero v0.8.1
+[1m[92m   Compiling[0m sys-locale v0.3.2
+[1m[92m   Compiling[0m craft-i18n v0.1.0 (https://github.com/storytold/craft-libs?rev=c5a1cbfb5f9049f9270955caffb5bee5997aebf7#c5a1cbfb)
+[1m[92m   Compiling[0m ureq v3.4.2
+[1m[33mwarning[0m: lightcraft-engine@0.19.0: no craft-fonts embedded: Chinese and Japanese text will render as empty boxes. Clone https://github.com/storytold/craft-fonts next to this repo and rebuild with CRAFT_FONTS_DIR=../craft-fonts
+[1m[92m   Compiling[0m lightcraft-preview v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/preview)
+[1m[92m   Compiling[0m tar v0.4.46
+[1m[92m   Compiling[0m plist v1.10.3
+[1m[92m   Compiling[0m harfrust v0.13.3
+[1m[92m   Compiling[0m dify v0.8.0
+[1m[92m   Compiling[0m enum-map v3.1.0
+[1m[92m   Compiling[0m lightcraft-merge v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/merge)
+[1m[92m   Compiling[0m lightcraft-fetch v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/fetch)
+[1m[92m   Compiling[0m kittest v0.5.0
+[1m[92m   Compiling[0m lightcraft-gpu v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/gpu)
+[1m[92m   Compiling[0m egui-wgpu v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)
+[1m[92m   Compiling[0m lightcraft-ui-egui v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/ui-egui)
+[1m[92m   Compiling[0m lightcraft-catalog v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/catalog)
+[1m[92m   Compiling[0m lightcraft-lensdb v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/lensdb)
+[1m[92m   Compiling[0m lightcraft-slideshow v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/slideshow)
+[1m[92m   Compiling[0m lightcraft-geocode v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/geocode)
+[1m[92m   Compiling[0m semver v1.0.28
+[1m[92m   Compiling[0m open v5.4.4
+[1m[92m   Compiling[0m craft-fonts-build v0.1.0 (https://github.com/storytold/craft-libs?rev=c5a1cbfb5f9049f9270955caffb5bee5997aebf7#c5a1cbfb)
+[1m[92m   Compiling[0m craft-ui v0.1.0 (https://github.com/storytold/craft-libs?rev=c5a1cbfb5f9049f9270955caffb5bee5997aebf7#c5a1cbfb)
+[1m[92m   Compiling[0m egui_kittest v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)
+[1m[92m   Compiling[0m craft-update v0.1.0 (https://github.com/storytold/craft-libs?rev=a231e517c3b371e1bf0ee8af71ed807424a9a05d#a231e517)
+[1m[92m   Compiling[0m egui_extras v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)
+[1m[92m   Compiling[0m craft-window v0.1.0 (https://github.com/storytold/craft-libs?rev=c5a1cbfb5f9049f9270955caffb5bee5997aebf7#c5a1cbfb)
+[1m[92m   Compiling[0m lightcraft-testkit v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/testkit)
+[1m[92m    Finished[0m `test` profile [optimized + debuginfo] target(s) in 7m 46s
+[1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/lightcraft_ui_egui-411a1ff461b96dd7)
+
+running 12 tests
+test tests::ipad::a_curve_channels_long_press_menu_resets_it ... ok
+test tests::ipad::a_colour_wheels_long_press_menu_resets_it ... ok
+test tests::ipad::a_narrow_bottom_bar_shows_the_compact_rating_pill ... ok
+test tests::ipad::a_history_steps_long_press_menu_previews_and_goes_back_to_it ... ok
+test tests::ipad::a_brush_or_spot_stroke_starts_where_the_finger_touched ... ok
+test tests::ipad::a_presets_long_press_menu_previews_and_applies_it ... ok
+test tests::ipad::a_sliders_name_menu_resets_it ... ok
+test tests::ipad::a_versions_long_press_menu_previews_and_restores_it ... ok
+test tests::ipad::the_bottom_bars_label_button_sets_and_clears_the_colour_label ... ok
+test tests::ipad::the_select_several_strips_sync_copies_settings_to_the_other_photos ... ok
+test tests::ipad::the_curve_menu_deletes_the_point_under_the_press ... ok
+test tests::ipad::the_loupe_shows_select_several_above_the_filmstrip_and_done_ends_it ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 1916 filtered out; finished in 8.27s
+

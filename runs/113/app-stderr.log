@@ -1,0 +1,56 @@
+2026-11-09T02:12:48.339Z INFO  [main] rawpad::ios: log file /Users/runner/Library/Developer/CoreSimulator/Devices/560CD563-3A24-434E-9AA6-6D016EF02D15/data/Containers/Data/Application/75D216ED-5B04-4F26-9593-BC458A8BB8A2/Documents/Logs/lightcraft.log
+2026-11-09T02:12:48.342Z INFO  [main] rawpad::ios: RawPad 0.19.0 starting
+2026-11-09T02:12:48.986Z WARN  [main] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+    The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-11-09T02:12:48.988Z WARN  [main] wgpu_core::instance: DownlevelCapabilities {
+        flags: DownlevelFlags(
+            COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+        ),
+        limits: DownlevelLimits,
+        shader_model: Sm5,
+    }
+2026-11-09T02:12:51.475Z INFO  [main] rawpad::ios: library /Users/runner/Library/Developer/CoreSimulator/Devices/560CD563-3A24-434E-9AA6-6D016EF02D15/data/Containers/Data/Application/75D216ED-5B04-4F26-9593-BC458A8BB8A2/Library/Application Support/RawPad Library: 24 photos (0 log records replayed)
+2026-11-09T02:12:51.486Z INFO  [main] rawpad::ios::control_server: control server listening on 127.0.0.1:7980
+2026-11-09T02:12:51.538Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-11-09T02:12:51.547Z INFO  [main] rawpad::ios: safe area (points): top 0 left 0 bottom 25 right 0
+2026-11-09T02:12:51.582Z WARN  [lc-gpu-init] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+    The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-11-09T02:12:51.583Z WARN  [lc-gpu-init] wgpu_core::instance: DownlevelCapabilities {
+        flags: DownlevelFlags(
+            COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+        ),
+        limits: DownlevelLimits,
+        shader_model: Sm5,
+    }
+2026-11-09T02:12:59.054Z INFO  [lc-gpu-init] lightcraft_gpu::ctx: gpu: Apple iOS simulator GPU (Metal), 49 kernels in 7468 ms, buffers ≤ 256 MiB
+2026-11-09T02:18:24.330Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x5D flags 0x200000 "5" down
+2026-11-09T02:18:24.334Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x5D flags 0x200000 "5" up
+2026-11-09T02:18:26.499Z INFO  [main] rawpad::native: keyboard (UIKit): key 0xE3 flags 0x100000 "" down
+2026-11-09T02:18:26.802Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x1D flags 0x100000 "z" down
+2026-11-09T02:18:26.804Z INFO  [main] rawpad::native: keyboard (UIKit): key 0x1D flags 0x100000 "z" up
+2026-11-09T02:18:26.805Z INFO  [main] rawpad::native: keyboard (UIKit): key 0xE3 flags 0x100000 "" up
+2026-11-09T02:18:36.084Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-11-09T02:18:36.658Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 0 pt
+2026-11-09T02:18:46.231Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-11-09T02:18:46.301Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 0 pt, UI shrunk by 0 pt
+2026-11-09T02:18:49.729Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-11-09T02:18:50.024Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 0 pt
+2026-11-09T02:18:56.824Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-11-09T02:18:56.945Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 0 pt, UI shrunk by 0 pt
+2026-11-09T02:18:59.122Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for text field (on-screen keyboard) taken
+2026-11-09T02:18:59.203Z INFO  [main] rawpad::ios: keyboard: lifting the UI above the on-screen keyboard (field bottom Some(1019.46875), keyboard top 898)
+2026-11-09T02:18:59.206Z INFO  [main] rawpad::ios: keyboard: focused text field out of view, on-screen keyboard kept up
+2026-11-09T02:18:59.217Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 257 pt
+2026-11-09T02:19:08.268Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 257 pt, UI shrunk by 0 pt
+2026-11-09T02:19:08.315Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-11-09T02:19:08.356Z INFO  [main] rawpad::ios: keyboard (UIKit): on-screen keyboard covers 0 pt, UI shrunk by 0 pt
+2026-11-09T02:20:23.978Z WARN  [main] rawpad::ios: memory warning: saving, dropping cached photos and returning freed memory
+2026-11-09T02:20:24.086Z WARN  [main] rawpad::ios: memory warning: caches held 661.5 MB, now 50.0 MB
+2026-11-09T02:20:24.086Z WARN  [main] rawpad::ios: memory warning: returned 0.0 MB of free pages
+2026-11-09T02:20:28.467Z WARN  [main] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-11-09T02:20:57.042Z WARN  [export] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-11-09T02:21:10.528Z INFO  [main] rawpad::native: share sheet for /Users/runner/Library/Developer/CoreSimulator/Devices/560CD563-3A24-434E-9AA6-6D016EF02D15/data/Containers/Data/Application/75D216ED-5B04-4F26-9593-BC458A8BB8A2/Documents/Exports/LC01214.jpg
+2026-11-09T02:21:30.215Z WARN  [export] lightcraft_gpu: gpu: rendering on the CPU instead: GPU render: 6000×4000 needs 275 MiB buffers, over the device's 256 MiB storage-buffer limit
+2026-11-09T02:21:44.708Z INFO  [export] rawpad::native: photos: saving /Users/runner/Library/Developer/CoreSimulator/Devices/560CD563-3A24-434E-9AA6-6D016EF02D15/data/Containers/Data/Application/75D216ED-5B04-4F26-9593-BC458A8BB8A2/Documents/Exports/LC01221.jpg (permission status 3)
+2026-11-09T02:23:17.610Z INFO  [export] rawpad::native: photos: saved /Users/runner/Library/Developer/CoreSimulator/Devices/560CD563-3A24-434E-9AA6-6D016EF02D15/data/Containers/Data/Application/75D216ED-5B04-4F26-9593-BC458A8BB8A2/Documents/Exports/LC01221.jpg
+2026-11-09T02:23:50.720Z INFO  [main] rawpad::ios: suspended: library and view saved (0 changes unsaved)

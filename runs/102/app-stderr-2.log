@@ -1,0 +1,26 @@
+2026-11-08T20:30:48.531Z INFO  [main] rawpad::ios: log file /Users/runner/Library/Developer/CoreSimulator/Devices/560CD563-3A24-434E-9AA6-6D016EF02D15/data/Containers/Data/Application/24E2FA4C-EBD2-4F06-9347-3F21CB035F0B/Documents/Logs/lightcraft.log
+2026-11-08T20:30:48.539Z INFO  [main] rawpad::ios: RawPad 0.19.0 starting
+2026-11-08T20:30:49.075Z WARN  [main] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+    The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-11-08T20:30:49.076Z WARN  [main] wgpu_core::instance: DownlevelCapabilities {
+        flags: DownlevelFlags(
+            COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+        ),
+        limits: DownlevelLimits,
+        shader_model: Sm5,
+    }
+2026-11-08T20:30:49.144Z INFO  [main] rawpad::ios: library /Users/runner/Library/Developer/CoreSimulator/Devices/560CD563-3A24-434E-9AA6-6D016EF02D15/data/Containers/Data/Application/24E2FA4C-EBD2-4F06-9347-3F21CB035F0B/Library/Application Support/RawPad Library: 25 photos (22 log records replayed)
+2026-11-08T20:30:49.151Z INFO  [main] rawpad::ios::control_server: control server listening on 127.0.0.1:7980
+2026-11-08T20:30:49.169Z INFO  [main] rawpad::native: keyboard (UIKit): first responder for keys taken
+2026-11-08T20:30:49.174Z INFO  [main] rawpad::ios: safe area (points): top 0 left 0 bottom 25 right 0
+2026-11-08T20:30:49.184Z WARN  [lc-gpu-init] wgpu_core::instance: Missing downlevel flags: DownlevelFlags(INDIRECT_EXECUTION | BASE_VERTEX | CUBE_ARRAY_TEXTURES | COMPARISON_SAMPLERS)
+    The underlying API or device in use does not support enough features to be a fully compliant implementation of WebGPU. A subset of the features can still be used. If you are running this program on native and not in a browser and wish to limit the features you use to the supported subset, call Adapter::downlevel_properties or Device::downlevel_properties to get a listing of the features the current platform supports.
+2026-11-08T20:30:49.184Z WARN  [lc-gpu-init] wgpu_core::instance: DownlevelCapabilities {
+        flags: DownlevelFlags(
+            COMPUTE_SHADERS | FRAGMENT_WRITABLE_STORAGE | READ_ONLY_DEPTH_STENCIL | NON_POWER_OF_TWO_MIPMAPPED_TEXTURES | INDEPENDENT_BLEND | VERTEX_STORAGE | ANISOTROPIC_FILTERING | FRAGMENT_STORAGE | MULTISAMPLED_SHADING | DEPTH_TEXTURE_AND_BUFFER_COPIES | WEBGPU_TEXTURE_FORMAT_SUPPORT | BUFFER_BINDINGS_NOT_16_BYTE_ALIGNED | UNRESTRICTED_INDEX_BUFFER | FULL_DRAW_INDEX_UINT32 | DEPTH_BIAS_CLAMP | VIEW_FORMATS | UNRESTRICTED_EXTERNAL_TEXTURE_COPIES | SURFACE_VIEW_FORMATS | NONBLOCKING_QUERY_RESOLVE | SHADER_F16_IN_F32 | MSL2_1 | TEXTURE_COMPRESSION,
+        ),
+        limits: DownlevelLimits,
+        shader_model: Sm5,
+    }
+2026-11-08T20:30:50.344Z INFO  [lc-gpu-init] lightcraft_gpu::ctx: gpu: Apple iOS simulator GPU (Metal), 49 kernels in 1146 ms, buffers ≤ 256 MiB
+2026-11-08T20:31:08.530Z WARN  [main] lightcraft_engine::disk_space: disk space: 26108444672 of 343073095680 bytes free; the preview cache takes 7390192 bytes

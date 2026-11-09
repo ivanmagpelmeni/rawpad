@@ -1,0 +1,52 @@
+[1m[33mwarning[0m: patch `egui_demo_lib v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[33mwarning[0m: patch `egui_inspection v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[33mwarning[0m: patch `egui_system_font_provider v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[96mhelp[0m: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+[1m[92m   Compiling[0m lightcraft-geom v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/geom)
+[1m[92m   Compiling[0m lightcraft-tiff v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/tiff)
+[1m[92m   Compiling[0m lightcraft-faces v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/faces)
+[1m[92m   Compiling[0m lightcraft-color v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/color)
+[1m[92m   Compiling[0m lightcraft-raster v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/raster)
+[1m[92m   Compiling[0m lightcraft-meta v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/meta)
+[1m[92m   Compiling[0m lightcraft-develop v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/develop)
+[1m[92m   Compiling[0m lightcraft-raw v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/raw)
+[1m[92m   Compiling[0m lightcraft-denoise-core v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/denoise-core)
+[1m[92m   Compiling[0m lightcraft-denoise v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/denoise)
+[1m[92m   Compiling[0m lightcraft-pipeline v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/pipeline)
+[1m[92m   Compiling[0m lightcraft-codecs v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/codecs)
+[1m[92m   Compiling[0m lightcraft-scenes v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/scenes)
+[1m[92m   Compiling[0m lightcraft-engine v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/engine)
+[1m[33mwarning[0m: lightcraft-engine@0.19.0: no craft-fonts embedded: Chinese and Japanese text will render as empty boxes. Clone https://github.com/storytold/craft-fonts next to this repo and rebuild with CRAFT_FONTS_DIR=../craft-fonts
+[1m[92m   Compiling[0m lightcraft-preview v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/preview)
+[1m[92m   Compiling[0m lightcraft-fetch v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/fetch)
+[1m[92m   Compiling[0m lightcraft-merge v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/merge)
+[1m[92m   Compiling[0m lightcraft-gpu v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/gpu)
+[1m[92m   Compiling[0m lightcraft-catalog v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/catalog)
+[1m[92m   Compiling[0m lightcraft-lensdb v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/lensdb)
+[1m[92m   Compiling[0m lightcraft-slideshow v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/slideshow)
+[1m[92m   Compiling[0m lightcraft-ui-egui v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/ui-egui)
+[1m[92m   Compiling[0m lightcraft-geocode v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/geocode)
+[1m[92m   Compiling[0m lightcraft-testkit v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/testkit)
+[1m[92m    Finished[0m `test` profile [optimized + debuginfo] target(s) in 5m 44s
+[1m[92m     Running[0m unittests src/lib.rs (target/debug/deps/lightcraft_ui_egui-411a1ff461b96dd7)
+
+running 13 tests
+test tests::ipad::a_curve_channels_long_press_menu_resets_it ... ok
+test tests::ipad::a_colour_wheels_long_press_menu_resets_it ... ok
+test tests::ipad::a_narrow_bottom_bar_shows_the_compact_rating_pill ... ok
+test tests::ipad::a_history_steps_long_press_menu_previews_and_goes_back_to_it ... ok
+test tests::ipad::a_brush_or_spot_stroke_starts_where_the_finger_touched ... ok
+test tests::ipad::a_sliders_name_menu_resets_it ... ok
+test tests::ipad::a_presets_long_press_menu_previews_and_applies_it ... ok
+test tests::ipad::an_effect_presets_long_press_menu_adds_it_to_the_selection ... ok
+test tests::ipad::a_versions_long_press_menu_previews_and_restores_it ... ok
+test tests::ipad::the_bottom_bars_label_button_sets_and_clears_the_colour_label ... ok
+test tests::ipad::the_curve_menu_deletes_the_point_under_the_press ... ok
+test tests::ipad::the_loupe_shows_select_several_above_the_filmstrip_and_done_ends_it ... ok
+test tests::ipad::the_select_several_strips_sync_copies_settings_to_the_other_photos ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 1916 filtered out; finished in 7.34s
+

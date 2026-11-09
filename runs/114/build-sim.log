@@ -1,0 +1,44 @@
+[1m[33mwarning[0m: patch `egui_demo_lib v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[33mwarning[0m: patch `egui_inspection v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[33mwarning[0m: patch `egui_system_font_provider v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+[1m[96mhelp[0m: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+[1m[92m   Compiling[0m lightcraft-geom v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/geom)
+[1m[92m   Compiling[0m ring v0.17.14
+[1m[92m   Compiling[0m lightcraft-tiff v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/tiff)
+[1m[92m   Compiling[0m lightcraft-color v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/color)
+[1m[92m   Compiling[0m lightcraft-raster v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/raster)
+[1m[92m   Compiling[0m lightcraft-meta v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/meta)
+[1m[92m   Compiling[0m lightcraft-develop v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/develop)
+[1m[92m   Compiling[0m rustls-webpki v0.103.16
+[1m[92m   Compiling[0m rustls v0.23.46
+[1m[92m   Compiling[0m lightcraft-raw v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/raw)
+[1m[92m   Compiling[0m lightcraft-inpaint v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/inpaint)
+[1m[92m   Compiling[0m lightcraft-codecs v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/codecs)
+[1m[92m   Compiling[0m lightcraft-pipeline v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/pipeline)
+[1m[92m   Compiling[0m rustls-rustcrypto v0.0.2-alpha
+[1m[92m   Compiling[0m rustls-platform-verifier v0.7.1
+[1m[92m   Compiling[0m lightcraft-faces v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/faces)
+[1m[92m   Compiling[0m lightcraft-scenes v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/scenes)
+[1m[92m   Compiling[0m lightcraft-engine v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/engine)
+[1m[92m   Compiling[0m lightcraft-preview v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/preview)
+[1m[92m   Compiling[0m ureq v3.4.2
+[1m[92m   Compiling[0m lightcraft-gpu v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/gpu)
+[1m[33mwarning[0m: lightcraft-engine@0.19.0: no craft-fonts embedded: Chinese and Japanese text will render as empty boxes. Clone https://github.com/storytold/craft-fonts next to this repo and rebuild with CRAFT_FONTS_DIR=../craft-fonts
+[1m[92m   Compiling[0m lightcraft-fetch v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/fetch)
+[1m[92m   Compiling[0m lightcraft-merge v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/merge)
+[1m[92m   Compiling[0m lightcraft-ui-egui v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/ui-egui)
+[1m[92m   Compiling[0m lightcraft-catalog v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/catalog)
+[1m[92m   Compiling[0m lightcraft-lensdb v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/lensdb)
+[1m[92m   Compiling[0m lightcraft-denoise-core v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/denoise-core)
+[1m[92m   Compiling[0m lightcraft-slideshow v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/slideshow)
+[1m[92m   Compiling[0m lightcraft-geocode v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/geocode)
+[1m[92m   Compiling[0m craft-update v0.1.0 (https://github.com/storytold/craft-libs?rev=a231e517c3b371e1bf0ee8af71ed807424a9a05d#a231e517)
+[1m[92m   Compiling[0m lightcraft-sysmem v0.19.0 (/Users/runner/work/rawpad/rawpad/crates/sysmem)
+[1m[92m   Compiling[0m rawpad-ios v0.19.0 (/Users/runner/work/rawpad/rawpad/apps/rawpad-ios)
+[1m[92m    Finished[0m `release` profile [optimized + debuginfo] target(s) in 4m 49s
+target/ipad/sim/Payload/RawPad.app/Info.plist: OK
+target/ipad/sim/Payload/RawPad.app: replacing existing signature
+built target/ipad/sim/RawPad.app (1.114)
