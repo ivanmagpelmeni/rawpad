@@ -437,6 +437,20 @@ def main():
                 print(f"    captured {name} = {json.dumps(names[name])[:80]}")
                 if names[name] is None:
                     failures.append(f"{step['method']}: nothing at {path} to capture as {name}: {json.dumps(reply)[:300]}")
+            for path, want_value in step.get("expectEquals", {}).items():
+                # {"expectEquals": {"result.available": true}}: a field of the reply must be this
+                got_value = dig(reply, path) if ok else None
+                if got_value != want_value:
+                    msg = f"{step['method']}: {path} is {json.dumps(got_value)[:200]}, expected {json.dumps(want_value)}"
+                    print(f"ERR {msg}")
+                    (warnings if step.get("soft") else failures).append(msg)
+            for path in step.get("expectAbsent", []):
+                # {"expectAbsent": ["result.files.0.gpuFallback"]}: the reply must not have it
+                # (the GPU export really ran on the GPU, DECISIONS 92)
+                if ok and dig(reply, path) is not None:
+                    msg = f"{step['method']}: {path} should be absent: {json.dumps(dig(reply, path))[:200]}"
+                    print(f"ERR {msg}")
+                    (warnings if step.get("soft") else failures).append(msg)
             if step.get("expectOk") and not ok:
                 failures.append(f"{step['method']} {json.dumps(step.get('params', {}))[:120]} failed: {json.dumps(reply)[:300]}")
             want = step.get("expectPhotosAtLeast")
