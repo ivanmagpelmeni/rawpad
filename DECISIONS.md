@@ -613,3 +613,14 @@ morning session, which had taken 45 and 46.
     tests) a long-press on a curve channel button opens the curve's existing reset menu for that
     channel (`curveMenu:resetChannel`, `curveMenu:resetAll`); a long-press on a colour wheel opens
     "Reset <wheel>" (`wheelMenu:reset:<key>`). The double-tap still works. Tests in `tests/ipad.rs`.
+
+## 2026-11-09: GPU against CPU in the tour (scheduled session, 00:54 Berlin)
+
+92. **2026-11-09: The tour compares a Metal export with a CPU export of the same photo** (Phase 1's
+    open "pixel comparison against the CPU reference"). It exports photo 1 as a 1200 px PNG with
+    GPU rendering on, again with `app.gpu {"enabled": false}`, turns the GPU back on, and
+    `compareImages` in `ios/sim_test.py` (a pure-Python PNG reader: the CI Mac has no imaging
+    library) reports the mean and the 99.9th-percentile difference per sample (0–255). Limits
+    to start: mean ≤ 2, 99.9 % ≤ 24. **Soft** until a run shows the real numbers and that the
+    first export didn't fall back to the CPU (run 105's full-size 6000×4000 export did: it needs
+    275 MiB of buffers, over the simulator's 256 MiB limit, hence the small export).
