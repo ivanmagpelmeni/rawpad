@@ -319,27 +319,6 @@
 {"method":"engine.execute","params":{"command":"app.export","params":{"ids":[1],"format":"png","longEdge":1200,"path":"$APPDATA/Documents/gpu-check-cpu.png"}},"expectOk":true,"capture":{"cpuFile":"result.files.0.path"}}
 {"method":"engine.execute","params":{"command":"app.gpu","params":{"enabled":true}},"expectOk":true}
 {"compareImages":["$gpuFile","$cpuFile"],"maxMean":0.5,"maxP999":4}
-# a background export, as the Export dialog does (the Share button watches that path). No Photos
-# here: the simulator's photolibraryd sometimes never answers (runs 22, 24, 26; DECISIONS.md 38)
-{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[2],"format":"jpeg","background":true}},"expectOk":true}
-{"waitUntil":"export.last","method":"ui.inspect","timeout":120}
-{"sleep":1}
-# after an export: the Share button for the files just written (rawpad-ios src/share_offer.rs)
-{"method":"ui.widgets","params":{"filter":"rawpadShare"}}
-{"shot":"05-share-offer"}
-{"method":"ui.clickWidget","params":{"id":"button:rawpadShareExport"},"expectOk":true}
-{"sleep":4}
-{"shot":"06-share-sheet"}
-# the log file (Files ▸ On My iPad ▸ RawPad ▸ Logs)
-{"checkFiles":"Documents/Logs","min":1}
-# Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome).
-# Soft: a timeout only warns, because the same code passed in runs 20, 21, 25 and hung in 22, 24, 26
-# Not expectOk: with the share sheet over it the app sometimes draws no frame for 5 s and the control
-# server refuses the request (run 48, run 49); passed in runs 46 and 47
-{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[3],"format":"jpeg","addToPhotos":true,"background":true}}}
-{"waitUntil":"imports.imported","method":"engine.execute","params":{"command":"export.photosImports","params":{}},"timeout":180,"soft":true}
-{"method":"ui.inspect"}
-# (Help › Open Log Folder → share sheet was checked in runs 15/16; a second sheet can't open over this one)
 # crash safety (P6, DECISIONS 72): rate photo 2, open it, send RawPad to the background (it saves
 # on `suspended`), kill it with simctl terminate (no callback, like iPadOS ending a suspended app)
 # and launch it again: the library, the rating and the open photo must come back. All hard since
@@ -367,3 +346,27 @@
 {"sleep":10}
 {"shot":"15-grid-after-relaunch"}
 {"memory":"grid-after-relaunch","maxRssMB":1500,"maxEngineMB":1200,"maxPreviews":3}
+# The share sheet comes last (DECISIONS 95): with it open the app sometimes draws no frame for
+# 5 s and the control server refuses every request after it (runs 48, 49, 111), which used to fail
+# the crash-safety steps. Nothing after the sheet is hard except the end-of-tour "still running".
+# a background export, as the Export dialog does (the Share button watches that path). No Photos
+# here: the simulator's photolibraryd sometimes never answers (runs 22, 24, 26; DECISIONS.md 38)
+{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[2],"format":"jpeg","background":true}},"expectOk":true}
+{"waitUntil":"export.last","method":"ui.inspect","timeout":120}
+{"sleep":1}
+# after an export: the Share button for the files just written (rawpad-ios src/share_offer.rs)
+{"method":"ui.widgets","params":{"filter":"rawpadShare"}}
+{"shot":"05-share-offer"}
+{"method":"ui.clickWidget","params":{"id":"button:rawpadShareExport"},"expectOk":true}
+{"sleep":4}
+{"shot":"06-share-sheet"}
+# the log file (Files ▸ On My iPad ▸ RawPad ▸ Logs)
+{"checkFiles":"Documents/Logs","min":1}
+# Add to Apple Photos (saved by PHPhotoLibrary on a worker; see replies.jsonl for the outcome).
+# Soft: a timeout only warns, because the same code passed in runs 20, 21, 25 and hung in 22, 24, 26
+# Not expectOk: with the share sheet over it the app sometimes draws no frame for 5 s and the control
+# server refuses the request (run 48, run 49); passed in runs 46 and 47
+{"method":"engine.execute","params":{"command":"app.export","params":{"ids":[3],"format":"jpeg","addToPhotos":true,"background":true}}}
+{"waitUntil":"imports.imported","method":"engine.execute","params":{"command":"export.photosImports","params":{}},"timeout":180,"soft":true}
+{"method":"ui.inspect"}
+# (Help › Open Log Folder → share sheet was checked in runs 15/16; a second sheet can't open over this one)

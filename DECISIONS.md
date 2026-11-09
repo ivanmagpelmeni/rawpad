@@ -647,3 +647,13 @@ morning session, which had taken 45 and 46.
     `expectAbsent ["result.files.0.gpuFallback"]` on the GPU export. Both fail the tour.
     Only the simulator's Metal is checked; a real iPad's GPU is the same code, but if Ivan ever
     sees colours differ between the photo on screen and an export, this is where to look.
+
+95. **2026-11-09: The share sheet is the tour's last step** (scheduled session, 02:54 Berlin).
+    Branch run 111 failed only because, with the share sheet open, the app drew no frame for 5 s
+    and the control server refused the crash-safety steps after it (rate, select, open photo,
+    the `suspended` log line). The same thing failed runs 48 and 49. Nothing in the app is wrong:
+    on the iPad the person is using the sheet then, and RawPad redraws once it closes. So the
+    background export, the Share button, the sheet and the soft Add to Photos step now run after
+    everything else, and only the end-of-tour "RawPad still running" check follows them. A
+    native "dismiss the sheet" command was the alternative; it needs `unsafe` UIKit calls for a
+    test-only need, so not now.
