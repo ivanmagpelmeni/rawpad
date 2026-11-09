@@ -613,3 +613,16 @@ morning session, which had taken 45 and 46.
     tests) a long-press on a curve channel button opens the curve's existing reset menu for that
     channel (`curveMenu:resetChannel`, `curveMenu:resetAll`); a long-press on a colour wheel opens
     "Reset <wheel>" (`wheelMenu:reset:<key>`). The double-tap still works. Tests in `tests/ipad.rs`.
+
+## 2026-11-08: Hover-only hints, the rest (scheduled session, 23:54 Berlin)
+
+91. **2026-11-08: Picking several mask effect presets by touch = the row's long-press menu.**
+    Went through every remaining `double_clicked()` and hover hint in the UI crate. Crop's
+    straighten hint ("double-click for Auto") already has an *Auto* button beside it; History's
+    versions ("double-click to rename") already have *Rename…* in their long-press menu; masks,
+    mask components and keywords have long-press menus with the same actions; the histogram's
+    double-tap reset works with a finger. The one real gap: Manage Effect Presets picks several
+    presets only with ⌘ or Shift. On iOS (and in unit tests) a long-press on a row now opens
+    *Add to Selection* / *Remove from Selection* (`effectMenu:toggle:<name>`); a tap still
+    selects just that row, and a group heading still selects the group. No new mode or strip
+    (unlike the grid's Select Several, 58): the window is small and rarely used.
