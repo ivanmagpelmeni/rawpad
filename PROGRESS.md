@@ -67,6 +67,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-09 (00:54–01:40 Berlin, unattended)**
+1. Main run 107 green (0 tour ERR): **release 1.107** (long-press reset menus for curve channels and colour wheels).
+2. Branch run 106 green, so **`p7-effect-select` is merged into main** (28048beb); main run 109 builds the next release.
+3. The audit's small touch targets (mask handles, radial rotate knob) were already done in October (DECISIONS 53, 57): the whole "still broken" list is done.
+4. New branch `p1-gpu-check`: the CI tour now exports the same photo with the iPad GPU and with the CPU and compares the pixels (DECISIONS 92), a soft check for now. Branch run 108's tour was still running at handoff.
+5. Upstream still at 0.19.0. Nothing new for Ivan: his list is the same (update to 1.107 or later).
+
 **2026-11-08 (23:54–00:40 Berlin, unattended)**
 1. Main run 104 green (0 tour ERR): **release 1.104** is out (upstream LightCraft 0.19.0 on the iPad).
 2. Branch run 105 green (0 tour ERR, menus on the screenshots), so **`p7-reset-hints` is merged into main** (0969f8b3); main run 107 builds the next release.
@@ -341,8 +348,8 @@ Classic setup steps and source fix.
 ## Phases
 
 - [x] **0. Kickoff:** brief, public fork, docs, CI, SideStore steps (`SETUP.md`)
-- [x] **1. Engine compiles for iOS** (sim + device) in CI. (A pixel comparison against the CPU
-      reference is still to add to the tour.)
+- [x] **1. Engine compiles for iOS** (sim + device) in CI. (Pixel comparison against the CPU
+      reference: branch `p1-gpu-check`, DECISIONS 92, soft so far.)
 - [x] **2. App shell** launches on the iPad simulator with the LightCraft UI on Metal and the demo
       library; CI screenshots
 - [ ] **3. First install on Ivan's iPad via SideStore**: release 1.8 is ready, waiting for Ivan
@@ -363,7 +370,7 @@ Classic setup steps and source fix.
   - [x] hard memory limits in the tour: 1500 MB resident, 1200 MB engine caches, 3 previews (DECISIONS 73, 74)
   - [x] 24 MP ARW test in the tour (merged: CC0 A7 III ARW in the tour, DECISIONS 70)
 - [ ] **7. Parity sweep against upstream** (minus AI and the second display):
-  - touch polish
+  - touch polish: the audit's "still broken" list is done (DECISIONS 53–63, 79–81, 90, 91)
   - ~~hide the AI mask tiles~~ and ~~AI items in mask menus~~ (done); ArtCraft links kept
     (DECISIONS.md 26)
   - craft-fonts in release builds
@@ -371,9 +378,9 @@ Classic setup steps and source fix.
 
 ## Current status
 
-Main: **upstream LightCraft v0.19.0 merged** 2026-11-08 (a0de4dbb; branch run 103 green with 0
-failed tour taps); main run 104 builds release 1.104. Branch `p7-reset-hints` (DECISIONS 90):
-long-press reset menus for the curve channel buttons and the colour wheels; branch run 105.
+Main: upstream LightCraft v0.19.0 (merged 2026-11-08) plus the long-press reset menus
+(release 1.107) and the effect-preset long-press (merged 2026-11-09, main run 109). Branch
+`p1-gpu-check` (DECISIONS 92): GPU vs CPU export comparison in the tour; branch run 108.
 CI checks build, fmt, unit tests, clippy, the simulator tour (sliders, radial and brush
 masks, pinch/pan, hardware keys with rating 5 and ⌘Z undo as hard checks, search box with
 on-screen keyboard and typing, caption and a low Info field with the keyboard, Select Several and
@@ -382,11 +389,9 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check main run 107** (merge of `p7-reset-hints`, next release) and **branch run 106**
-   (`p7-effect-select`); if 106 is clean and no main run is going, merge `p7-effect-select`.
-2. **Phase 7, touch polish:** the remaining items of the audit's "still broken" list: small touch
-   targets (mask handles, the radial mask's rotate knob) — check what the 2026-10-25 touch-target
-   work left, from the screenshots `03-masking.jpg`/`03-brush.jpg`.
+1. **Check main run 109** (merge of `p7-effect-select`, next release).
+2. **Phase 1, GPU vs CPU check:** read branch run 108's `compareImages` numbers and whether the
+   GPU export really ran on Metal; then make the check hard and merge `p1-gpu-check` (HANDOFF).
 3. **Delete the 0.19 leftovers:** `lightcraft-sysmem` in `apps/rawpad-ios/Cargo.toml` once a
    Cargo.lock can be regenerated in CI; the merged branches list in HANDOFF.
 
@@ -399,7 +404,7 @@ Also queued:
 ### This week: what to test on the iPad (start here)
 
 First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
-**My Apps** › **Update** next to RawPad (pick the newest: 1.104 or later; it brings ten upstream LightCraft releases at once, up to 0.19.0). Then try
+**My Apps** › **Update** next to RawPad (pick the newest: 1.107 or later; it brings ten upstream LightCraft releases at once, up to 0.19.0). Then try
 these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
 
 1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several

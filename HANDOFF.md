@@ -3,34 +3,37 @@
 The handoff between sessions. Each session overwrites this about every 45 minutes and at its
 end. The next session reads it **first**.
 
-- **Written:** 2026-11-09, about 00:30 Berlin, by the scheduled session (23:54–00:40 Berlin).
-- **Upstream:** **v0.19.0** (2026-11-06) is merged on main and released (1.104).
-- **Main:** 0969f8b3 = merge of `p7-reset-hints` (long-press reset menus for curve channel
-  buttons and colour wheels, DECISIONS 90). It started **main run 107**
-  (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42534895184), which builds the next
-  release. Main runs take ~45–90 minutes now (the device build alone took ~30 min in run 104).
-  **Don't push code to main until it ends.**
+- **Written:** 2026-11-09, about 01:35 Berlin, by the scheduled session (00:54–01:40 Berlin).
+- **Upstream:** **v0.19.0** (2026-11-06) is still the newest (checked with `git ls-remote --tags`).
+- **Main:** 28048beb = merge of `p7-effect-select` (long-press on a Manage Effect Presets row,
+  DECISIONS 91). It started **main run 109**
+  (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42538830192), which builds the next
+  release. **Don't push code to main until it ends.**
 - **Done this session:**
-  - Main run 104: success, `runs/104/tour.log` 0 ERR/FAIL, **release v1.104** published
-    (23:21 UTC). Branch run 105: success, 0 ERR, `08-before-after-menu.jpg` shows the ⌄ menu.
-  - Merged `p7-reset-hints` into main (no conflicts).
-  - Went through every `double_clicked()` / hover hint left in `crates/ui-egui/src`: crop's
-    straighten (Auto button exists), History versions (Rename… in their menu), masks,
-    components, keywords (long-press menus), histogram (double-tap works). One gap: **branch
-    `p7-effect-select`** (bf98d1d1 + docs): Manage Effect Presets' long-press on a row =
-    Add to / Remove from Selection (`effectMenu:toggle:<name>`), test
-    `an_effect_presets_long_press_menu_adds_it_to_the_selection`, DECISIONS 91, UPSTREAM row.
-    It is based on `p7-reset-hints`, so it merges cleanly onto main.
-  - **Branch run 106** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42532729438):
-    fmt and both unit-test steps (with the new test) green; simulator build/tour running at
-    handoff. Report lands in `runs/106/`.
+  - Main run 107 (`p7-reset-hints`): success, `runs/107/tour.log` 0 ERR/FAIL, **release v1.107**.
+  - Branch run 106 (`p7-effect-select`): success, 0 ERR, the new unit test ran (13 iPad tests
+    passed). Merged into main.
+  - PROGRESS › Next 3 tasks › 2 (small touch targets) is already done: DECISIONS 53 and 57
+    (22 pt grab radius for mask pins/handles, a separate 7 pt rotate knob 44 pt out);
+    `runs/105/03-masking.jpg` shows the knob. The audit's "still broken" list is now all done.
+  - **New branch `p1-gpu-check`** (Phase 1's leftover: GPU vs CPU pixel comparison, DECISIONS 92):
+    the tour exports photo 1 as a 1200 px PNG with Metal, again with `app.gpu {"enabled": false}`,
+    and the new `compareImages` step in `ios/sim_test.py` prints the mean / 99.9 % / max
+    difference. **Soft check** (warning only). Main was merged into the branch afterwards
+    (4b0b4cf6, docs conflict in DECISIONS.md resolved).
+  - **Branch run 108** (https://github.com/ivanmagpelmeni/rawpad/actions/runs/42537859931) on
+    6776480f: build and unit tests green; the simulator tour was still running at handoff.
 - **Very next step:**
-  1. Check main run 107's conclusion, `runs/107/tour.log` (grep ERR) and the new release
-     (`…/releases?per_page=2`). If red: fix on main, or `git revert -m 1 0969f8b3`.
-  2. Check run 106 (`runs/106/tour.log` no ERR). If clean and no main run is going:
-     `git checkout main; git merge --ff-only origin/main; git merge --no-ff
-     origin/p7-effect-select`, push, watch the main run.
-  3. Then PROGRESS › Next 3 tasks › 2 (small touch targets left: mask handles, radial rotate knob).
+  1. Check main run 109 and the new release (`…/releases?per_page=2`); `runs/109/tour.log` no ERR.
+     If red: fix on main, or `git revert -m 1 28048beb`.
+  2. Read run 108's `runs/108/tour.log`: `grep compareImages` gives the numbers; in
+     `runs/108/replies.jsonl` the export with `gpu-check-gpu.png` must have **no** `gpuFallback`
+     (else the GPU never ran and the check compares CPU with CPU: then try a smaller `longEdge`
+     or look at `app.gpu`'s reply just before it). Also check that both exports said ok.
+  3. If the numbers are fine and the GPU really ran: set limits a little above what was seen,
+     make the step hard (drop `"soft": true`), push, run the branch again, then merge into main
+     (after run 109). If the numbers are bad: that's a real Metal rendering difference on the
+     iPad — find which stage (export a photo with one slider at a time) before anything else.
 - **Open problems:**
   - Returning free pages (DECISIONS 77) freed 0 MB in the simulator; only a real iPad's log
     ("memory warning: returned X MB") would tell. Resident size after zooming out stays ~550 MB.
@@ -51,7 +54,7 @@ end. The next session reads it **first**.
     `p4-touch-all`, `p4-touch-2`, `p4-select-several`, `p4-select-bar`, `p4-select-sync`,
     `p4-reset-menu`, `p4-sync-test`, `p4-preset-preview`, `p4-snapshot-preview`,
     `p4-film-select`, `p4-keyboard-check`, `p4-rotate`, `p4-raw24`, `p6-memtrim`, `p6-relaunch`,
-    `p6-hard-checks`, `p6-preview-cap`, `p6-gpu-pool`, `p7-stroke-start`.
+    `p6-hard-checks`, `p6-preview-cap`, `p6-gpu-pool`, `p7-stroke-start`, `p7-effect-select`.
   - The artifact zip download URL (blob.core.windows.net) is blocked from the sandbox: wait for
     the `ci-artifacts` report.
   - `ui.inspect`'s `window` is [820, 1110] pt in portrait on the CI simulator; the `simctl`
