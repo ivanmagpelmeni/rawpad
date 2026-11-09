@@ -67,6 +67,13 @@ Classic setup steps and source fix.
 
 ## Latest session summary
 
+**2026-11-09 (01:54–02:40 Berlin, unattended)**
+1. Main run 109 green (0 tour ERR; split view on the screenshot): **release 1.109** (long-press on a Manage Effect Presets row).
+2. Run 108's GPU-against-CPU numbers: mean 0.000, max 1 of 255, and the export really ran on Metal. Branch `p1-gpu-check` makes it a hard check with tighter limits and two new reply checks (DECISIONS 93); branch run 110.
+3. New branch `p7-drop-sysmem`: drops the unused `lightcraft-sysmem` dependency (the Cargo.lock worry was unfounded, DECISIONS 94); branch run 111.
+4. Results of runs 110 and 111 and what was merged: see HANDOFF.md.
+5. Upstream still at 0.19.0. Ivan's list is unchanged (update to 1.109 or later).
+
 **2026-11-09 (00:54–01:40 Berlin, unattended)**
 1. Main run 107 green (0 tour ERR): **release 1.107** (long-press reset menus for curve channels and colour wheels).
 2. Branch run 106 green, so **`p7-effect-select` is merged into main** (28048beb); main run 109 builds the next release.
@@ -348,8 +355,8 @@ Classic setup steps and source fix.
 ## Phases
 
 - [x] **0. Kickoff:** brief, public fork, docs, CI, SideStore steps (`SETUP.md`)
-- [x] **1. Engine compiles for iOS** (sim + device) in CI. (Pixel comparison against the CPU
-      reference: branch `p1-gpu-check`, DECISIONS 92, soft so far.)
+- [x] **1. Engine compiles for iOS** (sim + device) in CI. Pixel comparison of a Metal export against
+      the CPU reference in the tour (run 108: max diff 1/255; hard on branch `p1-gpu-check`, DECISIONS 92, 93)
 - [x] **2. App shell** launches on the iPad simulator with the LightCraft UI on Metal and the demo
       library; CI screenshots
 - [ ] **3. First install on Ivan's iPad via SideStore**: release 1.8 is ready, waiting for Ivan
@@ -389,11 +396,15 @@ Apple Photos as a soft check), the export file and the log file.
 
 ## Next 3 tasks
 
-1. **Check main run 109** (merge of `p7-effect-select`, next release).
-2. **Phase 1, GPU vs CPU check:** read branch run 108's `compareImages` numbers and whether the
-   GPU export really ran on Metal; then make the check hard and merge `p1-gpu-check` (HANDOFF).
-3. **Delete the 0.19 leftovers:** `lightcraft-sysmem` in `apps/rawpad-ios/Cargo.toml` once a
-   Cargo.lock can be regenerated in CI; the merged branches list in HANDOFF.
+1. **Merge the two branches** if their runs are clean and no main run is going (one at a time,
+   each needs a main run of ~40 minutes): `p1-gpu-check` (run 110, `compareImages` hard),
+   `p7-drop-sysmem` (run 111). DECISIONS.md conflicts are just both new entries: keep both.
+2. **Phase 6, tiling:** the last open Phase 6 item. First measure: does a full-size export or
+   a zoomed raw ever fail on the iPad? (`lastFallback` says the simulator's Metal can't take a
+   6000×4000 render in one piece; the CPU takes over, so it's slower, not broken.) Decide
+   whether tiling the GPU render is worth it before writing code.
+3. **Phase 7:** craft-fonts in release builds (Chinese/Japanese text), then the next upstream
+   release when it appears.
 
 Also queued:
 - Delete merged branches (no tool for it from the sandbox).
@@ -404,7 +415,7 @@ Also queued:
 ### This week: what to test on the iPad (start here)
 
 First update RawPad: plug the iPad into the PC, make sure AltServer is running, open AltStore ›
-**My Apps** › **Update** next to RawPad (pick the newest: 1.107 or later; it brings ten upstream LightCraft releases at once, up to 0.19.0). Then try
+**My Apps** › **Update** next to RawPad (pick the newest: 1.109 or later; it brings ten upstream LightCraft releases at once, up to 0.19.0). Then try
 these and tell Claude in chat what you see (a sentence per item is plenty; "works" is fine):
 
 1. **Keyboard stays away when editing** (your note from 2026-10-19): open a photo, move several
